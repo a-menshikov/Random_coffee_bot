@@ -75,9 +75,3 @@ class DatabaseManager():
 
     def __del__(self):
         self.conn.close()
-
-
-if __name__ == '__main__':
-    path = '../data/coffee_database.db'
-    db_controller = DatabaseManager(path)
-    db_controller.create_tables()
