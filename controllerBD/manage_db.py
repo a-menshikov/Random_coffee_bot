@@ -1,4 +1,5 @@
 import sqlite3 as lite
+from datetime import datetime
 
 
 class DatabaseManager():
@@ -40,6 +41,11 @@ class DatabaseManager():
             "CREATE TABLE IF NOT EXISTS user_mets"
             "(id INTEGER PRIMARY KEY,"
             "met_info TEXT NOT NULL,"
+            "FOREIGN KEY (id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS holidays_status"
+            "(id INTEGER PRIMARY KEY,"
+            "status INTEGER NOT NULL,"
+            "till_date TEXT,"
             "FOREIGN KEY (id) REFERENCES user_info(id))"
         ]
         for query in queries:
@@ -57,21 +63,16 @@ class DatabaseManager():
             self.cur.execute(query, values)
         self.conn.commit()
 
-    def fetchone(self, query, values=None):
-        """Выполнить запрос и получить одну строку."""
-        if values is None:
-            self.cur.execute(query)
-        else:
-            self.cur.execute(query, values)
-        return self.cur.fetchone()
-
-    def fetchall(self, query, values=None):
-        """Выполнить запрос и получить все строки."""
-        if values is None:
-            self.cur.execute(query)
-        else:
-            self.cur.execute(query, values)
-        return self.cur.fetchall()
+    def update_mets(self, match_info: dict):
+        """Записывает в базу информацию о новых встречах"""
+        today = datetime.now().strftime('%d.%m.%Y')
+        for match in match_info.items():
+            if all(match):
+                first_user = match[0]
+                second_user = match[1]
+                query = ('INSERT INTO met_info(first_user_id,'
+                         'second_user_id, date) VALUES (?,?,?)')
+                self.query(query, (first_user, second_user, today))
 
     def __del__(self):
         self.conn.close()
