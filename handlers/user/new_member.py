@@ -26,11 +26,16 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
     if answer == back_message:
         await question_gender(message)
     else:
-        await bot.send_message(message.from_user.id, 'Теперь вы добавлены в нашу БД. И будете участвовать в распределении на следующей неделе.')
+        await bot.send_message(
+            message.from_user.id,
+            'Теперь вы добавлены в нашу БД. И будете участвовать в распределении на следующей неделе.',
+            reply_markup=ReplyKeyboardRemove()
+        )
         data = await state.get_data()
         date_obj = datetime.strptime(data.get('birthday'), '%d.%m.%Y')
         birthday_for_save = str(date_obj.date())
         add_to_db(message.from_user.id, data.get('name'), birthday_for_save, data.get('about'), data.get('gender'))
+        add_new_user_in_status_table(message.from_user.id)
         await state.reset_state()
 
 async def change_data(message: types.Message, state: FSMContext):
@@ -47,6 +52,19 @@ def add_to_db(chat_id, name, birthday, about, gender):
     cur.execute("""insert into user_info (teleg_id, name, birthday, about, gender) values (
     ?,?,?,?,?)""", (
         chat_id, name, birthday, about, gender
+    ))
+    conn.commit()
+
+def add_new_user_in_status_table(teleg_id):
+    """Добавляем нового пользователя в базу."""
+    conn = sqlite3.connect('data/coffee_database.db')
+    cur = conn.cursor()
+    id_obj = cur.execute(
+        """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
+    )
+    cur.execute("""insert into user_status (id, status) values (
+    ?,?)""", (
+        id_obj.fetchone()[0], 1
     ))
     conn.commit()
 
