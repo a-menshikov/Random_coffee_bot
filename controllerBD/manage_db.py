@@ -45,7 +45,6 @@ class DatabaseManager():
         for query in queries:
             try:
                 self.query(query=query)
-                self.conn.commit()
             except Exception:
                 continue
 
@@ -56,22 +55,6 @@ class DatabaseManager():
         else:
             self.cur.execute(query, values)
         self.conn.commit()
-
-    def fetchone(self, query, values=None):
-        """Выполнить запрос и получить одну строку."""
-        if values is None:
-            self.cur.execute(query)
-        else:
-            self.cur.execute(query, values)
-        return self.cur.fetchone()
-
-    def fetchall(self, query, values=None):
-        """Выполнить запрос и получить все строки."""
-        if values is None:
-            self.cur.execute(query)
-        else:
-            self.cur.execute(query, values)
-        return self.cur.fetchall()
 
     def __del__(self):
         self.conn.close()

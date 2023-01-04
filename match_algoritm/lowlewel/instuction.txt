@@ -1,0 +1,21 @@
+Алгоритмы для задач сопоставления максимальной мощности и задач идеального сопоставления минимальной стоимости в общих графах
+
+to compile:
+    g++ -O3 Example.cpp BinaryHeap.cpp Matching.cpp Graph.cpp -o matchingalogitm
+после этого переместите matchingalogitm.exe в папку matching_alogitm
+
+useage:
+    ./example -f <filename> <--minweight | --max>
+where:
+    `--minweight` for minimum weight perfect matching
+    `--max` for maximum cardinality matching
+
+
+Формат файла:
+первые две строки дают n (количество вершин) и m (количество ребер) соответственно, 
+за которыми следуют m строк, каждая с кортежем (u, v [, c]), представляющим ребра. 
+В каждом кортеже u и v — это конечные точки (индексация на основе 0) ребра, а c — его стоимость. 
+Стоимость необязательна, если указан --max
+
+пример запуска:
+./example -f input.txt --minweight
