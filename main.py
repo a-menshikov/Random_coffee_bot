@@ -1,7 +1,8 @@
 import sqlite3
 from data.config import dp, bot
 from aiogram import executor, types
-from .controllerBD import DatabaseManager
+from match_algoritm import MachingHelper
+from controllerBD import DatabaseManager
 
 
 
@@ -14,6 +15,9 @@ async def process_start_command(message: types.Message):
         text=f'Привет, {name}. У нас вот такой бот. "Регламент".',
     )
     await check_and_add_registration_button(message)
+    help = MachingHelper()
+    res = help.start()
+    await message.answer(res)
 
 
 async def check_and_add_registration_button(message: types.Message):
@@ -41,7 +45,7 @@ registration_keyboard.row(registration)
 
 
 if __name__ == '__main__':
-    path = '/data/coffee_database.db'
+    path = 'C:/Users/User/Desktop/Programming/Data/random_coffee/data/coffee_database.db'
     db_controller = DatabaseManager(path)
     db_controller.create_tables()
     executor.start_polling(dp, skip_updates=True)

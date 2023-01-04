@@ -1,6 +1,4 @@
 import sqlite3 as lite
-
-
 class DatabaseManager():
     """Класс для работы с базой данных."""
 
@@ -56,5 +54,5 @@ class DatabaseManager():
             self.cur.execute(query, values)
         self.conn.commit()
 
-    def __del__(self):
-        self.conn.close()
+    # def __del__(self):
+    #     self.conn.close()
