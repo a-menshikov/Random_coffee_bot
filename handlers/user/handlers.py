@@ -4,53 +4,57 @@ from aiogram import types
 
 from data.config import dp, bot
 
-from aiogram.utils.markdown import hlink
-
-
-def check_user_in_base(message):
-    """Проверяем пользователя на наличие в БД."""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT * FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
-    )
-    if info.fetchone() is None:
-        # Делаем когда нету человека в бд
-        return False
-    return True
-
-def change_status_to_yes(message: types.Message):
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    cur.execute("""update user_status SET status = ? where id = (
-        SELECT id FROM user_info WHERE teleg_id = ?
-    )""", (
-        1, message.from_user.id
-    ))
-    conn.commit()
-
-
-def change_take_part_status_to_no(message: types.Message):
-    conn = sqlite3.connect('random_coffee.db')
-    cur = conn.cursor()
-    cur.execute("""update users SET take_part = ? where tg_id = ?""", (
-        0, message.from_user.id
-    ))
-    conn.commit()
+from keyboards.user import *
+from handlers.user.new_member import get_gender_from_db, start_registration
 
 
 
-def get_data_from_db_for_mailing_list():
-    conn = sqlite3.connect('random_coffee.db')
-
-    cur = conn.execute("""SELECT tg_id FROM users where holidays = 0 and take_part = 0""")
-    data = cur.fetchall()
-    return [element[0] for element in data]
-
-@dp.message_handler(commands=['send'])
-async def send(message: types.Message):
+@dp.message_handler(text=menu_message)
+async def main_menu(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        f'<a href="tg://user?id={message.from_user.id}">Alex</a>',
-        parse_mode="HTML"
+        text="Меню:",
+        reply_markup=menu_markup()
+    )
+
+
+@dp.callback_query_handler(text=my_profile_message)
+async def send_profile(message: types.Message):
+    data = dict(get_user_data_from_db(message.from_user.id))
+    if data['about'] == 'null':
+        data['about'] = 'Не указано'
+    gender_id = data['gender']
+    gender_status = get_gender_from_db(gender_id)
+    data['gender'] = gender_status
+    birthday = data['birthday'].split('-')
+    birthday.reverse()
+    data['birthday'] = '-'.join(birthday)
+    await bot.send_message(
+        message.from_user.id,
+        f"Имя: {data['name']};\n"
+        f"Дата рождения: {data['birthday']};\n"
+        f"О себе: {data['about']};\n"
+        f"Пол: {data['gender']};",
+        reply_markup=edit_profile_markup()
+    )
+
+def get_user_data_from_db(teleg_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM user_info WHERE teleg_id=?""", (teleg_id,)
+    )
+    row = cur.fetchone()
+    return row
+
+
+@dp.callback_query_handler(text=edit_profile_message)
+async def edit_profile(message: types.Message):
+    await start_registration(message)
+
+@dp.callback_query_handler(text=about_bot_message)
+async def about_bot_message(message: types.Message):
+    await bot.send_message(
+        message.from_user.id,
+        "Тут будет сообщение о боте"
     )

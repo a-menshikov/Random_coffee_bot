@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -18,6 +17,18 @@ def get_gender_from_db(status):
     )
     return info.fetchone()[0]
 
+async def check_user_in_base(message):
+    """Проверяем пользователя на наличие в БД."""
+    conn = sqlite3.connect('data/coffee_database.db')
+    cur = conn.cursor()
+    info = cur.execute(
+        """SELECT * FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
+    )
+    if info.fetchone() is None:
+        # Делаем когда нету человека в бд
+        return False
+    return True
+
 @dp.message_handler(state=UserData.check_info)
 async def confirmation_and_save(message: types.Message, state: FSMContext):
     if not await validate_check_info(message):
@@ -31,11 +42,19 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
             'Теперь вы добавлены в нашу БД. И будете участвовать в распределении на следующей неделе.',
             reply_markup=ReplyKeyboardRemove()
         )
+        await bot.send_message(
+            message.from_user.id,
+            text="Нажмите кнопку меню и выберите из доступных вариантов",
+            reply_markup=main_markup(),
+        )
         data = await state.get_data()
         date_obj = datetime.strptime(data.get('birthday'), '%d.%m.%Y')
         birthday_for_save = str(date_obj.date())
-        add_to_db(message.from_user.id, data.get('name'), birthday_for_save, data.get('about'), data.get('gender'))
-        add_new_user_in_status_table(message.from_user.id)
+        if await check_user_in_base(message):
+            update_profile_db(message.from_user.id, data.get('name'), birthday_for_save, data.get('about'), data.get('gender'))
+        else:
+            add_to_db(message.from_user.id, data.get('name'), birthday_for_save, data.get('about'), data.get('gender'))
+            add_new_user_in_status_table(message.from_user.id)
         await state.reset_state()
 
 async def change_data(message: types.Message, state: FSMContext):
@@ -55,6 +74,14 @@ def add_to_db(chat_id, name, birthday, about, gender):
     ))
     conn.commit()
 
+def update_profile_db(teleg_id, name, birthday, about, gender):
+    conn = sqlite3.connect('data/coffee_database.db')
+    cur = conn.cursor()
+    cur.execute("""UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =? WHERE teleg_id = ? """, (
+        name, birthday, about, gender, teleg_id
+    ))
+    conn.commit()
+
 def add_new_user_in_status_table(teleg_id):
     """Добавляем нового пользователя в базу."""
     conn = sqlite3.connect('data/coffee_database.db')
@@ -62,9 +89,16 @@ def add_new_user_in_status_table(teleg_id):
     id_obj = cur.execute(
         """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
     )
+    teleg_id = id_obj.fetchone()[0]
     cur.execute("""insert into user_status (id, status) values (
     ?,?)""", (
-        id_obj.fetchone()[0], 1
+        teleg_id, 1
+    ))
+    cur.execute("""insert into holidays_status (id, status, till_date) values (
+        ?,?,?)""", (
+        teleg_id,
+        0,
+        'null'
     ))
     conn.commit()
 

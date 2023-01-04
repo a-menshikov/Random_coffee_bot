@@ -40,6 +40,11 @@ class DatabaseManager():
             "CREATE TABLE IF NOT EXISTS user_mets"
             "(id INTEGER PRIMARY KEY,"
             "met_info TEXT NOT NULL,"
+            "FOREIGN KEY (id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS holidays_status"
+            "(id INTEGER PRIMARY KEY,"
+            "status INTEGER NOT NULL,"
+            "till_date TEXT,"
             "FOREIGN KEY (id) REFERENCES user_info(id))"
         ]
         for query in queries:

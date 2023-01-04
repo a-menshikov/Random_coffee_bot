@@ -20,14 +20,19 @@ async def process_start_command(message: types.Message, state: FSMContext):
 
 
 async def check_and_add_registration_button(message: types.Message):
-    if not check_user_in_base(message):
+    if not await check_user_in_base(message):
         await bot.send_message(
             message.from_user.id,
             text="Нажмите кнопку регистрации для старта.",
             reply_markup=start_registr_markup()
         )
         await UserData.start.set()
-    pass # дописать если пользователь в базе при необходимости
+    else:
+        await bot.send_message(
+            message.from_user.id,
+            text="Нажмите кнопку меню и выберите из доступных вариантов",
+            reply_markup=main_markup(),
+        )
 
 
 if __name__ == '__main__':

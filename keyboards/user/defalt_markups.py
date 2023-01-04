@@ -10,6 +10,7 @@ menu_message = '🏠 Меню'
 confirm_message = '✅ Да'
 reject_message = '❌ Нет'
 edit_profile_message = "👩🏿‍🎨 Изменить Профиль"
+my_profile_message = "Мой профиль" # Может добавить смайлик
 set_holiday_message = "⛱️ Каникулы"
 about_bot_message = "🤖 О Боте"
 man_message = "👨 Мужской"
@@ -26,14 +27,21 @@ def main_markup():
 
 def menu_markup():
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(InlineKeyboardButton(edit_profile_message,
-               callback_data=edit_profile_message))
+    markup.add(InlineKeyboardButton(my_profile_message,
+               callback_data=my_profile_message))
     markup.add(InlineKeyboardButton(set_holiday_message,
                callback_data=set_holiday_message))
     markup.add(InlineKeyboardButton(
         about_bot_message, callback_data=about_bot_message))
 
     return markup
+
+def edit_profile_markup():
+    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(InlineKeyboardButton(edit_profile_message,
+                                    callback_data=edit_profile_message))
+    return markup
+
 
 
 def confirm_markup():
@@ -70,4 +78,28 @@ def register_man_or_woman_markup():
     markup.row(man_message, woman_message)
     markup.row(back_message, skip_message)
 
+    return markup
+
+def holidays_length():
+    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.row(
+        InlineKeyboardButton(
+            '1 неделя',
+            callback_data='one_week_holidays'
+        ),
+        InlineKeyboardButton(
+            '2 недели',
+            callback_data='two_week_holidays'
+        )
+    )
+    markup.row(
+        InlineKeyboardButton(
+            '3 недели',
+            callback_data='three_week_holidays'
+        ),
+        InlineKeyboardButton(
+            'Отмена',
+            callback_data='cancel_holidays'
+        )
+    )
     return markup
