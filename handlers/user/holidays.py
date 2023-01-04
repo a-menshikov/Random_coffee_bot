@@ -105,11 +105,12 @@ async def check_holidays_until(tg_id):
             text=f'Каникулы установлены до {row[2]}.'
         )
 
+
 async def sheduled_check_holidays():
-    conn = sqlite3.connect('random_coffee.db')
+    conn = sqlite3.connect('data/coffee_database.db')
     cur = conn.cursor()
     info = cur.execute(
-        """SELECT * FROM holidays_status WHERE holidays = 1"""
+        """SELECT * FROM holidays_status WHERE status = 1"""
     )
 
     data = info.fetchall()
@@ -121,17 +122,20 @@ async def sheduled_check_holidays():
                 """SELECT teleg_id FROM user_info WHERE id=?""",
                 (row[0],)
             )
+            teleg_id = id_obj.fetchone()[0]
             cur.execute(
-                """update holidays_status SET status=?, till_date=?""",
+                """update holidays_status SET status=?, till_date=? WHERE id=?""",
                 (
                     0,
-                    "null"
+                    "null",
+                    row[0]
                 ))
-            cur.execute("""UPDATE user_status SET status=? """, (
+            cur.execute("""UPDATE user_status SET status=? WHERE id = ?""", (
                 1,
+                row[0]
             ))
             conn.commit()
             await bot.send_message(
-                id_obj.fetchone()[0],
+                teleg_id,
                 text=f'Режим каникул был отключен'
             )

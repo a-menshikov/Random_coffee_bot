@@ -1,4 +1,8 @@
 import sqlite3
+
+import aioschedule
+import asyncio
+
 from data.config import dp, bot
 from aiogram import executor, types
 from controllerBD import DatabaseManager
@@ -34,10 +38,19 @@ async def check_and_add_registration_button(message: types.Message):
             reply_markup=main_markup(),
         )
 
+async def scheduler():
+    aioschedule.every().day.at("00:22").do(sheduled_check_holidays)
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
+
+async def on_startup(_):
+    loop = asyncio.get_event_loop()
+    loop.create_task(scheduler())
 
 if __name__ == '__main__':
     path = 'data/coffee_database.db'
     db_controller = DatabaseManager(path)
     db_controller.create_tables()
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
