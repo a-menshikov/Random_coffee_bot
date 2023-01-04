@@ -48,6 +48,25 @@ def get_user_data_from_db(teleg_id):
     return row
 
 
+def get_user_status_from_db(user_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM user_status WHERE id=?""", (user_id,)
+    )
+    row = cur.fetchone()
+    return row
+
+def get_holidays_status_from_db(user_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM holidays_status WHERE id=?""", (user_id,)
+    )
+    row = cur.fetchone()
+    return row
+
+
 @dp.callback_query_handler(text=edit_profile_message)
 async def edit_profile(message: types.Message):
     await start_registration(message)
@@ -58,3 +77,18 @@ async def about_bot_message(message: types.Message):
         message.from_user.id,
         "Тут будет сообщение о боте"
     )
+
+
+@dp.callback_query_handler(text=my_status_message)
+async def status_message(message: types.Message):
+    user_row = get_user_data_from_db(message.from_user.id)
+    status_row = get_user_status_from_db(user_row['id'])
+    if status_row['status'] == 1:
+        status = "Вы участвуете в распределении на следующец неделе"
+    else:
+        holidays_row = get_holidays_status_from_db(user_row['id'])
+        holidays_till = holidays_row['till_date'].split('-')
+        holidays_till.reverse()
+        holidays_till = '-'.join(holidays_till)
+        status = f"Вы на каникулах до {holidays_till}"
+    await bot.send_message(message.from_user.id, text=status)

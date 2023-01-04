@@ -10,7 +10,8 @@ menu_message = '🏠 Меню'
 confirm_message = '✅ Да'
 reject_message = '❌ Нет'
 edit_profile_message = "👩🏿‍🎨 Изменить Профиль"
-my_profile_message = "Мой профиль" # Может добавить смайлик
+my_profile_message = "Мой профиль"# Может добавить смайлик
+my_status_message = "Мой статус"# Может добавить смайлик
 set_holiday_message = "⛱️ Каникулы"
 about_bot_message = "🤖 О Боте"
 man_message = "👨 Мужской"
@@ -29,10 +30,13 @@ def menu_markup():
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(InlineKeyboardButton(my_profile_message,
                callback_data=my_profile_message))
+    markup.add(InlineKeyboardButton(
+        my_status_message, callback_data=my_status_message))
     markup.add(InlineKeyboardButton(set_holiday_message,
                callback_data=set_holiday_message))
     markup.add(InlineKeyboardButton(
         about_bot_message, callback_data=about_bot_message))
+
 
     return markup
 
