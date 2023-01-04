@@ -103,6 +103,7 @@ pair< Graph, vector<double> > ReadWeightedGraph(string filename)
 
 void MinimumCostPerfectMatchingExample(string filename)
 {
+	ofstream myfile;
 	Graph G;
 	vector<double> cost;
 	
@@ -121,14 +122,16 @@ void MinimumCostPerfectMatchingExample(string filename)
 	list<int> matching = solution.first;
 	double obj = solution.second;
 
-	cout << "Optimal matching cost: " << obj << endl;
-	cout << "Edges in the matching:" << endl;
+	string res = "";
 	for(list<int>::iterator it = matching.begin(); it != matching.end(); it++)
 	{
 		pair<int, int> e = G.GetEdge( *it );
 
-		cout << e.first << " " << e.second << endl;
+		res +=to_string(e.first)+ " " + to_string(e.second) + "\n";
 	}
+	myfile.open ("/data/match_algoritm_data/output.txt");
+	myfile << res;
+	myfile.close();
 }
 
 void MaximumMatchingExample(string filename)
@@ -140,8 +143,6 @@ void MaximumMatchingExample(string filename)
 	list<int> matching;
 	matching = M.SolveMaximumMatching();
 
-	cout << "Number of edges in the maximum matching: " << matching.size() << endl;
-	cout << "Edges in the matching:" << endl;
 	string res = "";
 	for(list<int>::iterator it = matching.begin(); it != matching.end(); it++)
 	{
@@ -149,7 +150,7 @@ void MaximumMatchingExample(string filename)
 
 		res +=to_string(e.first)+ " " + to_string(e.second) + "\n";
 	}
-	myfile.open ("res.txt");
+	myfile.open ("/data/match_algoritm_data/output.txt");
 	myfile << res;
 	myfile.close();
 }

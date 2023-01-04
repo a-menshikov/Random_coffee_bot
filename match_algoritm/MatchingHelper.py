@@ -34,17 +34,17 @@ class MachingHelper():
         self.edges_count = len(edges)
         self.vertex_conunt = len(self.all_active) + 1
         res = f"{self.vertex_conunt}\n{self.edges_count}\n{str_edges}"
-        with open("./match_algoritm/input.txt","w") as text:
+        with open("./data/match_algoritm_data/input.txt","w") as text:
             text.write(res)
-        with open("./match_algoritm/temp.txt","w") as text:
+        with open("./data/match_algoritm_data/temp.txt","w") as text:
             text.write(temp)
 
 
 
     def start(self):
-        subprocess.call('./match_algoritm/matchingalogitm -f ./match_algoritm/input.txt --max')
+        subprocess.call('./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max')
         res = []
-        with open("./match_algoritm/res.txt", "r") as text:
+        with open("./data/match_algoritm_data/output.txt", "r") as text:
             res = text.readlines()
         res = [tuple(map(int,i[:-1].split())) for i in res]
         t = {}
@@ -58,9 +58,9 @@ class MachingHelper():
         return t
 
     def _start_from_here(self):
-        subprocess.call('./matchingalogitm -f ./input2.txt --max')
+        subprocess.call('./matchingalogitm -f ./input.txt --max')
         res = []
-        with open("./res.txt", "r") as text:
+        with open("./data/match_algoritm_data/output.txt", "r") as text:
             res = text.readlines()
         res = [tuple(map(int,i[:-3].split())) for i in res]
         return res
