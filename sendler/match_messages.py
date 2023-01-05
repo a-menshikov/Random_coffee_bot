@@ -2,8 +2,8 @@ from importlib.machinery import SourceFileLoader
 
 from aiogram import Bot
 
-clas = SourceFileLoader("module.name", "../controllerBD/manage_db.py").load_module()
-clas_1 = SourceFileLoader("module.name", "../data/__init__.py").load_module()
+clas = SourceFileLoader("module.name", "./controllerBD/manage_db.py").load_module()
+clas_1 = SourceFileLoader("module.name", "./data/__init__.py").load_module()
 
 ADMIN_TG_ID = clas_1.ADMIN_TG_ID
 
@@ -76,5 +76,3 @@ def pare_users_query(pare: tuple):
         result = None  # TODO сюда добавить логгер
     finally:
         return result
-    
-print(ADMIN_TG_ID)

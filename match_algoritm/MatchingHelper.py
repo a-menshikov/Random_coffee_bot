@@ -1,6 +1,8 @@
 import subprocess
 from importlib.machinery import SourceFileLoader
 import json
+from loader import bot
+from sendler.match_messages import send_match_messages
 
 class MachingHelper():
     vertex_conunt:int
@@ -50,7 +52,9 @@ class MachingHelper():
         with open("./data/match_algoritm_data/temp.txt","w") as text:
             text.write(temp)
 
-
+    def send_and_write(self, t: dict):
+        self.db_controller.update_all_user_mets(t)
+        send_match_messages(t, bot)
 
     def start(self):
         subprocess.call('./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max')
@@ -72,6 +76,7 @@ class MachingHelper():
             self.all_active.remove(second)
         for i in self.all_active:
             t[i] = None
+        self.matchings = t
         return t
 
     def _start_from_here(self):
