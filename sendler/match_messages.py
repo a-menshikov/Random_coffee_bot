@@ -1,22 +1,14 @@
-import os
-import sqlite3 as lite
+from importlib.machinery import SourceFileLoader
 
 from aiogram import Bot
-from dotenv import load_dotenv
 
-load_dotenv()
+clas = SourceFileLoader("module.name", "../controllerBD/manage_db.py").load_module()
+clas_1 = SourceFileLoader("module.name", "../data/__init__.py").load_module()
 
-TOKEN = os.getenv('TG_TOKEN')
-ADMIN_TG_ID = os.getenv('ADMIN_TG_ID')
-
-bot = Bot(token=str(TOKEN))
-
-path = '../data/coffee_database.db'
-conn = lite.connect(path)
-cur = conn.cursor()
+ADMIN_TG_ID = clas_1.ADMIN_TG_ID
 
 
-async def send_match_messages(match_info: dict):
+async def send_match_messages(match_info: dict, bot: Bot):
     """Рассылка сообщений после распределения пар на неделю."""
     for match in match_info.items():
         users_info = pare_users_query(match)
@@ -44,7 +36,8 @@ async def send_match_messages(match_info: dict):
             message = (f'Без пары на этой неделе: <a href="tg://user?id'
                        f'={fail_user_id}">{fail_user_name}</a>')
             try:
-                await bot.send_message(ADMIN_TG_ID, message, parse_mode="HTML")
+                await bot.send_message(ADMIN_TG_ID,
+                                       message, parse_mode="HTML")
             except Exception:
                 pass  # TODO сюда добавить логгер
 
@@ -75,10 +68,13 @@ def pare_users_query(pare: tuple):
         "ON g.id = u.gender "
         "WHERE u.id in (?, ?)"
     )
+    path = '../data/coffee_database.db'
+    db_controller = clas.DatabaseManager(path)
     try:
-        result = cur.execute(query, pare).fetchall()
-        conn.commit()
+        result = db_controller.select_query(query, pare).fetchall()
     except Exception:
         result = None  # TODO сюда добавить логгер
     finally:
         return result
+    
+print(ADMIN_TG_ID)
