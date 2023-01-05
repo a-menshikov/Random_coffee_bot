@@ -7,6 +7,7 @@ def get_maximum_matching(graph, matching, i):
     else:
         return matching
 
+
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 """Получить наибольший поток в графе"""
 def get_augmenting_path(graph, matching):
@@ -29,13 +30,15 @@ def get_augmenting_path(graph, matching):
                     pass
                 else:
                     if forest.get_root(v) != forest.get_root(w):
-                        path = forest.get_path_from_root_to(v) + forest.get_path_to_root_from(w)
+                        path = forest.get_path_from_root_to(
+                            v) + forest.get_path_to_root_from(w)
                         return path
                     else:
                         blossom = forest.get_blossom(v, w)
                         graph_prime = graph.contract(blossom)
                         matching_prime = matching.contract(blossom)
-                        path_prime = get_augmenting_path(graph_prime, matching_prime)
+                        path_prime = get_augmenting_path(
+                            graph_prime, matching_prime)
                         path = graph.lift_path(path_prime, blossom)
                         return path
             graph.mark_edge(e)
@@ -44,7 +47,10 @@ def get_augmenting_path(graph, matching):
         v = forest.get_unmarked_even_vertice()
     return []
 
+
 """Просто класс графа для упрощения работы"""
+
+
 class Graph:
     def __init__(self):
         self.adjacency = {}
@@ -52,37 +58,48 @@ class Graph:
         self.__assert_representation()
 
     """Обработчики ошибок"""
+
     def __assert_representation(self):
         for t in self.adjacency:
-            assert len(self.adjacency[t]) > 0, 'Если вершина существует в матрице смежности, она должна иметь хотя бы одного соседа.'
+            assert len(
+                self.adjacency[t]) > 0, 'Если вершина существует в матрице смежности, она должна иметь хотя бы одного соседа.'
             for u in self.adjacency[t]:
                 self.__assert_edge_exists((t, u))
         for t in self.unmarked_adjacency:
-            assert len(self.unmarked_adjacency[t]) > 0, 'Если вершина существует в непомеченной матрице смежности, она должна иметь хотя бы одного соседа.'
+            assert len(
+                self.unmarked_adjacency[t]) > 0, 'Если вершина существует в непомеченной матрице смежности, она должна иметь хотя бы одного соседа.'
             for u in self.unmarked_adjacency[t]:
                 self.__assert_edge_exists((t, u))
                 self.__assert_unmarked_edge_exists((t, u))
 
     def __assert_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.adjacency) and (w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
-        assert (w in self.adjacency) and (v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
+        assert (v in self.adjacency) and (
+            w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
+        assert (w in self.adjacency) and (
+            v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
-        print(v,w)
-        assert (v not in self.adjacency) or (w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
-        assert (w not in self.adjacency) or (v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
+        print(v, w)
+        assert (v not in self.adjacency) or (
+            w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
+        assert (w not in self.adjacency) or (
+            v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
 
     def __assert_unmarked_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.unmarked_adjacency) and (w in self.unmarked_adjacency[v]), 'Ребро должно существовать в непомеченной матрице смежности'
-        assert (w in self.unmarked_adjacency) and (v in self.unmarked_adjacency[w]), 'Взаимное ребро должно существовать в непомеченной матрице смежности'
+        assert (v in self.unmarked_adjacency) and (
+            w in self.unmarked_adjacency[v]), 'Ребро должно существовать в непомеченной матрице смежности'
+        assert (w in self.unmarked_adjacency) and (
+            v in self.unmarked_adjacency[w]), 'Взаимное ребро должно существовать в непомеченной матрице смежности'
 
     def __assert_unmarked_edge_does_not_exist(self, edge):
         v, w = edge
-        assert (v not in self.unmarked_adjacency) or (w not in self.unmarked_adjacency[v]), 'Ребро не должно существовать в непомеченной матрице смежности'
-        assert (w not in self.unmarked_adjacency) or (v not in self.unmarked_adjacency[w]), 'Обратное ребро не должно существовать в непомеченной матрице смежности'
+        assert (v not in self.unmarked_adjacency) or (
+            w not in self.unmarked_adjacency[v]), 'Ребро не должно существовать в непомеченной матрице смежности'
+        assert (w not in self.unmarked_adjacency) or (
+            v not in self.unmarked_adjacency[w]), 'Обратное ребро не должно существовать в непомеченной матрице смежности'
 
     def __assert_vertice_exists(self, vertice):
         assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
@@ -92,6 +109,7 @@ class Graph:
         assert vertice not in self.unmarked_adjacency, 'Вершина не должна существовать в непомеченной матрице смежности'
 
     """Копировать граф"""
+
     def copy(self):
         self.__assert_representation()
         graph = Graph()
@@ -111,6 +129,7 @@ class Graph:
             self.add_edge(i)
 
     """Добавить в граф ребро"""
+
     def add_edge(self, edge):
         self.__assert_edge_does_not_exist(edge)
         self.__assert_unmarked_edge_does_not_exist(edge)
@@ -130,6 +149,7 @@ class Graph:
         self.__assert_representation()
 
     """Снять отметку со всех вершин"""
+
     def unmark_all_edges(self):
         self.unmarked_adjacency = {}
         for t in self.adjacency:
@@ -139,12 +159,14 @@ class Graph:
         self.__assert_representation()
 
     """Добавить отметки на вершинах"""
+
     def mark_edges(self, edges):
         for edge in edges:
             self.mark_edge(edge)
         self.__assert_representation()
-    
+
     """Добавить отметки на 1 вершине"""
+
     def mark_edge(self, edge):
         self.__assert_edge_exists(edge)
         self.__assert_unmarked_edge_exists(edge)
@@ -158,14 +180,16 @@ class Graph:
         self.__assert_representation()
 
     """Получить непомеченное соседнее ребро"""
+
     def get_unmarked_neighboring_edge(self, vertice):
         self.__assert_representation()
         if vertice in self.unmarked_adjacency:
             return vertice, next(iter(self.unmarked_adjacency[vertice]))
         else:
             return None
-    
+
     """Получить вершины графа"""
+
     def get_vertices(self):
         self.__assert_representation()
         return self.adjacency.keys()
@@ -200,7 +224,7 @@ class Graph:
 
             ############################################################################################################
             # ЛЕВАЯ КОНЕЧНАЯ ТОЧКА
-            ############################################################################################################            
+            ############################################################################################################
 
             w = path[1]
             blossom_path = []
@@ -272,6 +296,7 @@ class Graph:
                     assert False, 'Ровно одна сторона пути должна быть инцидентна основанию цветка.'
         return path
 
+
 class Matching:
 
     def __init__(self):
@@ -293,32 +318,40 @@ class Matching:
 
     def __assert_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.adjacency) and (w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
-        assert (w in self.adjacency) and (v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
+        assert (v in self.adjacency) and (
+            w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
+        assert (w in self.adjacency) and (
+            v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
         assert edge in self.edges, 'Край должен существовать в наборе ребер'
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
-        assert (v not in self.adjacency) or (w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
-        assert (w not in self.adjacency) or (v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
+        assert (v not in self.adjacency) or (
+            w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
+        assert (w not in self.adjacency) or (
+            v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
         assert edge not in self.edges, 'Ребро не должно существовать в наборе ребер'
 
     def __assert_vertice_is_exposed(self, vertice):
         assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
         assert vertice in self.exposed_vertices, 'Вершина должна существовать в наборе вершин.'
-        assert len(self.adjacency[vertice]) == 0, 'Вершина не должна иметь соседей'
+        assert len(self.adjacency[vertice]
+                   ) == 0, 'Вершина не должна иметь соседей'
 
     def __assert_vertice_is_not_exposed(self, vertice):
         assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
         assert vertice not in self.exposed_vertices, 'Вершина должна существовать в наборе вершин'
-        assert len(self.adjacency[vertice]) == 1, 'Вершина должна иметь ровно одного соседа'
+        assert len(
+            self.adjacency[vertice]) == 1, 'Вершина должна иметь ровно одного соседа'
 
     def __assert_vertice_exists(self, vertice):
         assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
         if vertice in self.exposed_vertices:
-            assert len(self.adjacency[vertice]) == 0, 'Если вершина открыта, у нее не должно быть соседей'
+            assert len(
+                self.adjacency[vertice]) == 0, 'Если вершина открыта, у нее не должно быть соседей'
         else:
-            assert len(self.adjacency[vertice]) == 1, 'Если вершина не открыта, она должна иметь ровно одного соседа.'
+            assert len(
+                self.adjacency[vertice]) == 1, 'Если вершина не открыта, она должна иметь ровно одного соседа.'
 
     def __assert_vertice_does_not_exist(self, vertice):
         assert vertice not in self.adjacency, 'Вершина не должна существовать в матрице смежности'
@@ -405,9 +438,13 @@ class Matching:
             matching.exposed_vertices.discard(t)
         matching.__assert_representation()
         return matching
+
+
 """Лес — это неориентированный граф, в котором любые две вершины связаны не более чем одним путем. 
 Эквивалентно, лес - это неориентированный ациклический граф, все компоненты связности которого являются деревьями; 
 другими словами, граф состоит из несвязного объединения деревьев."""
+
+
 class Forest:
     def __init__(self):
         self.roots = {}
@@ -419,8 +456,10 @@ class Forest:
     def __assert_representation(self):
         for vertice in self.roots:
             self.__assert_vertice_exists(vertice)
-        assert self.roots.keys() == self.distances_to_root.keys(), 'Корни и расстояния до корня должны иметь одинаковые ключи'
-        assert self.roots.keys() == self.parents.keys(), 'Корни и родители mut имеют одинаковые ключи'
+        assert self.roots.keys() == self.distances_to_root.keys(
+        ), 'Корни и расстояния до корня должны иметь одинаковые ключи'
+        assert self.roots.keys() == self.parents.keys(
+        ), 'Корни и родители mut имеют одинаковые ключи'
         for vertice in self.unmarked_even_vertices:
             self.__assert_vertice_exists(vertice)
             assert self.distances_to_root[vertice] % 2 == 0, 'Неотмеченная четная вершина должна иметь четное расстояние до корня'
@@ -508,7 +547,8 @@ class Forest:
             path.append(parent)
             parent = self.parents[parent]
         path.append(root)
-        assert len(set(path)) == len(path), 'Путь к корню не должен содержать повторяющихся вершин.'
+        assert len(set(path)) == len(
+            path), 'Путь к корню не должен содержать повторяющихся вершин.'
         return path
 
     def get_blossom(self, v, w):
@@ -531,11 +571,15 @@ class Forest:
                 break
             else:
                 w_blossom_vertices.append(u)
-        blossom_vertices = [common_ancestor] + list(reversed(v_blossom_vertices)) + w_blossom_vertices
-        assert len(set(blossom_vertices)) == len(blossom_vertices), 'Цветок не должен содержать повторяющихся вершин.'
-        assert len(blossom_vertices) % 2 != 0, 'Цветок должен содержать нечетное количество вершин'
+        blossom_vertices = [common_ancestor] + \
+            list(reversed(v_blossom_vertices)) + w_blossom_vertices
+        assert len(set(blossom_vertices)) == len(
+            blossom_vertices), 'Цветок не должен содержать повторяющихся вершин.'
+        assert len(
+            blossom_vertices) % 2 != 0, 'Цветок должен содержать нечетное количество вершин'
         blossom = Blossom(blossom_vertices, common_ancestor)
         return blossom
+
 
 class Blossom:
 
@@ -550,8 +594,10 @@ class Blossom:
 
     def __assert_representation(self):
         assert self.vertices[0] == self.base, 'Цветок должен начинаться с базовой вершины'
-        assert len(self.vertices) % 2 != 0, 'Цветок должен иметь нечетное количество вершин'
-        assert len(self.vertices) >= 3, 'Цветок должен иметь не менее трех вершин.'
+        assert len(
+            self.vertices) % 2 != 0, 'Цветок должен иметь нечетное количество вершин'
+        assert len(
+            self.vertices) >= 3, 'Цветок должен иметь не менее трех вершин.'
 
     def get_id(self):
         self.__assert_representation()
