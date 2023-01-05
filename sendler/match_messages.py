@@ -1,6 +1,7 @@
 from importlib.machinery import SourceFileLoader
 
 from aiogram import Bot
+from loader import db_controller
 
 clas = SourceFileLoader("module.name", "./controllerBD/manage_db.py").load_module()
 clas_1 = SourceFileLoader("module.name", "./data/__init__.py").load_module()
@@ -68,8 +69,6 @@ def pare_users_query(pare: tuple):
         "ON g.id = u.gender "
         "WHERE u.id in (?, ?)"
     )
-    path = '../data/coffee_database.db'
-    db_controller = clas.DatabaseManager(path)
     try:
         result = db_controller.select_query(query, pare).fetchall()
     except Exception:

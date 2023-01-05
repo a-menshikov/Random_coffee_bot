@@ -94,6 +94,10 @@ def add_new_user_in_status_table(teleg_id):
     ?,?)""", (
         teleg_id, 1
     ))
+    cur.execute("""insert into user_mets (id, met_info) values (
+    ?,?)""", (
+        teleg_id, "{}"
+    ))
     cur.execute("""insert into holidays_status (id, status, till_date) values (
         ?,?,?)""", (
         teleg_id,

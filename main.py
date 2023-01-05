@@ -1,13 +1,13 @@
 import sqlite3
-from loader import bot, dp
+from loader import bot, dp, db_controller
 from aiogram import executor, types
-from controllerBD import DatabaseManager
-from match_algoritm import *
 import aioschedule
 import asyncio
+from controllerBD import DatabaseManager
 from keyboards.user import *
 from states import UserData
 from handlers.user import *
+from match_algoritm import MachingHelper
 
 
 
@@ -20,9 +20,13 @@ async def process_start_command(message: types.Message, state: FSMContext):
         text=f'Привет, {name}. У нас вот такой бот. "Регламент".',
     )
     await check_and_add_registration_button(message)
-    help = MachingHelper()
-    res = help.start()
-    await message.answer(res)
+
+@dp.message_handler(commands=['start_algo'], state="*")
+async def start_algoritm(message: types.Message):
+    mc.prepare()
+    res = mc.start()
+    print("retunr-",res)
+    await mc.send_and_write(res)
 
 
 async def check_and_add_registration_button(message: types.Message):
@@ -51,9 +55,6 @@ async def on_startup(_):
     loop.create_task(scheduler())
 
 if __name__ == '__main__':
-    path = 'data/coffee_database.db'
-    db_controller = DatabaseManager(path)
-    db_controller.create_tables()
     mc = MachingHelper(db_controller)
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 

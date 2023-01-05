@@ -52,9 +52,10 @@ class MachingHelper():
         with open("./data/match_algoritm_data/temp.txt","w") as text:
             text.write(temp)
 
-    def send_and_write(self, t: dict):
+    async def send_and_write(self, t: dict):
+        self.db_controller.update_mets(t)
         self.db_controller.update_all_user_mets(t)
-        send_match_messages(t, bot)
+        await send_match_messages(t, bot)
 
     def start(self):
         subprocess.call('./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max')
