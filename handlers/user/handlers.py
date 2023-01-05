@@ -2,86 +2,93 @@ import sqlite3
 
 from aiogram import types
 
-from config.bot_config import dp, bot
-from handlers.user.new_member import add_new_user_to_db
+from loader import bot, dp
+
+from keyboards.user import *
+from handlers.user.new_member import get_gender_from_db, start_registration
 
 
-def check_user_in_base(message):
-    """Проверяем пользователя на наличие в БД."""
-    conn = sqlite3.connect('random_coffee.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT * FROM users WHERE tg_id=?""", (message.from_user.id,)
-    )
-    conn.commit()
-    if info.fetchone() is None:
-        # Делаем когда нету человека в бд
-        return False
-    return True
 
-def change_take_part_status_to_yes(message: types.Message):
-    conn = sqlite3.connect('random_coffee.db')
-    cur = conn.cursor()
-    cur.execute("""update users SET take_part = ? where tg_id = ?""", (
-        1, message.from_user.id
-    ))
-    conn.commit()
-
-
-def change_take_part_status_to_no(message: types.Message):
-    conn = sqlite3.connect('random_coffee.db')
-    cur = conn.cursor()
-    cur.execute("""update users SET take_part = ? where tg_id = ?""", (
-        0, message.from_user.id
-    ))
-    conn.commit()
-
-
-@dp.callback_query_handler(text="take_part")
-async def take_part(message: types.Message):
-    if not check_user_in_base(message):
-        await bot.send_message(message.from_user.id,
-            'Мы не нашли Вас в нашей базе. Пожалуйста ответьте на несколько вопросов и мы добавим Вас в наш список.')
-        await add_new_user_to_db(message)
-    else:
-        change_take_part_status_to_yes(message)
-        await bot.send_message(message.from_user.id, 'Ваша заявка принята. Ожидайте распределения')
-
-@dp.callback_query_handler(text="do_not_take_part")
-async def do_not_take_part(message: types.Message):
-    if not check_user_in_base(message):
-        await message.answer(
-            'Мы не нашли Вас в нашей базе. Пожалуйста ответьте на несколько вопросов и мы добавим Вас в наш список.')
-    change_take_part_status_to_no(message)
-    await bot.send_message(message.from_user.id, 'Вы не будете участвовать в распределении на следующей неделе.')
-
-async def question_about_take_part(tg_id):
+@dp.message_handler(text=menu_message)
+async def main_menu(message: types.Message):
     await bot.send_message(
-        tg_id,
-        text=f'Желаешь принять участие на следующей неделе?',
-        reply_markup=keyboard_choose_take_part_or_not
+        message.from_user.id,
+        text="Меню:",
+        reply_markup=menu_markup()
     )
 
-keyboard_choose_take_part_or_not = types.InlineKeyboardMarkup()
 
-take_part = types.InlineKeyboardButton(
-    'Участвую',
-    callback_data='take_part'
-)
-do_not_take_part = types.InlineKeyboardButton(
-    'Не участвую',
-    callback_data='do_not_take_part'
-)
-keyboard_choose_take_part_or_not.row(take_part, do_not_take_part)
+@dp.callback_query_handler(text=my_profile_message)
+async def send_profile(message: types.Message):
+    data = dict(get_user_data_from_db(message.from_user.id))
+    if data['about'] == 'null':
+        data['about'] = 'Не указано'
+    gender_id = data['gender']
+    gender_status = get_gender_from_db(gender_id)
+    data['gender'] = gender_status
+    birthday = data['birthday'].split('-')
+    birthday.reverse()
+    data['birthday'] = '-'.join(birthday)
+    await bot.send_message(
+        message.from_user.id,
+        f"Имя: {data['name']};\n"
+        f"Дата рождения: {data['birthday']};\n"
+        f"О себе: {data['about']};\n"
+        f"Пол: {data['gender']};",
+        reply_markup=edit_profile_markup()
+    )
+
+def get_user_data_from_db(teleg_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM user_info WHERE teleg_id=?""", (teleg_id,)
+    )
+    row = cur.fetchone()
+    return row
 
 
-def get_data_from_db_for_mailing_list():
-    conn = sqlite3.connect('random_coffee.db')
+def get_user_status_from_db(user_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM user_status WHERE id=?""", (user_id,)
+    )
+    row = cur.fetchone()
+    return row
 
-    cur = conn.execute("""SELECT tg_id FROM users where holidays = 0 and take_part = 0""")
-    data = cur.fetchall()
-    return [element[0] for element in data]
+def get_holidays_status_from_db(user_id):
+    conn = sqlite3.connect('data/coffee_database.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute(
+        """SELECT * FROM holidays_status WHERE id=?""", (user_id,)
+    )
+    row = cur.fetchone()
+    return row
 
-async def get_mailing():
-    all_user_for_next_week = get_data_from_db_for_mailing_list()
-    print(all_user_for_next_week)
+
+@dp.callback_query_handler(text=edit_profile_message)
+async def edit_profile(message: types.Message):
+    await start_registration(message)
+
+@dp.callback_query_handler(text=about_bot_message)
+async def about_bot_message(message: types.Message):
+    await bot.send_message(
+        message.from_user.id,
+        "Тут будет сообщение о боте"
+    )
+
+
+@dp.callback_query_handler(text=my_status_message)
+async def status_message(message: types.Message):
+    user_row = get_user_data_from_db(message.from_user.id)
+    status_row = get_user_status_from_db(user_row['id'])
+    if status_row['status'] == 1:
+        status = "Вы участвуете в распределении на следующец неделе"
+    else:
+        holidays_row = get_holidays_status_from_db(user_row['id'])
+        holidays_till = holidays_row['till_date'].split('-')
+        holidays_till.reverse()
+        holidays_till = '-'.join(holidays_till)
+        status = f"Вы на каникулах до {holidays_till}"
+    await bot.send_message(message.from_user.id, text=status)

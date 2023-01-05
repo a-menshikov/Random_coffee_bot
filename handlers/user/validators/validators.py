@@ -4,14 +4,15 @@ from datetime import datetime
 
 from aiogram import types
 
-from config.bot_config import bot
+from data.config import dp, bot
+from keyboards.user import *
 
 
 def validate_name(message):
-    return re.fullmatch(
+    return (re.fullmatch(
         r"^[a-яА-ЯЁёa-yA-Y]{1,100}$",
         message
-    )
+    ) and len(message) <= 100)
 
 
 async def validate_birthday(message: types.Message):
@@ -35,3 +36,25 @@ async def validate_birthday(message: types.Message):
         f'Что то не так с введенными данными. Дата должно состоять из цифр и точек ДД.ММ.ГГГГ"')
     return False
 
+async def validate_about(message):
+    return len(message) <= 500
+
+async def validate_gender(message: types.Message):
+    choice = [man_message, woman_message, skip_message]
+    if not message.text in choice:
+        await bot.send_message(
+            message.from_user.id,
+            'Пожалуйста выберите из доступных вариантов или нажмите "Пропустить"'
+        )
+        return False
+    return True
+
+async def validate_check_info(message):
+    choice = [all_right_message, back_message]
+    if not message.text in choice:
+        await bot.send_message(
+            message.from_user.id,
+            'Пожалуйста выберите из доступных вариантов.'
+        )
+        return False
+    return True
