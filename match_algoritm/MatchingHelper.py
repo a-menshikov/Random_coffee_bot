@@ -1,23 +1,35 @@
 import subprocess
+from importlib.machinery import SourceFileLoader
+import json
 
 class MachingHelper():
     vertex_conunt:int
     edges_count:int
 
-    def __init__(self) -> None:
+    def __init__(self, db_controller) -> None:
+        self.db_controller = db_controller
         self.prepare()
 
     def prepare(self):
+        data_from_bd = {}
+        active_users = self.db_controller.select_query("SELECT id FROM user_status WHERE status=1").fetchall()
+        active_users = [i[0] for i in active_users]
+        for now_user in active_users:
+            connected_user = self.db_controller.select_query(f"SELECT met_info FROM user_mets WHERE id={now_user}").fetchone()[0]
+            connected_user = list(json.loads(connected_user).values())
+            # connected_user = list(map(int,connected_user.split()))
+            data_from_bd[now_user] = connected_user
+
         # беру данные из бд
-        data_from_bd = {
-            1:[2,3],
-            2:[1,4],
-            3:[1],
-            4:[2],
-            5:[]
-        }
+        # data_from_bd = {
+        #     1:[2,3],
+        #     2:[1,4],
+        #     3:[1],
+        #     4:[2],
+        #     5:[]
+        # }
         adjacency_list = {}
-        self.all_active = data_from_bd.keys()
+        self.all_active = list(data_from_bd.keys())
         for v in self.all_active:
             adjacency_list[v] = [item for item in self.all_active if item not in data_from_bd[v]+[v]]
         edges = []
@@ -47,13 +59,19 @@ class MachingHelper():
             res = text.readlines()
         res = [tuple(map(int,i[:-1].split())) for i in res]
         t = {}
+        # for i in self.all_active:
+        #     t[i] = None
+        # for i in res:
+        #     a = i[0]
+        #     b = i[1]
+        #     t[a] = b
+        #     t[b] = a 
+        for first, second in res:
+            t[first] = second
+            self.all_active.remove(first)
+            self.all_active.remove(second)
         for i in self.all_active:
             t[i] = None
-        for i in res:
-            a = i[0]
-            b = i[1]
-            t[a] = b
-            t[b] = a 
         return t
 
     def _start_from_here(self):

@@ -1,9 +1,8 @@
 import sqlite3
 from data.config import dp, bot
 from aiogram import executor, types
-from match_algoritm import MachingHelper
+from match_algoritm import *
 from controllerBD import DatabaseManager
-
 
 
 @dp.message_handler(commands=['start', 'help'])
@@ -47,6 +46,9 @@ registration_keyboard.row(registration)
 if __name__ == '__main__':
     path = 'C:/Users/User/Desktop/Programming/Data/random_coffee/data/coffee_database.db'
     db_controller = DatabaseManager(path)
-    db_controller.create_tables()
-    executor.start_polling(dp, skip_updates=True)
+    mc = MachingHelper(db_controller)
+    print(mc.start())
+    # db_controller.create_tables()
+    # executor.start_polling(dp, skip_updates=True)
+
 
