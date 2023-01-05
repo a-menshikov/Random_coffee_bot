@@ -1,5 +1,4 @@
 import subprocess
-import asyncio
 
 class MachingHelper():
     vertex_conunt:int
