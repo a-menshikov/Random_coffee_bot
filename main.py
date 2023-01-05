@@ -3,7 +3,7 @@ import sqlite3
 import aioschedule
 import asyncio
 
-from data.config import dp, bot
+from loader import bot, dp
 from aiogram import executor, types
 from controllerBD import DatabaseManager
 from keyboards.user import *

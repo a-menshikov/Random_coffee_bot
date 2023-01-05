@@ -3,7 +3,7 @@ import sqlite3
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from data.config import dp, bot
+from loader import bot, dp
 from handlers.user.validators import *
 
 from states.states import UserData

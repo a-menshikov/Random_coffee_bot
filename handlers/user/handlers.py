@@ -2,7 +2,7 @@ import sqlite3
 
 from aiogram import types
 
-from data.config import dp, bot
+from loader import bot, dp
 
 from keyboards.user import *
 from handlers.user.new_member import get_gender_from_db, start_registration
