@@ -1,8 +1,9 @@
 import sqlite3
-from loader import bot, dp, db_controller
+from loader import bot, dp, db_controller, logger
 from aiogram import executor, types
 import aioschedule
 import asyncio
+from datetime import datetime
 from controllerBD import DatabaseManager
 from keyboards.user import *
 from states import UserData
@@ -55,6 +56,7 @@ async def on_startup(_):
     loop.create_task(scheduler())
 
 if __name__ == '__main__':
+    logger.info(f"Запуск сервера в {datetime.now()}")
     mc = MachingHelper(db_controller)
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 

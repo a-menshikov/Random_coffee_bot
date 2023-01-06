@@ -1,4 +1,6 @@
 import logging
+import sys
+
 from data import config
 from controllerBD import DatabaseManager
 from aiogram import Bot, Dispatcher
@@ -9,6 +11,10 @@ logging.basicConfig(filename="main.log",
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(stream=sys.stdout)
+logger.addHandler(handler)
 
 
 bot = Bot(token=str(config.TOKEN))

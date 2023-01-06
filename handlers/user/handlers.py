@@ -2,15 +2,15 @@ import sqlite3
 
 from aiogram import types
 
-from loader import bot, dp
+from loader import bot, dp, logger
 
 from keyboards.user import *
 from handlers.user.new_member import get_gender_from_db, start_registration
 
 
-
 @dp.message_handler(text=menu_message)
 async def main_menu(message: types.Message):
+    """Вывод меню"""
     await bot.send_message(
         message.from_user.id,
         text="Меню:",
@@ -20,6 +20,9 @@ async def main_menu(message: types.Message):
 
 @dp.callback_query_handler(text=my_profile_message)
 async def send_profile(message: types.Message):
+    """Вывод данных о пользователе"""
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"запросил информацию о себе")
     data = dict(get_user_data_from_db(message.from_user.id))
     if data['about'] == 'null':
         data['about'] = 'Не указано'
@@ -38,7 +41,9 @@ async def send_profile(message: types.Message):
         reply_markup=edit_profile_markup()
     )
 
+
 def get_user_data_from_db(teleg_id):
+    """Получение id пользователя"""
     conn = sqlite3.connect('data/coffee_database.db')
     conn.row_factory = sqlite3.Row
     cur = conn.execute(
@@ -49,6 +54,7 @@ def get_user_data_from_db(teleg_id):
 
 
 def get_user_status_from_db(user_id):
+    """Получение статуса участия пользователя из БД"""
     conn = sqlite3.connect('data/coffee_database.db')
     conn.row_factory = sqlite3.Row
     cur = conn.execute(
@@ -57,7 +63,9 @@ def get_user_status_from_db(user_id):
     row = cur.fetchone()
     return row
 
+
 def get_holidays_status_from_db(user_id):
+    """Получение статуса каникул пользователя из БД"""
     conn = sqlite3.connect('data/coffee_database.db')
     conn.row_factory = sqlite3.Row
     cur = conn.execute(
@@ -69,10 +77,17 @@ def get_holidays_status_from_db(user_id):
 
 @dp.callback_query_handler(text=edit_profile_message)
 async def edit_profile(message: types.Message):
+    """Перенаправление на повторную регистрацию"""
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"отправлен на повторную регистрацию")
     await start_registration(message)
+
 
 @dp.callback_query_handler(text=about_bot_message)
 async def about_bot_message(message: types.Message):
+    """Вывод информации о боте"""
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"запросил информацию о боте")
     await bot.send_message(
         message.from_user.id,
         "Тут будет сообщение о боте"
@@ -81,6 +96,9 @@ async def about_bot_message(message: types.Message):
 
 @dp.callback_query_handler(text=my_status_message)
 async def status_message(message: types.Message):
+    """Вывод статуса участия в распределении"""
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} " 
+                f"запросил информацию о статусе участия")
     user_row = get_user_data_from_db(message.from_user.id)
     status_row = get_user_status_from_db(user_row['id'])
     if status_row['status'] == 1:
@@ -92,3 +110,5 @@ async def status_message(message: types.Message):
         holidays_till = '-'.join(holidays_till)
         status = f"Вы на каникулах до {holidays_till}"
     await bot.send_message(message.from_user.id, text=status)
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"получил информацию о статусе участия")
