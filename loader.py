@@ -13,8 +13,6 @@ logging.basicConfig(filename="main.log",
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-handler = logging.StreamHandler(stream=sys.stdout)
-logger.addHandler(handler)
 
 
 bot = Bot(token=str(config.TOKEN))

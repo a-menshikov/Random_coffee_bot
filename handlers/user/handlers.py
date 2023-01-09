@@ -112,3 +112,5 @@ async def status_message(message: types.Message):
     await bot.send_message(message.from_user.id, text=status)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"получил информацию о статусе участия")
+
+
