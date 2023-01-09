@@ -1,4 +1,3 @@
-import sqlite3
 from asyncio import sleep
 
 from aiogram import types
@@ -18,12 +17,10 @@ async def check_message(message: types.Message):
 
 
 def prepare_user_list():
-    conn = sqlite3.connect('data/coffee_database.db')
-
-    cur = conn.execute("""SELECT user_info.teleg_id FROM user_status 
+    query = """SELECT user_info.teleg_id FROM user_status 
     JOIN user_info ON user_info.id = user_status.id 
-    WHERE user_status.status = 1 """)
-    data = cur.fetchall()
+    WHERE user_status.status = 1 """
+    data = db_controller.select_query(query).fetchall()
     return [element[0] for element in data]
 
 
@@ -40,13 +37,11 @@ async def send_message(teleg_id, **kwargs):
 
 
 async def change_status(teleg_id):
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute(
-        """UPDATE user_status SET status = 0
-        WHERE id = ? """, (teleg_id,))
-    conn.commit()
+    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
+    values_id = (teleg_id,)
+    id_obj = db_controller.select_query(query_id, values_id)
+    user_id = id_obj.fetchone()[0]
+    query = """UPDATE user_status SET status = 0
+        WHERE id = ? """
+    values = (user_id,)
+    db_controller.query(query, values)

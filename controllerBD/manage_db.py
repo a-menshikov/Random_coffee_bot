@@ -147,6 +147,21 @@ class DatabaseManager():
                                       f'{first_user} не обновлена. '
                                       f' Ошибка - {error}')
 
+    def row_factory(self, query, values=None):
+        self.conn.row_factory = lite.Row
+        try:
+            if values is None:
+                result = self.conn.execute(query)
+                self.logger.info(f'Запрос {query} отработал')
+            else:
+                result = self.conn.execute(query, values)
+                self.logger.info(f'Запрос {query} со значениями {values}'
+                                 f' отработал')
+            self.conn.commit()
+            return result
+        except Exception as error:
+            self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
+
     def __del__(self):
         self.conn.close()
         self.logger.info('Соединение с базой закрыто')

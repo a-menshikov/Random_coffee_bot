@@ -1,9 +1,7 @@
-import sqlite3
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from loader import bot, dp, logger
+from loader import bot, dp, db_controller, logger
 from handlers.user.validators import *
 
 from states.states import UserData
@@ -12,21 +10,17 @@ from keyboards.user import *
 
 def get_gender_from_db(status):
     """Получаем пол пользователя по id пола"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT gender_name FROM genders WHERE id=?""", (status,)
-    )
+    query = """SELECT gender_name FROM genders WHERE id=?"""
+    values = (status,)
+    info = db_controller.select_query(query, values)
     return info.fetchone()[0]
 
 
 async def check_user_in_base(message):
     """Проверяем пользователя на наличие в БД."""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT * FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
-    )
+    query = """SELECT * FROM user_info WHERE teleg_id=?"""
+    values = (message.from_user.id,)
+    info = db_controller.select_query(query, values)
     if info.fetchone() is None:
         return False
     return True
@@ -77,56 +71,41 @@ async def change_data(message: types.Message, state: FSMContext):
 
 def add_to_db(teleg_id, name, birthday, about, gender):
     """Добавляем нового пользователя в базу."""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    cur.execute(
-        """insert into user_info (teleg_id, name, birthday, about, gender) 
-        values (?,?,?,?,?)""", (
-            teleg_id, name, birthday, about, gender
-        ))
-    conn.commit()
+    query = """INSERT INTO user_info (teleg_id, name, birthday, about, gender) 
+        VALUES (?,?,?,?,?)"""
+    values = (teleg_id, name, birthday, about, gender)
+    db_controller.query(query, values)
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"добавлен в БД как новый участник")
 
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    cur.execute(
-        """UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =?
-        WHERE teleg_id = ? """, (
-            name, birthday, about, gender, teleg_id
-        ))
-    conn.commit()
+
+    query = """UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =?
+        WHERE teleg_id = ? """
+    values = (name, birthday, about, gender, teleg_id)
+    db_controller.query(query, values)
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"обновил информацию о себе")
 
 
 def add_new_user_in_status_table(teleg_id):
     """Проставляем статусы участия в таблицах БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute("""insert into user_status (id, status) values (
-    ?,?)""", (
-        teleg_id, 1
-    ))
-    cur.execute("""insert into user_mets (id, met_info) values (
-    ?,?)""", (
-        teleg_id, "{}"
-    ))
-    cur.execute("""insert into holidays_status (id, status, till_date) values (
-        ?,?,?)""", (
-        teleg_id,
-        0,
-        'null'
-    ))
-    conn.commit()
-
+    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
+    values_id = (teleg_id,)
+    id_obj = db_controller.select_query(query_id, values_id)
+    user_id = id_obj.fetchone()[0]
+    queries = {
+        """insert into user_status (id, status) values (
+    ?,?)""": (user_id, 1),
+        """insert into user_mets (id, met_info) values (
+    ?,?)""": (user_id, "{}"),
+        """insert into holidays_status (id, status, till_date) values (
+        ?,?,?)""": (user_id, 0, 'null')
+    }
+    for query, values in queries.items():
+        db_controller.query(query,values)
 
 @dp.message_handler(text="Регистрация", state=UserData.start)
 async def start_registration(message: types.Message):

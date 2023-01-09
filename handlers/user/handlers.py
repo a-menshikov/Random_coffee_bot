@@ -1,8 +1,6 @@
-import sqlite3
-
 from aiogram import types
 
-from loader import bot, dp, logger
+from loader import bot, dp, db_controller, logger
 
 from keyboards.user import *
 from handlers.user.new_member import get_gender_from_db, start_registration
@@ -44,35 +42,26 @@ async def send_profile(message: types.Message):
 
 def get_user_data_from_db(teleg_id):
     """Получение id пользователя"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.execute(
-        """SELECT * FROM user_info WHERE teleg_id=?""", (teleg_id,)
-    )
-    row = cur.fetchone()
-    return row
+    query = """SELECT * FROM user_info WHERE teleg_id=?"""
+    values = (teleg_id,)
+    row = db_controller.row_factory(query, values)
+    return row.fetchone()
 
 
 def get_user_status_from_db(user_id):
     """Получение статуса участия пользователя из БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.execute(
-        """SELECT * FROM user_status WHERE id=?""", (user_id,)
-    )
-    row = cur.fetchone()
-    return row
+    query = """SELECT * FROM user_status WHERE id=?"""
+    values = (user_id,)
+    row = db_controller.row_factory(query, values)
+    return row.fetchone()
 
 
 def get_holidays_status_from_db(user_id):
     """Получение статуса каникул пользователя из БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.execute(
-        """SELECT * FROM holidays_status WHERE id=?""", (user_id,)
-    )
-    row = cur.fetchone()
-    return row
+    query = """SELECT * FROM holidays_status WHERE id=?"""
+    values = (user_id,)
+    row = db_controller.row_factory(query, values)
+    return row.fetchone()
 
 
 @dp.callback_query_handler(text=edit_profile_message)
@@ -112,5 +101,3 @@ async def status_message(message: types.Message):
     await bot.send_message(message.from_user.id, text=status)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"получил информацию о статусе участия")
-
-
