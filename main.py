@@ -1,5 +1,5 @@
 import sqlite3
-from loader import bot, dp, db_controller, logger
+from loader import bot, dp, logger
 from aiogram import executor, types
 import aioschedule
 import asyncio
@@ -16,6 +16,7 @@ from match_algoritm import MachingHelper
 async def process_start_command(message: types.Message, state: FSMContext):
     """Функция первого обращения к боту."""
     name = message.from_user.full_name
+    logger.info(f"user id-{message.from_user.id} tg-@{message.from_user.username} start a bot")
     await bot.send_message(
         message.from_user.id,
         text=f'Привет, {name}. У нас вот такой бот. "Регламент".',
@@ -56,7 +57,6 @@ async def on_startup(_):
     loop.create_task(scheduler())
 
 if __name__ == '__main__':
-    logger.info(f"Запуск сервера в {datetime.now()}")
-    mc = MachingHelper(db_controller)
+    mc = MachingHelper()
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 

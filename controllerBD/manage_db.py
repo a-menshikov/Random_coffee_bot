@@ -6,7 +6,8 @@ from datetime import datetime
 class DatabaseManager():
     """Класс для работы с базой данных."""
 
-    def __init__(self, path):
+    def __init__(self, path, logger):
+        self.logger = logger
         self.conn = lite.connect(path)
         self.conn.execute('pragma foreign_keys = on')
         self.conn.commit()
@@ -58,74 +59,68 @@ class DatabaseManager():
 
     def query(self, query, values=None):
         """Выполнение запроса к базе кроме select."""
-        if values is None:
-            self.cur.execute(query)
-        else:
-            self.cur.execute(query, values)
-        self.conn.commit()
+        try:
+            if values is None:
+                self.cur.execute(query)
+                self.logger.info(f'Запрос {query} отработал')
+            else:
+                self.cur.execute(query, values)
+                self.logger.info(f'Запрос {query} со значениями {values}'
+                                 f' отработал')
+            self.conn.commit()
+        except Exception as error:
+            self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
     def select_query(self, query, values=None):
         """Выполнение select_запроса к базе."""
-        if values is None:
-            result = self.cur.execute(query)
-        else:
-            result = self.cur.execute(query, values)
-        self.conn.commit()
-        return result
+        try:
+            if values is None:
+                result = self.cur.execute(query)
+                self.logger.info(f'Запрос {query} отработал')
+            else:
+                result = self.cur.execute(query, values)
+                self.logger.info(f'Запрос {query} со значениями {values}'
+                                 f' отработал')
+            self.conn.commit()
+            return result
+        except Exception as error:
+            self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
     def update_mets(self, match_info: dict):
-        """Записывает в базу информацию о новых встречах."""
+        """Записывает в met_info информацию о новых встречах."""
         today = datetime.now().strftime('%d.%m.%Y')
         for match in match_info.items():
-            if all(match):
-                first_user = match[0]
-                second_user = match[1]
-                query = ('INSERT INTO met_info(first_user_id,'
-                         'second_user_id, date) VALUES (?,?,?)')
-                self.query(query, (first_user, second_user, today))
+            try:
+                if all(match):
+                    first_user = match[0]
+                    second_user = match[1]
+                    query = ('INSERT INTO met_info(first_user_id,'
+                             'second_user_id, date) VALUES (?,?,?)')
+                    self.query(query, (first_user, second_user, today))
+                    self.logger.info(
+                        f'Встреча для польователей {match} записана')
+            except Exception as error:
+                self.logger.error(f'Встреча для польователей {match} не записана.'
+                                  f' Ошибка - {error}')
+                continue
 
     def update_one_user_mets(self, first_user: int, second_user: int):
         """Записывает в user_mets информацию об одном пользователе."""
         today = datetime.now().strftime('%d.%m.%Y')
         all_mets_query = 'SELECT met_info FROM user_mets WHERE id = ?'
         db_result = self.select_query(all_mets_query,
-                                                (first_user,)).fetchone()
+                                      (first_user,)).fetchone()
         user_mets = json.loads(db_result[0])
-        print(user_mets)
         new_met_query = ('SELECT id FROM met_info WHERE date = ? '
-                            'and (first_user_id = ? or second_user_id = ?)')
+                         'and (first_user_id = ? or second_user_id = ?)')
         met_id = self.select_query(new_met_query,
-                                            (today,
-                                                first_user,
-                                                first_user)).fetchone()[0]
+                                   (today,
+                                    first_user,
+                                    first_user)).fetchone()[0]
         user_mets[met_id] = second_user
         new_mets_value = json.dumps(user_mets)
         insert_query = 'UPDATE user_mets SET met_info = ? WHERE id = ?'
         self.query(insert_query, (new_mets_value, first_user))
-        # if db_result:
-        #     user_mets = json.loads(db_result[0])
-        #     new_met_query = ('SELECT id FROM met_info WHERE date = ? '
-        #                      'and (first_user_id = ? or second_user_id = ?)')
-        #     met_id = self.select_query(new_met_query,
-        #                                         (today,
-        #                                          first_user,
-        #                                          first_user)).fetchone()[0]
-        #     user_mets[met_id] = second_user
-        #     new_mets_value = json.dumps(user_mets)
-        #     insert_query = 'UPDATE user_mets SET met_info = ? WHERE id = ?'
-        #     self.query(insert_query, (new_mets_value, first_user))
-        # else:
-        #     user_mets = {}
-        #     new_met_query = ('SELECT id FROM met_info WHERE date = ? '
-        #                      'and (first_user_id = ? or second_user_id = ?)')
-        #     met_id = self.select_query(new_met_query,
-        #                                         (today,
-        #                                          first_user,
-        #                                          first_user)).fetchone()[0]
-        #     user_mets[met_id] = second_user
-        #     new_mets_value = json.dumps(user_mets)
-        #     insert_query = 'INSERT INTO user_mets VALUES (?, ?)'
-        #     self.query(insert_query, (first_user, new_mets_value))
 
     def update_all_user_mets(self, match_info: dict):
         """Записывает в user_mets всю информацию о новых встречaх."""
@@ -133,10 +128,25 @@ class DatabaseManager():
             if all(match):
                 first_user = match[0]
                 second_user = match[1]
-                self.update_one_user_mets(first_user, second_user)
+                try:
+                    self.update_one_user_mets(first_user, second_user)
+                    self.logger.info(f'Информация о встречах пользователя '
+                                     f'{first_user} обновлена')
+                except Exception as error:
+                    self.logger.error(f'Информация о встречах пользователя '
+                                      f'{first_user} не обновлена. '
+                                      f' Ошибка - {error}')
                 first_user = match[1]
                 second_user = match[0]
-                self.update_one_user_mets(first_user, second_user)
+                try:
+                    self.update_one_user_mets(first_user, second_user)
+                    self.logger.info(f'Информация о встречах пользователя '
+                                     f'{first_user} обновлена')
+                except Exception as error:
+                    self.logger.error(f'Информация о встречах пользователя '
+                                      f'{first_user} не обновлена. '
+                                      f' Ошибка - {error}')
 
     def __del__(self):
         self.conn.close()
+        self.logger.info('Соединение с базой закрыто')
