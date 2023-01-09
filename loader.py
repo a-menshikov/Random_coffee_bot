@@ -10,7 +10,7 @@ logging.basicConfig(filename="main.log",
                     datefmt='%H:%M:%S',
                     level=logging.INFO)
 
-
+logger = logging.getLogger(__name__)
 bot = Bot(token=str(config.TOKEN))
 dp = Dispatcher(bot, storage=MemoryStorage())
 path = 'data/coffee_database.db'
