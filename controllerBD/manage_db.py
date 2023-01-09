@@ -1,7 +1,8 @@
 import json
-import logging
 import sqlite3 as lite
 from datetime import datetime
+
+from loader import logger
 
 
 class DatabaseManager():
@@ -62,29 +63,29 @@ class DatabaseManager():
         try:
             if values is None:
                 self.cur.execute(query)
-                logging.info(f'Запрос {query} отработал')
+                logger.info(f'Запрос {query} отработал')
             else:
                 self.cur.execute(query, values)
-                logging.info(f'Запрос {query} со значениями {values}'
-                             f' отработал')
+                logger.info(f'Запрос {query} со значениями {values}'
+                            f' отработал')
             self.conn.commit()
         except Exception as error:
-            logging.error(f'Запрос {query} не отработал. Ошибка {error}')
+            logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
     def select_query(self, query, values=None):
         """Выполнение select_запроса к базе."""
         try:
             if values is None:
                 result = self.cur.execute(query)
-                logging.info(f'Запрос {query} отработал')
+                logger.info(f'Запрос {query} отработал')
             else:
                 result = self.cur.execute(query, values)
-                logging.info(f'Запрос {query} со значениями {values}'
-                             f' отработал')
+                logger.info(f'Запрос {query} со значениями {values}'
+                            f' отработал')
             self.conn.commit()
             return result
         except Exception as error:
-            logging.error(f'Запрос {query} не отработал. Ошибка {error}')
+            logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
     def update_mets(self, match_info: dict):
         """Записывает в met_info информацию о новых встречах."""
@@ -97,10 +98,10 @@ class DatabaseManager():
                     query = ('INSERT INTO met_info(first_user_id,'
                              'second_user_id, date) VALUES (?,?,?)')
                     self.query(query, (first_user, second_user, today))
-                    logging.info(f'Встреча для польователей {match} записана')
+                    logger.info(f'Встреча для польователей {match} записана')
             except Exception as error:
-                logging.error(f'Встреча для польователей {match} не записана.'
-                              f' Ошибка - {error}')
+                logger.error(f'Встреча для польователей {match} не записана.'
+                             f' Ошибка - {error}')
                 continue
 
     def update_one_user_mets(self, first_user: int, second_user: int):
@@ -129,23 +130,23 @@ class DatabaseManager():
                 second_user = match[1]
                 try:
                     self.update_one_user_mets(first_user, second_user)
-                    logging.info(f'Информация о встречах пользователя '
-                                 f'{first_user} обновлена')
+                    logger.info(f'Информация о встречах пользователя '
+                                f'{first_user} обновлена')
                 except Exception as error:
-                    logging.error(f'Информация о встречах пользователя '
-                                  f'{first_user} не обновлена. '
-                                  f' Ошибка - {error}')
+                    logger.error(f'Информация о встречах пользователя '
+                                 f'{first_user} не обновлена. '
+                                 f' Ошибка - {error}')
                 first_user = match[1]
                 second_user = match[0]
                 try:
                     self.update_one_user_mets(first_user, second_user)
-                    logging.info(f'Информация о встречах пользователя '
-                                 f'{first_user} обновлена')
+                    logger.info(f'Информация о встречах пользователя '
+                                f'{first_user} обновлена')
                 except Exception as error:
-                    logging.error(f'Информация о встречах пользователя '
-                                  f'{first_user} не обновлена. '
-                                  f' Ошибка - {error}')
+                    logger.error(f'Информация о встречах пользователя '
+                                 f'{first_user} не обновлена. '
+                                 f' Ошибка - {error}')
 
     def __del__(self):
         self.conn.close()
-        logging.info('Соединение с базой закрыто')
+        logger.info('Соединение с базой закрыто')

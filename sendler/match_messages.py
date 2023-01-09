@@ -1,8 +1,7 @@
-import logging
 from importlib.machinery import SourceFileLoader
 
 from aiogram import Bot
-from loader import db_controller
+from loader import db_controller, logger
 
 clas = SourceFileLoader("module.name",
                         "./controllerBD/manage_db.py").load_module()
@@ -16,8 +15,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
     for match in match_info.items():
         users_info = pare_users_query(match)
         if not users_info:
-            logging.error(f'Не удалось получить информацию '
-                          f'из БД для пары {match}')
+            logger.error(f'Не удалось получить информацию '
+                         f'из БД для пары {match}')
             continue
         elif len(users_info) == 2:
             first_user = users_info[0]
@@ -27,29 +26,29 @@ async def send_match_messages(match_info: dict, bot: Bot):
             try:
                 first_message = make_message(first_user)
             except Exception as error:
-                logging.error(f'Не удалось сформировать сообщение о '
-                              f'пользователе {first_user}. Ошибка {error}')
+                logger.error(f'Не удалось сформировать сообщение о '
+                             f'пользователе {first_user}. Ошибка {error}')
             try:
                 second_message = make_message(second_user)
             except Exception as error:
-                logging.error(f'Не удалось сформировать сообщение о '
-                              f'пользователе {second_user}. Ошибка {error}')
+                logger.error(f'Не удалось сформировать сообщение о '
+                             f'пользователе {second_user}. Ошибка {error}')
             try:
                 await bot.send_message(second_user_id, first_message,
                                        parse_mode="HTML")
-                logging.info(f'Сообщение для пользователя {second_user_id} '
-                             f'отправлено')
+                logger.info(f'Сообщение для пользователя {second_user_id} '
+                            f'отправлено')
             except Exception as error:
-                logging.error(f'Сообщение для пользователя {second_user_id} '
-                              f'не отправлено. Ошибка {error}')
+                logger.error(f'Сообщение для пользователя {second_user_id} '
+                             f'не отправлено. Ошибка {error}')
             try:
                 await bot.send_message(first_user_id, second_message,
                                        parse_mode="HTML")
-                logging.info(f'Сообщение для пользователя {first_user_id} '
-                             f'отправлено')
+                logger.info(f'Сообщение для пользователя {first_user_id} '
+                            f'отправлено')
             except Exception as error:
-                logging.error(f'Сообщение для пользователя {first_user_id} '
-                              f'не отправлено. Ошибка {error}')
+                logger.error(f'Сообщение для пользователя {first_user_id} '
+                             f'не отправлено. Ошибка {error}')
         else:
             fail_user = users_info[0]
             fail_user_id = fail_user[1]
@@ -57,13 +56,13 @@ async def send_match_messages(match_info: dict, bot: Bot):
             try:
                 await bot.send_message(ADMIN_TG_ID,
                                        message, parse_mode="HTML")
-                logging.info(f'Сообщение админу об отсутствии пары '
-                             f'для пользователя {fail_user_id} '
-                             f'отправлено')
+                logger.info(f'Сообщение админу об отсутствии пары '
+                            f'для пользователя {fail_user_id} '
+                            f'отправлено')
             except Exception as error:
-                logging.error(f'Сообщение админу об отсутствии пары '
-                              f'для пользователя {fail_user_id} '
-                              f'не отправлено. Ошибка {error}')
+                logger.error(f'Сообщение админу об отсутствии пары '
+                             f'для пользователя {fail_user_id} '
+                             f'не отправлено. Ошибка {error}')
 
 
 def make_message(user_info: tuple, fail: bool = False):
