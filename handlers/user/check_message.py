@@ -2,8 +2,9 @@ import sqlite3
 from asyncio import sleep
 
 from aiogram import types
+from aiogram.utils.exceptions import BotBlocked
 
-from loader import bot, dp, logger
+from loader import bot, dp, db_controller, logger
 
 
 @dp.message_handler(commands=['check'])
@@ -29,10 +30,13 @@ def prepare_user_list():
 async def send_message(teleg_id, **kwargs):
     try:
         await bot.send_message(teleg_id, **kwargs)
-    except Exception as error:
-        logger.error(f"Не возможно доставить сообщение пользователю  {teleg_id}. "
-                     f"{error}")
+    except BotBlocked:
+        logger.error(f"Не возможно доставить сообщение пользователю {teleg_id}."
+                     f"Бот заблокирован.")
         await change_status(teleg_id)
+    except Exception as error:
+        logger.error(f"Не возможно доставить сообщение пользователю {teleg_id}."
+                     f"{error}")
 
 
 async def change_status(teleg_id):
