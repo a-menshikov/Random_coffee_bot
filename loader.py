@@ -1,4 +1,6 @@
 import logging
+import sys
+
 from data import config
 from controllerBD import DatabaseManager
 from aiogram import Bot, Dispatcher

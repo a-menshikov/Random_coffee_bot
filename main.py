@@ -3,6 +3,7 @@ from loader import bot, dp, logger
 from aiogram import executor, types
 import aioschedule
 import asyncio
+from datetime import datetime
 from controllerBD import DatabaseManager
 from keyboards.user import *
 from states import UserData
@@ -46,7 +47,7 @@ async def check_and_add_registration_button(message: types.Message):
         )
 
 async def scheduler():
-    aioschedule.every().day.at("00:22").do(sheduled_check_holidays)
+    aioschedule.every().day.at("12:22").do(sheduled_check_holidays)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
