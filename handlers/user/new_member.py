@@ -92,10 +92,7 @@ def update_profile_db(teleg_id, name, birthday, about, gender):
 
 def add_new_user_in_status_table(teleg_id):
     """Проставляем статусы участия в таблицах БД"""
-    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
-    values_id = (teleg_id,)
-    id_obj = db_controller.select_query(query_id, values_id)
-    user_id = id_obj.fetchone()[0]
+    user_id = get_id_from_user_info_table(teleg_id)
     queries = {
         """insert into user_status (id, status) values (
     ?,?)""": (user_id, 1),
@@ -105,7 +102,8 @@ def add_new_user_in_status_table(teleg_id):
         ?,?,?)""": (user_id, 0, 'null')
     }
     for query, values in queries.items():
-        db_controller.query(query,values)
+        db_controller.query(query, values)
+
 
 @dp.message_handler(text="Регистрация", state=UserData.start)
 async def start_registration(message: types.Message):
@@ -239,3 +237,10 @@ async def answer_gender(message: types.Message, state: FSMContext):
             gender = 2
         await state.update_data(gender=gender)
         await end_registration(state, message)
+
+
+def get_id_from_user_info_table(teleg_id):
+    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
+    values_id = (teleg_id,)
+    id_obj = db_controller.select_query(query_id, values_id)
+    return id_obj.fetchone()[0]

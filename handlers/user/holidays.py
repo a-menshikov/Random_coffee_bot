@@ -2,7 +2,8 @@ import sqlite3
 from datetime import date, timedelta, datetime
 from aiogram import types
 
-from loader import bot, dp, logger
+from handlers.user import get_id_from_user_info_table
+from loader import bot, dp, logger, db_controller
 
 from keyboards.user import *
 
@@ -56,23 +57,14 @@ async def get_three_week_holidays(message: types.Message):
 @dp.callback_query_handler(text="cancel_holidays")
 async def cancel_holidays(message: types.Message):
     """Отключение режима каникул"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute(
-        """update holidays_status SET status=?, till_date=? where id = ?""", (
-            0,
-            "null",
-            teleg_id
-        ))
-    cur.execute("""UPDATE user_status SET status=? WHERE id = ? """, (
-        1,
-        teleg_id
-    ))
-    conn.commit()
+    user_id = get_id_from_user_info_table(message.from_user.id)
+    queries = {
+        """update holidays_status SET status=?, till_date=? where id = ?""":
+            (0, "null", user_id),
+        """UPDATE user_status SET status=? WHERE id = ? """: (1, user_id)
+    }
+    for query, values in queries.items():
+        db_controller.query(query, values)
     await bot.send_message(
         message.from_user.id,
         text=f'Режим каникул был отключен'
@@ -83,80 +75,57 @@ async def cancel_holidays(message: types.Message):
 
 async def get_holidays(message: types.Message, date_to_return):
     """Запись данных о каникулах в БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute("""update holidays_status SET status=?, till_date=? 
-                where id = ?""", (
-            1,
-            date_to_return,
-            teleg_id,
-        ))
-    cur.execute("""UPDATE user_status SET status=? WHERE id = ? """, (
-        0,
-        teleg_id,
-    ))
-    conn.commit()
+    user_id = get_id_from_user_info_table(message.from_user.id)
+    queries = {
+        """UPDATE holidays_status SET status=?, till_date=? 
+        WHERE id = ?""": (1, date_to_return, user_id),
+        """UPDATE user_status SET status=? WHERE id = ? """: (0, user_id)
+    }
+    for query, values in queries.items():
+        db_controller.query(query, values)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"установил режим каникул до {date_to_return}")
 
 
-async def check_holidays_until(tg_id):
+async def check_holidays_until(teleg_id):
     """Проверка даты окончания каникул пользователя в БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""",
-        (tg_id,)
-    )
-    info = cur.execute(
-        """SELECT * FROM holidays_status WHERE id = ?""",
-        (id_obj.fetchone()[0],)
-    )
-    row = info.fetchone()
+    user_id = get_id_from_user_info_table(teleg_id)
+    query = """SELECT * FROM holidays_status WHERE id = ?"""
+    values = (user_id,)
+    row = db_controller.select_query(query, values).fetchone()
     if row[1] == 0:
         pass
     else:
         await bot.send_message(
-            tg_id,
+            teleg_id,
             text=f'Каникулы установлены до {row[2]}.'
         )
 
 
 async def sheduled_check_holidays():
     """Отключение режима каникул при окончании срока. Проверка по расписанию"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT * FROM holidays_status WHERE status = 1"""
-    )
-
-    data = info.fetchall()
+    query = """SELECT * FROM holidays_status WHERE status = 1"""
+    data = db_controller.select_query(query).fetchall()
     for row in data:
         date_obj = datetime.strptime(row[2], '%Y-%m-%d')
         date_obj = date_obj.date()
         if date_obj == date.today():
-            id_obj = cur.execute(
-                """SELECT teleg_id FROM user_info WHERE id=?""",
-                (row[0],)
-            )
-            teleg_id = id_obj.fetchone()[0]
-            cur.execute(
+            user_id = get_teleg_id_from_user_info_table(row[0])
+            queries = {
                 """update holidays_status SET status=?, till_date=? 
-                WHERE id=?""", (
-                    0,
-                    "null",
-                    row[0]
-                ))
-            cur.execute("""UPDATE user_status SET status=? WHERE id = ?""", (
-                1,
-                row[0]
-            ))
-            conn.commit()
+                WHERE id=?""": (0, "null", row[0]),
+                """UPDATE user_status SET status=? WHERE id = ?""":
+                    (1, row[0])
+            }
+            for query, values in queries.items():
+                db_controller.query(query, values)
             await bot.send_message(
-                teleg_id,
+                user_id,
                 text=f'Режим каникул был отключен'
             )
+
+def get_teleg_id_from_user_info_table(id):
+    query_id = """SELECT teleg_id FROM user_info WHERE id=?"""
+    values_id = (id,)
+    id_obj = db_controller.select_query(query_id, values_id)
+    return id_obj.fetchone()[0]

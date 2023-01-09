@@ -1,8 +1,10 @@
 from asyncio import sleep
+from datetime import date, timedelta
 
 from aiogram import types
 from aiogram.utils.exceptions import BotBlocked
 
+from handlers.user import get_id_from_user_info_table
 from loader import bot, dp, db_controller, logger
 
 
@@ -37,11 +39,11 @@ async def send_message(teleg_id, **kwargs):
 
 
 async def change_status(teleg_id):
-    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
-    values_id = (teleg_id,)
-    id_obj = db_controller.select_query(query_id, values_id)
-    user_id = id_obj.fetchone()[0]
-    query = """UPDATE user_status SET status = 0
-        WHERE id = ? """
-    values = (user_id,)
-    db_controller.query(query, values)
+    user_id = get_id_from_user_info_table(teleg_id)
+    queries = {
+        """UPDATE user_status SET status = 0 WHERE id =?""": (user_id,),
+        """UPDATE holidays_status SET status = 1, till_date = ? 
+        WHERE id = ? """: (str(date.today() + timedelta(days=6)), user_id)
+    }
+    for query, values in queries.items():
+        db_controller.query(query, values)
