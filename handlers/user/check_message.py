@@ -3,7 +3,7 @@ from asyncio import sleep
 
 from aiogram import types
 
-from loader import bot, dp, logger
+from loader import bot, dp, logger, db_controller
 
 
 @dp.message_handler(commands=['check'])

@@ -1,13 +1,7 @@
-from importlib.machinery import SourceFileLoader
-
 from aiogram import Bot
 from loader import db_controller, logger
 
-clas = SourceFileLoader("module.name",
-                        "./controllerBD/manage_db.py").load_module()
-clas_1 = SourceFileLoader("module.name", "./data/__init__.py").load_module()
-
-ADMIN_TG_ID = clas_1.ADMIN_TG_ID
+from data import ADMIN_TG_ID
 
 
 async def send_match_messages(match_info: dict, bot: Bot):
@@ -52,16 +46,17 @@ async def send_match_messages(match_info: dict, bot: Bot):
         else:
             fail_user = users_info[0]
             fail_user_id = fail_user[1]
+            fail_user_db_id = fail_user[0]
             message = make_message(fail_user, fail=True)
             try:
                 await bot.send_message(ADMIN_TG_ID,
                                        message, parse_mode="HTML")
                 logger.info(f'Сообщение админу об отсутствии пары '
-                            f'для пользователя {fail_user_id} '
+                            f'для пользователя {fail_user_db_id} '
                             f'отправлено')
             except Exception as error:
                 logger.error(f'Сообщение админу об отсутствии пары '
-                             f'для пользователя {fail_user_id} '
+                             f'для пользователя {fail_user_db_id} '
                              f'не отправлено. Ошибка {error}')
 
 

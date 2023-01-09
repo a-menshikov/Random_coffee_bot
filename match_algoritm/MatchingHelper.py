@@ -49,12 +49,13 @@ class MachingHelper():
         with open("./data/match_algoritm_data/temp.txt", "w") as text:
             text.write(temp)
 
-    def send_and_write(self, t: dict):
+    async def send_and_write(self, t: dict):
         """Send a mets to users"""
         logger.info("Write mets to db")
+        db_controller.update_mets(t)
         db_controller.update_all_user_mets(t)
         logger.info("Start send matches")
-        send_match_messages(t, bot)
+        await send_match_messages(t, bot)
 
     def start(self):
         """Run matching algo"""
