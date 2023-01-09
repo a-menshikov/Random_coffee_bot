@@ -58,6 +58,7 @@ coverage.xml
 *.mo
 *.pot
 *.db
+.vscode
 
 # Django stuff:
 *.log
