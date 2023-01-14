@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class UserData(StatesGroup):
-    """Машина состояний"""
+    """Машина состояний пользователя"""
     start = State()
     name = State()
     birthday = State()
@@ -10,3 +10,8 @@ class UserData(StatesGroup):
     gender = State()
     end_registration = State()
     check_info = State()
+
+
+class AdminData(StatesGroup):
+    """Машина состояний админа"""
+    start = State()
