@@ -14,9 +14,10 @@ from handlers.admin import *
 from match_algoritm import MachingHelper
 
 
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start', 'help'], state='*')
 async def process_start_command(message: types.Message, state: FSMContext):
     """Функция первого обращения к боту."""
+    await state.reset_state()
     name = message.from_user.full_name
     logger.info(f"user id-{message.from_user.id} tg-@{message.from_user.username} start a bot")
     await bot.send_message(
@@ -48,7 +49,6 @@ async def check_and_add_registration_button(message: types.Message):
             text="Привет, Админ. Нажмите кнопку меню и выберите из доступных вариантов",
             reply_markup=admin_main_markup(),
         )
-        await AdminData.start.set()
     else:
         await bot.send_message(
             message.from_user.id,
