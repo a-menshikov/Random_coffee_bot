@@ -100,8 +100,8 @@ class DatabaseManager():
                     self.logger.info(
                         f'Встреча для польователей {match} записана')
             except Exception as error:
-                self.logger.error(f'Встреча для польователей {match} не записана.'
-                                  f' Ошибка - {error}')
+                self.logger.error(f'Встреча для польователей {match} '
+                                  f'не записана. Ошибка - {error}')
                 continue
 
     def update_one_user_mets(self, first_user: int, second_user: int):
