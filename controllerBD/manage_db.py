@@ -53,6 +53,7 @@ class DatabaseManager():
             "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "met_id INTEGER NOT NULL,"
             "user_id INTEGER NOT NULL,"
+            "comment TEXT NOT NULL,"
             "FOREIGN KEY (met_id) REFERENCES met_info(id)"
             "FOREIGN KEY (user_id) REFERENCES user_info(id))"
         ]

@@ -3,7 +3,8 @@ import datetime
 from aiogram import types
 from aiogram.types import ReplyKeyboardRemove
 
-from handlers.user import get_teleg_id_from_user_info_table
+from handlers.user import get_teleg_id_from_user_info_table, \
+    get_id_from_user_info_table
 from keyboards import skip_message, main_markup, review_messages
 from keyboards.user.review_markups import review_markup
 from loader import db_controller, dp, bot, logger
@@ -50,6 +51,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
     """Получаем отзыв и записываем в базу"""
     answer = message.text
     if answer != skip_message:
+        await save_review(message.from_user.id, answer)
         try:
             await bot.send_message(
                 message.from_user.id,
@@ -82,3 +84,23 @@ def preparing_list_of_users_id():
     data = db_controller.select_query(query, values).fetchall()
     logger.info("Список ID для рассылки на отзывы сформирован")
     return [element[0] for element in data] + [element[1] for element in data]
+
+async def save_review(teleg_id, text):
+    user_id = get_id_from_user_info_table(teleg_id)
+    met_id = get_met_id_with_user_last_week(user_id)
+    query = """INSERT INTO mets_reviews (met_id, user_id, comment)
+            VALUES (?, ?, ?)"""
+    values = (met_id, user_id, text)
+    db_controller.query(query, values)
+
+def get_met_id_with_user_last_week(user_id):
+    today = datetime.date.today()
+    start_period = today - datetime.timedelta(days=7)
+    query = """SELECT id 
+        FROM met_info 
+        WHERE date
+        BETWEEN strftime('%d.%m.%Y', ?) AND strftime('%d.%m.%Y', ?)
+        AND (first_user_id = ? OR second_user_id = ?)"""
+    values = (start_period, today, user_id, user_id)
+    met_id = db_controller.select_query(query, values).fetchone()[0]
+    return met_id
