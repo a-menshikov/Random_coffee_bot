@@ -2,19 +2,23 @@ from asyncio import sleep
 from datetime import date, timedelta
 
 from aiogram import types
+from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
 from handlers.user import get_id_from_user_info_table
+from keyboards import menu_markup, check_messages
 from loader import bot, dp, db_controller, logger
+from states import AdminData
 
 
-@dp.message_handler(commands=['check'])
-async def check_message(message: types.Message):
-    await sleep(10)
+@dp.message_handler(text=check_messages, state=AdminData.start)
+async def check_message(message: types.Message, state: FSMContext):
+    await sleep(5)
+    await state.reset_state()
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
-            text="Через несколько минут будем произведена рассылка"
+            text="Через несколько минут будем произведена рассылка",
         )
 
 

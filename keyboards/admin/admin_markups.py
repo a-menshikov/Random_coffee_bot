@@ -5,24 +5,29 @@ from aiogram.types import ReplyKeyboardRemove, \
 admin_menu = "Меню администратора"
 inform = "Отчет за прошедшую неделю"
 ban_list = "Бан-лист"
-user_menu = "🏠 Меню пользователей"
 back_to_main = 'Главное меню'
 add_to_ban_list = "Добавить в бан-лист"
 remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
+check_messages = "Запустить проверку перед алгоритмом"
+algo_start = "Запуск алгоритма"
+review_messages = "Запуск опроса"
 
 
 def admin_main_markup():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(admin_menu)
-    markup.add(user_menu)
     return markup
 
 def admin_menu_markup():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(inform)
     markup.add(ban_list)
+    markup.add(check_messages)
+    markup.add(algo_start)
+    markup.add(review_messages)
     markup.add(back_to_main)
+
     return markup
 
 def admin_ban_markup():

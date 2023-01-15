@@ -1,4 +1,6 @@
 from aiogram import Bot
+
+from keyboards import help_texts_markup
 from loader import db_controller, logger
 
 from data import ADMIN_TG_ID
@@ -29,7 +31,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
                              f'пользователе {second_user}. Ошибка {error}')
             try:
                 await bot.send_message(second_user_id, first_message,
-                                       parse_mode="HTML")
+                                       parse_mode="HTML",
+                                       reply_markup=help_texts_markup())
                 logger.info(f'Сообщение для пользователя {second_user_id} '
                             f'отправлено')
             except Exception as error:
@@ -37,7 +40,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
                              f'не отправлено. Ошибка {error}')
             try:
                 await bot.send_message(first_user_id, second_message,
-                                       parse_mode="HTML")
+                                       parse_mode="HTML",
+                                       reply_markup=help_texts_markup())
                 logger.info(f'Сообщение для пользователя {first_user_id} '
                             f'отправлено')
             except Exception as error:

@@ -15,3 +15,6 @@ class UserData(StatesGroup):
 class AdminData(StatesGroup):
     """Машина состояний админа"""
     start = State()
+
+class ReviewState(StatesGroup):
+    start = State()

@@ -53,7 +53,7 @@ async def ban_list_remove(message: types.Message):
     )
 
 
-@dp.message_handler(text=back_to_main, state=AdminData.start)
+@dp.message_handler(text=back_to_main, state="*")
 async def back_to_main(message: types.Message, state: FSMContext):
     await state.reset_state()
     await bot.send_message(message.from_user.id,
@@ -65,8 +65,3 @@ async def back_to_main(message: types.Message, state: FSMContext):
 @dp.message_handler(text=go_back, state=AdminData)
 async def go_back(message: types.Message):
     await admin_menu(message)
-
-
-@dp.message_handler(text=user_menu)
-async def user_menu(message: types.Message):
-    await main_menu(message)

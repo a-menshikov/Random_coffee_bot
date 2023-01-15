@@ -27,7 +27,7 @@ async def process_start_command(message: types.Message, state: FSMContext):
     await check_and_add_registration_button(message)
 
 
-@dp.message_handler(commands=['start_algo'], state="*")
+@dp.message_handler(text=algo_start, state=AdminData.start)
 async def start_algoritm(message: types.Message):
     mc.prepare()
     res = mc.start()
@@ -46,7 +46,7 @@ async def check_and_add_registration_button(message: types.Message):
     elif message.from_user.id == int(ADMIN_TG_ID):
         await bot.send_message(
             message.from_user.id,
-            text="Привет, Админ. Нажмите кнопку меню и выберите из доступных вариантов",
+            text="Привет, Админ. Добро пожаловать в меню администратора",
             reply_markup=admin_main_markup(),
         )
     else:
