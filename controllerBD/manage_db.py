@@ -48,7 +48,13 @@ class DatabaseManager():
             "(id INTEGER PRIMARY KEY,"
             "status INTEGER NOT NULL,"
             "till_date TEXT,"
-            "FOREIGN KEY (id) REFERENCES user_info(id))"
+            "FOREIGN KEY (id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS mets_reviews"
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "met_id INTEGER NOT NULL,"
+            "user_id INTEGER NOT NULL,"
+            "FOREIGN KEY (met_id) REFERENCES met_info(id)"
+            "FOREIGN KEY (user_id) REFERENCES user_info(id))"
         ]
         for query in queries:
             try:
