@@ -15,7 +15,11 @@ async def start_review(message: types.Message):
     """Запускаем процесс сбора отзывов"""
     logger.info("Подготавливаем список ID для запроса отзыва.")
     users_id = set(preparing_list_of_users_id())
-    await request_review(users_id)
+    if len(users_id) > 0:
+        await request_review(users_id)
+    else:
+        await bot.send_message(message.from_user.id,
+                               "На этой неделе не было встреч.")
 
 
 async def request_review(users_id):
