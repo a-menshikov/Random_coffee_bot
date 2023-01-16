@@ -55,7 +55,16 @@ class DatabaseManager():
             "user_id INTEGER NOT NULL,"
             "comment TEXT NOT NULL,"
             "FOREIGN KEY (met_id) REFERENCES met_info(id)"
-            "FOREIGN KEY (user_id) REFERENCES user_info(id))"
+            "FOREIGN KEY (user_id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS ban_list"
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "banned_user_id INTEGER NOT NULL,"
+            "ban_status INTEGER NOT NULL,"
+            "date_of_ban TEXT NOT NULL,"
+            "comment_to_ban TEXT NOT NULL,"
+            "date_of_unban TEXT NOT NULL,"
+            "comment_to_unban TEXT NOT NULL,"
+            "FOREIGN KEY (banned_user_id) REFERENCES user_info(id))"
         ]
         for query in queries:
             try:

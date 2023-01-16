@@ -1,6 +1,7 @@
 import sqlite3
 
 from data import ADMIN_TG_ID
+from handlers.user.ban_check import check_user_in_ban
 from loader import bot, dp, logger
 from aiogram import executor, types
 import aioschedule
@@ -8,7 +9,7 @@ import asyncio
 from datetime import datetime
 from controllerBD import DatabaseManager
 from keyboards import *
-from states import UserData, AdminData
+from states import UserData, AdminData, BannedState
 from handlers.user import *
 from handlers.admin import *
 from match_algoritm import MachingHelper
@@ -36,25 +37,35 @@ async def start_algoritm(message: types.Message):
 
 
 async def check_and_add_registration_button(message: types.Message):
-    if not await check_user_in_base(message):
-        await bot.send_message(
-            message.from_user.id,
-            text="Нажмите кнопку регистрации для старта.",
-            reply_markup=start_registr_markup()
-        )
-        await UserData.start.set()
-    elif message.from_user.id == int(ADMIN_TG_ID):
+    if message.from_user.id == int(ADMIN_TG_ID):
         await bot.send_message(
             message.from_user.id,
             text="Привет, Админ. Добро пожаловать в меню администратора",
             reply_markup=admin_main_markup(),
         )
+    elif not await check_user_in_base(message):
+            await bot.send_message(
+                message.from_user.id,
+                text="Нажмите кнопку регистрации для старта.",
+                reply_markup=start_registr_markup()
+            )
+            await UserData.start.set()
+
     else:
-        await bot.send_message(
-            message.from_user.id,
-            text="Нажмите кнопку меню и выберите из доступных вариантов",
-            reply_markup=main_markup(),
-        )
+        if not await check_user_in_ban(message):
+            await bot.send_message(
+                message.from_user.id,
+                text="Нажмите кнопку меню и выберите из доступных вариантов",
+                reply_markup=main_markup(),
+            )
+        else:
+            await bot.send_message(
+                message.from_user.id,
+                text="К сожалению вы нарушили наши правила и попали в бан. "
+                     "Для решения данного вопроса просим обратиться к "
+                     "администратору",
+            )
+            await BannedState.start.set()
 
 async def scheduler():
     aioschedule.every().day.at("23:19").do(sheduled_check_holidays)
