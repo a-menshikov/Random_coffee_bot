@@ -6,23 +6,25 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
 from handlers.user import get_id_from_user_info_table
-from keyboards import menu_markup, check_messages
+from keyboards import menu_markup
 from loader import bot, dp, db_controller, logger
 from states import AdminData
 
 
-@dp.message_handler(text=check_messages, state=AdminData.start)
-async def check_message(message: types.Message, state: FSMContext):
-    await sleep(5)
+async def check_message(state: FSMContext):
+    logger.info("Запуск проверки пользователей")
     await state.reset_state()
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
             text="Через несколько минут будем произведена рассылка",
         )
+        await sleep(0.05)
+    logger.info("Все пользователи проверены.")
 
 
 def prepare_user_list():
+    logger.info("""Подготавливаем список пользователей из базы""")
     query = """SELECT user_info.teleg_id FROM user_status 
     JOIN user_info ON user_info.id = user_status.id 
     WHERE user_status.status = 1 """

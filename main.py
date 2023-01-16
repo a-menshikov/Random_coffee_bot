@@ -29,7 +29,8 @@ async def process_start_command(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(text=algo_start, state=AdminData.start)
-async def start_algoritm(message: types.Message):
+async def start_algoritm(message: types.Message, state: FSMContext):
+    await check_message(state)
     mc.prepare()
     res = mc.start()
     print("retunr-",res)
