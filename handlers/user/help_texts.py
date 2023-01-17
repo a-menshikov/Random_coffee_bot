@@ -30,6 +30,3 @@ async def send_help_texts(message: types.Message):
         await bot.send_message(message.from_user.id,
                                f'<code>{text}</code>',
                                parse_mode='HTML')
-
-
-

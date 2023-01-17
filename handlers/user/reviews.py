@@ -66,7 +66,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
     else:
         await bot.send_message(
             message.from_user.id,
-            f"Спасибо за Ваш отзыв.",
+            "Спасибо за Ваш отзыв.",
             reply_markup=main_markup()
         )
     await state.reset_state()

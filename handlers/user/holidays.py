@@ -1,11 +1,10 @@
-import sqlite3
 from datetime import date, timedelta, datetime
 from aiogram import types
 
 from handlers.user import get_id_from_user_info_table
 from loader import bot, dp, logger, db_controller
 
-from keyboards.user import *
+from keyboards.user import set_holiday_message, holidays_length
 
 
 @dp.callback_query_handler(text=set_holiday_message)
@@ -16,7 +15,7 @@ async def check_and_choice_holidays(message: types.Message):
     await check_holidays_until(message.from_user.id)
     await bot.send_message(
         message.from_user.id,
-        text=f'Выберите на какой срок выхотите установить каникулы',
+        text='Выберите на какой срок выхотите установить каникулы',
         reply_markup=holidays_length()
     )
 
@@ -67,7 +66,7 @@ async def cancel_holidays(message: types.Message):
         db_controller.query(query, values)
     await bot.send_message(
         message.from_user.id,
-        text=f'Режим каникул был отключен'
+        text='Режим каникул был отключен'
     )
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"отключил режим каникул")
@@ -121,8 +120,9 @@ async def sheduled_check_holidays():
                 db_controller.query(query, values)
             await bot.send_message(
                 user_id,
-                text=f'Режим каникул был отключен'
+                text='Режим каникул был отключен'
             )
+
 
 def get_teleg_id_from_user_info_table(id):
     """Получение id телеграм чата по id пользователя."""

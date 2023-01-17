@@ -1,11 +1,10 @@
 import re
-
 from datetime import datetime
 
 from aiogram import types
-
+from keyboards.user import (all_right_message, back_message, man_message,
+                            skip_message, woman_message)
 from loader import bot
-from keyboards.user import *
 
 
 def validate_name(message):
@@ -29,21 +28,21 @@ async def validate_birthday(message: types.Message):
         if age < 0:
             await bot.send_message(
                 message.from_user.id,
-                f'Вы что из будущего? Введите правильную дату рождения"'
+                'Вы что из будущего?)) Введите правильную дату рождения"'
             )
             return False
         elif age > 120:
             await bot.send_message(
                 message.from_user.id,
-                f'Указанный возраст болеее 120 лет. '
-                f'Введите правильную дату рождения'
+                'Указанный возраст болеее 120 лет. '
+                'Введите правильную дату рождения'
             )
             return False
         return True
     await bot.send_message(
         message.from_user.id,
-        f'Что то не так с введенными данными. '
-        f'Дата должно состоять из цифр и точек ДД.ММ.ГГГГ"'
+        'Что то не так с введенными данными. '
+        'Дата должно состоять из цифр и точек ДД.ММ.ГГГГ"'
     )
     return False
 
@@ -65,8 +64,8 @@ async def validate_gender(message: types.Message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            f'Пожалуйста выберите из доступных вариантов или '
-            f'нажмите "Пропустить"'
+            'Пожалуйста выберите из доступных вариантов или '
+            'нажмите "Пропустить"'
         )
         return False
     return True

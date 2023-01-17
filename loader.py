@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from data import config
 from controllerBD import DatabaseManager
@@ -8,7 +7,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 logging.basicConfig(filename="main.log",
                     filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    format=('%(asctime)s,%(msecs)d %(name)s '
+                            '%(levelname)s %(message)s'),
                     datefmt='%H:%M:%S',
                     level=logging.INFO)
 

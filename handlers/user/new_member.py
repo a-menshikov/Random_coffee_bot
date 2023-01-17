@@ -1,11 +1,15 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-
-from loader import bot, dp, db_controller, logger
-from handlers.user.validators import *
-
+from aiogram.types import ReplyKeyboardRemove
+from handlers.user.validators import (validate_about, validate_birthday,
+                                      validate_check_info, validate_gender,
+                                      validate_name)
+from keyboards.user import (back_message, confirm_markup, main_markup,
+                            man_message, register_can_skip_reply_markup,
+                            register_man_or_woman_markup,
+                            register_reply_markup, skip_message, woman_message)
+from loader import bot, db_controller, dp, logger
 from states.states import UserData
-from keyboards.user import *
 
 
 def get_gender_from_db(status):
@@ -37,8 +41,8 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
     else:
         await bot.send_message(
             message.from_user.id,
-            f'Теперь вы добавлены в нашу БД. '
-            f'И будете участвовать в распределении на следующей неделе.',
+            'Ура! Теперь вы добавлены в базу бота '
+            'и будете участвовать в распределении на следующей неделе.',
             reply_markup=ReplyKeyboardRemove()
         )
         await bot.send_message(
@@ -81,7 +85,8 @@ def add_to_db(teleg_id, name, birthday, about, gender):
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-    query = """UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =?
+    query = """UPDATE user_info 
+        SET name = ?, birthday = ?, about = ?, gender = ?
         WHERE teleg_id = ? """
     values = (name, birthday, about, gender, teleg_id)
     db_controller.query(query, values)
@@ -150,9 +155,9 @@ async def answer_name(message: types.Message, state: FSMContext):
     name = message.text
     if not validate_name(name):
         await message.answer(
-            f'Что то не так с введенным именем. '
-            f'Имя должно состоять из букв русского или латинского алфавита '
-            f'и быть менее 100 символов."'
+            'Что то не так с введенным именем. '
+            'Имя должно состоять из букв русского или латинского алфавита '
+            'и быть менее 100 символов."'
         )
         return
     await state.update_data(name=name)

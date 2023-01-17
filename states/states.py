@@ -24,5 +24,6 @@ class AdminData(StatesGroup):
 class ReviewState(StatesGroup):
     start = State()
 
+
 class BannedState(StatesGroup):
     start = State()

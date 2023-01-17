@@ -8,7 +8,7 @@ skip_message = "👉 Пропустить"
 
 
 def review_markup():
-    """Кнопки с вариантами ответов."""
+    """Кнопки с вариантами отзыва о встрече."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(review_answer_1)
     markup.add(review_answer_2)

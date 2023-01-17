@@ -1,6 +1,5 @@
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                           ReplyKeyboardMarkup)
 
 back_message = '👈 Назад'
 skip_message = '👉 Пропустить'
@@ -22,6 +21,7 @@ help_texts = "С чего начать"
 
 
 def main_markup():
+    """Главная клавиатура."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(menu_message)
 
@@ -29,6 +29,7 @@ def main_markup():
 
 
 def menu_markup():
+    """Клавиатура главного меню."""
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(InlineKeyboardButton(my_profile_message,
                callback_data=my_profile_message))
@@ -42,6 +43,7 @@ def menu_markup():
 
 
 def edit_profile_markup():
+    """Клавиатура редактирование профиля."""
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(InlineKeyboardButton(edit_profile_message,
                                     callback_data=edit_profile_message))
@@ -49,6 +51,7 @@ def edit_profile_markup():
 
 
 def confirm_markup():
+    """Клавиатура подтверждения."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(all_right_message)
     markup.add(back_message)
@@ -57,6 +60,7 @@ def confirm_markup():
 
 
 def start_registr_markup():
+    """Клавиатура начала регистрации."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(registr_message)
 
@@ -64,6 +68,7 @@ def start_registr_markup():
 
 
 def register_can_skip_reply_markup():
+    """Клавиатура назад-пропустить"""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(back_message, skip_message)
 
@@ -71,6 +76,7 @@ def register_can_skip_reply_markup():
 
 
 def register_reply_markup():
+    """Кнопка назад."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(back_message)
 
@@ -78,6 +84,7 @@ def register_reply_markup():
 
 
 def register_man_or_woman_markup():
+    """Клавиатура выбора пола."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(man_message, woman_message)
     markup.row(back_message, skip_message)
@@ -86,6 +93,7 @@ def register_man_or_woman_markup():
 
 
 def holidays_length():
+    """Выбор длины каникул."""
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(
         InlineKeyboardButton(
@@ -111,6 +119,7 @@ def holidays_length():
 
 
 def help_texts_markup():
+    """Клавиатура с чего начать разговор."""
     markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(
         InlineKeyboardButton(

@@ -1,7 +1,6 @@
 from asyncio import sleep
 from datetime import date, timedelta
 
-from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
@@ -16,7 +15,7 @@ async def check_message(state: FSMContext):
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
-            text="Через несколько минут будем произведена рассылка",
+            text="Совсем скоро будет произведено распределение пар",
         )
         await sleep(0.05)
     logger.info("Все пользователи проверены.")
@@ -37,11 +36,11 @@ async def send_message(teleg_id, **kwargs):
     try:
         await bot.send_message(teleg_id, **kwargs)
     except BotBlocked:
-        logger.error(f"Не возможно доставить сообщение пользователю {teleg_id}."
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
                      f"Бот заблокирован.")
         await change_status(teleg_id)
     except Exception as error:
-        logger.error(f"Не возможно доставить сообщение пользователю {teleg_id}."
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
                      f"{error}")
 
 

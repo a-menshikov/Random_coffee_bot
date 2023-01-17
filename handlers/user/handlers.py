@@ -1,9 +1,9 @@
 from aiogram import types
-
-from loader import bot, dp, db_controller, logger
-
-from keyboards.user import *
 from handlers.user.new_member import get_gender_from_db, start_registration
+from keyboards.user import (about_bot_message, edit_profile_markup,
+                            edit_profile_message, menu_markup, menu_message,
+                            my_profile_message, my_status_message)
+from loader import bot, db_controller, dp, logger
 
 
 @dp.message_handler(text=menu_message)
@@ -86,12 +86,12 @@ async def about_bot_message(message: types.Message):
 @dp.callback_query_handler(text=my_status_message)
 async def status_message(message: types.Message):
     """Вывод статуса участия в распределении"""
-    logger.info(f"Пользователь с TG_ID {message.from_user.id} " 
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о статусе участия")
     user_row = get_user_data_from_db(message.from_user.id)
     status_row = get_user_status_from_db(user_row['id'])
     if status_row['status'] == 1:
-        status = "Вы участвуете в распределении на следующец неделе"
+        status = "Вы участвуете в распределении на следующей неделе"
     else:
         holidays_row = get_holidays_status_from_db(user_row['id'])
         holidays_till = holidays_row['till_date'].split('-')
