@@ -81,7 +81,6 @@ def add_to_db(teleg_id, name, birthday, about, gender):
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-
     query = """UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =?
         WHERE teleg_id = ? """
     values = (name, birthday, about, gender, teleg_id)
@@ -240,6 +239,7 @@ async def answer_gender(message: types.Message, state: FSMContext):
 
 
 def get_id_from_user_info_table(teleg_id):
+    """Получение id пользователя по телеграм id."""
     query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
     values_id = (teleg_id,)
     id_obj = db_controller.select_query(query_id, values_id)

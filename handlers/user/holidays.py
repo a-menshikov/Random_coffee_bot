@@ -125,6 +125,7 @@ async def sheduled_check_holidays():
             )
 
 def get_teleg_id_from_user_info_table(id):
+    """Получение id телеграм чата по id пользователя."""
     query_id = """SELECT teleg_id FROM user_info WHERE id=?"""
     values_id = (id,)
     id_obj = db_controller.select_query(query_id, values_id)

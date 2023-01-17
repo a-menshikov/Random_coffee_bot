@@ -4,7 +4,7 @@ from datetime import datetime
 
 from aiogram import types
 
-from loader import bot, dp
+from loader import bot
 from keyboards.user import *
 
 

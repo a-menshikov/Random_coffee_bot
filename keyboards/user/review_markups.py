@@ -1,6 +1,4 @@
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup
 
 review_answer_1 = "Все было просто замечательно!"
 review_answer_2 = "Общение было интересным."
@@ -10,6 +8,7 @@ skip_message = "👉 Пропустить"
 
 
 def review_markup():
+    """Кнопки с вариантами ответов."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(review_answer_1)
     markup.add(review_answer_2)

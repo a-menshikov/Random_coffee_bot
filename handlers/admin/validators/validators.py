@@ -2,19 +2,22 @@ import re
 
 from aiogram import types
 
-from loader import db_controller, bot
+from loader import db_controller, bot, logger
 
 
 async def comment_validator(text):
+    """Валидация поля комментария."""
     if 10 <= len(text) <= 500:
         return True
     return False
 
 
 async def ban_validator(message: types.Message):
+    """Валидация id пользователя для добавления в бан."""
     if re.fullmatch(r"^\d{1,10}$", message.text):
         if await check_id_in_base(message.text):
             if not await check_id_in_ban_with_status(message.text, 1):
+                logger.info("Валидация пройдена.")
                 return True
             await bot.send_message(
                 message.from_user.id,
@@ -34,9 +37,11 @@ async def ban_validator(message: types.Message):
 
 
 async def unban_validator(message: types.Message):
+    """Валидация id пользователя для вывода из бана."""
     if re.fullmatch(r"^\d{1,10}$", message.text):
         if await check_id_in_base(message.text):
             if await check_id_in_ban_with_status(message.text, 1):
+                logger.info("Валидация пройдена.")
                 return True
             await bot.send_message(
                 message.from_user.id,
@@ -66,7 +71,7 @@ async def check_id_in_base(user_id):
 
 
 async def check_id_in_ban_with_status(user_id, status):
-    """Проверяем пользователя на наличие в БД."""
+    """Проверяем пользователя на наличие в бане с определенным статусом."""
     query = """SELECT * FROM ban_list WHERE banned_user_id=? 
     AND ban_status = ?"""
     values = (user_id, status)

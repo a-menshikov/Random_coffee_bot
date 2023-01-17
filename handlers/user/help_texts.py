@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from aiogram import types
 
 from loader import dp, bot
@@ -14,14 +16,17 @@ help_texts = [
      "загружена вторая половина недели. "
      "Может, у нас получится во вторник или среду?")
 ]
-# @dp.callback_query_handler(text='help_texts')
-@dp.message_handler(commands=['help_text'])
+
+
+@dp.callback_query_handler(text='help_texts')
 async def send_help_texts(message: types.Message):
+    """Отправка сообщений примеров."""
     await bot.send_message(
         message.from_user.id,
         "Вы можете скопировать текст просто на него нажав."
     )
     for text in help_texts:
+        await sleep(0.05)
         await bot.send_message(message.from_user.id,
                                f'<code>{text}</code>',
                                parse_mode='HTML')

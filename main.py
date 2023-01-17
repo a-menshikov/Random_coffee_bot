@@ -30,6 +30,7 @@ async def process_start_command(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text=algo_start, state=AdminData.start)
 async def start_algoritm(message: types.Message, state: FSMContext):
+    """Запуск алгоритма распределения"""
     await check_message(state)
     mc.prepare()
     res = mc.start()
@@ -38,6 +39,7 @@ async def start_algoritm(message: types.Message, state: FSMContext):
 
 
 async def check_and_add_registration_button(message: types.Message):
+    """Проверка пользователя для последующих действий."""
     if message.from_user.id == int(ADMIN_TG_ID):
         await bot.send_message(
             message.from_user.id,
@@ -69,12 +71,14 @@ async def check_and_add_registration_button(message: types.Message):
             await BannedState.start.set()
 
 async def scheduler():
+    """Расписание выполнения задач."""
     aioschedule.every().day.at("23:19").do(sheduled_check_holidays)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
 
 async def on_startup(_):
+    """Создание задания."""
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
 

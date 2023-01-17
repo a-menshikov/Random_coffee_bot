@@ -6,12 +6,11 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
 from handlers.user import get_id_from_user_info_table
-from keyboards import menu_markup
-from loader import bot, dp, db_controller, logger
-from states import AdminData
+from loader import bot, db_controller, logger
 
 
 async def check_message(state: FSMContext):
+    """Рассылка проверочного сообщения по всем пользователям."""
     logger.info("Запуск проверки пользователей")
     await state.reset_state()
     for user in prepare_user_list():
@@ -24,6 +23,7 @@ async def check_message(state: FSMContext):
 
 
 def prepare_user_list():
+    """Подготовка списка id пользователей со статусом готов к встрече."""
     logger.info("""Подготавливаем список пользователей из базы""")
     query = """SELECT user_info.teleg_id FROM user_status 
     JOIN user_info ON user_info.id = user_status.id 
@@ -33,6 +33,7 @@ def prepare_user_list():
 
 
 async def send_message(teleg_id, **kwargs):
+    """Отправка проверочного сообщения и обработка исключений."""
     try:
         await bot.send_message(teleg_id, **kwargs)
     except BotBlocked:
@@ -45,6 +46,7 @@ async def send_message(teleg_id, **kwargs):
 
 
 async def change_status(teleg_id):
+    """Смена статуса участия."""
     user_id = get_id_from_user_info_table(teleg_id)
     queries = {
         """UPDATE user_status SET status = 0 WHERE id =?""": (user_id,),
