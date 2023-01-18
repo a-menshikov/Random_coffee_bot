@@ -1,9 +1,9 @@
-from aiogram import Bot
 from asyncio import sleep
+
+from aiogram import Bot
+from data import ADMIN_TG_ID
 from keyboards import help_texts_markup
 from loader import db_controller, logger
-
-from data import ADMIN_TG_ID
 
 
 async def send_match_messages(match_info: dict, bot: Bot):

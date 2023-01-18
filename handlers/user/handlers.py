@@ -1,9 +1,10 @@
 from aiogram import types
-from handlers.user.new_member import get_gender_from_db, start_registration
 from keyboards.user import (about_bot_message, edit_profile_markup,
                             edit_profile_message, menu_markup, menu_message,
                             my_profile_message, my_status_message)
 from loader import bot, db_controller, dp, logger
+
+from handlers.user.new_member import get_gender_from_db, start_registration
 
 
 @dp.message_handler(text=menu_message)

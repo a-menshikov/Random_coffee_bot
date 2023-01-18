@@ -1,8 +1,7 @@
 import re
 
 from aiogram import types
-
-from loader import db_controller, bot, logger
+from loader import bot, db_controller, logger
 
 
 async def comment_validator(text):

@@ -1,10 +1,12 @@
 import logging
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
-from data import config
-from controllerBD import DatabaseManager
 from logging.handlers import RotatingFileHandler
+
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
+
+from controllerBD import DatabaseManager
+from data import config
 
 logger = logging.getLogger(__name__)
 

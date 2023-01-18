@@ -1,13 +1,13 @@
 import datetime
 
 from aiogram import types
-
-from handlers.user import get_teleg_id_from_user_info_table, \
-    get_id_from_user_info_table
-from keyboards import skip_message, main_markup, review_messages
+from keyboards import main_markup, review_messages, skip_message
 from keyboards.user.review_markups import review_markup
-from loader import db_controller, dp, bot, logger
-from states import ReviewState, AdminData
+from loader import bot, db_controller, dp, logger
+from states import AdminData, ReviewState
+
+from handlers.user import (get_id_from_user_info_table,
+                           get_teleg_id_from_user_info_table)
 
 
 @dp.message_handler(text=review_messages, state=AdminData.start)

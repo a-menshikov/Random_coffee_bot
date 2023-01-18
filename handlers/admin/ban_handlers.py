@@ -2,11 +2,11 @@ import datetime
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-
-from handlers.admin.validators import *
 from keyboards import *
 from loader import *
 from states import AdminData
+
+from handlers.admin.validators import *
 
 
 @dp.message_handler(text=ban_list, state=AdminData.start)

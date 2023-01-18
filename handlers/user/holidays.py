@@ -1,10 +1,10 @@
-from datetime import date, timedelta, datetime
+from datetime import date, datetime, timedelta
+
 from aiogram import types
+from keyboards.user import holidays_length, set_holiday_message
+from loader import bot, db_controller, dp, logger
 
 from handlers.user import get_id_from_user_info_table
-from loader import bot, dp, logger, db_controller
-
-from keyboards.user import set_holiday_message, holidays_length
 
 
 @dp.callback_query_handler(text=set_holiday_message)

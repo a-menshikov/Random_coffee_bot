@@ -1,8 +1,7 @@
 from asyncio import sleep
 
 from aiogram import types
-
-from loader import dp, bot
+from loader import bot, dp
 
 help_texts = [
     ("Привет! Я твой собеседник на этой неделе. "

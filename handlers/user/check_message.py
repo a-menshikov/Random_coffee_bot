@@ -3,9 +3,9 @@ from datetime import date, timedelta
 
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
+from loader import bot, db_controller, logger
 
 from handlers.user import get_id_from_user_info_table
-from loader import bot, db_controller, logger
 
 
 async def check_message(state: FSMContext):

@@ -1,15 +1,16 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
-from handlers.user.validators import (validate_about, validate_birthday,
-                                      validate_check_info, validate_gender,
-                                      validate_name)
 from keyboards.user import (back_message, confirm_markup, main_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
                             register_reply_markup, skip_message, woman_message)
 from loader import bot, db_controller, dp, logger
 from states.states import UserData
+
+from handlers.user.validators import (validate_about, validate_birthday,
+                                      validate_check_info, validate_gender,
+                                      validate_name)
 
 
 def get_gender_from_db(status):

@@ -1,9 +1,8 @@
 from aiogram import types
-
 from data import ADMIN_TG_ID
+from keyboards.admin import admin_menu, admin_menu_markup, go_back, inform
 from loader import bot, dp
 from states import AdminData
-from keyboards.admin import admin_menu, admin_menu_markup, inform, go_back
 
 
 @dp.message_handler(text=admin_menu)
