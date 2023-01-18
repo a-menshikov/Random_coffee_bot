@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 from loader import bot, db_controller, logger
 
-from handlers.user import get_id_from_user_info_table
+from .new_member import get_id_from_user_info_table
 
 
 async def check_message(state: FSMContext):

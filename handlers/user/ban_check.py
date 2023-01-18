@@ -1,7 +1,8 @@
 from aiogram import types
 
 from handlers.admin import check_id_in_ban_with_status
-from handlers.user import get_id_from_user_info_table
+
+from .new_member import get_id_from_user_info_table
 
 
 async def check_user_in_ban(message: types.Message):
