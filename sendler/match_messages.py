@@ -1,5 +1,5 @@
 from aiogram import Bot
-
+from asyncio import sleep
 from keyboards import help_texts_markup
 from loader import db_controller, logger
 
@@ -9,6 +9,7 @@ from data import ADMIN_TG_ID
 async def send_match_messages(match_info: dict, bot: Bot):
     """Рассылка сообщений после распределения пар на неделю."""
     for match in match_info.items():
+        await sleep(0.05)
         users_info = pare_users_query(match)
         if not users_info:
             logger.error(f'Не удалось получить информацию '
