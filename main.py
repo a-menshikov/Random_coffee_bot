@@ -25,7 +25,13 @@ async def process_start_command(message: types.Message,
                 f"tg-@{message.from_user.username} start a bot")
     await bot.send_message(
         message.from_user.id,
-        text=f'Привет, {name}. У нас вот такой бот. "Регламент".',
+        text=(f"Добро пожаловать в бот для нетворкинга, {name}.\n\n"
+              f"С помощью бота проходят живые и онлайн встречи 1-1 "
+              f"для студентов и IT-специалистов. Каждую неделю по "
+              f"понедельникам великий рандом подбирает пару. "
+              f"Вам нужно самостоятельно договориться о встрече и "
+              f"созвониться.  Можно встретиться лично, если вы в "
+              f"одном городе.\n\nАдминистратор @Loravel")
     )
     await check_and_add_registration_button(message)
 
@@ -51,7 +57,7 @@ async def check_and_add_registration_button(message: types.Message):
     elif not await check_user_in_base(message):
         await bot.send_message(
                 message.from_user.id,
-                text="Нажмите кнопку регистрации для старта.",
+                text="Нажмите кнопку Регистрации для старта.",
                 reply_markup=start_registr_markup()
             )
         await UserData.start.set()
@@ -60,7 +66,7 @@ async def check_and_add_registration_button(message: types.Message):
         if not await check_user_in_ban(message):
             await bot.send_message(
                 message.from_user.id,
-                text="Нажмите кнопку меню и выберите из доступных вариантов",
+                text="Нажмите кнопку Меню и выберите из доступных вариантов",
                 reply_markup=main_markup(),
             )
         else:
@@ -68,7 +74,7 @@ async def check_and_add_registration_button(message: types.Message):
                 message.from_user.id,
                 text="К сожалению вы нарушили наши правила и попали в бан. "
                      "Для решения данного вопроса просим обратиться к "
-                     "администратору",
+                     "администратору @Loravel",
             )
             await BannedState.start.set()
 

@@ -41,8 +41,8 @@ async def validate_birthday(message: types.Message):
         return True
     await bot.send_message(
         message.from_user.id,
-        'Что то не так с введенными данными. '
-        'Дата должно состоять из цифр и точек ДД.ММ.ГГГГ"'
+        'Что-то не так с введенными данными. '
+        'Дата должна состоять из цифр и точек в формате ДД.ММ.ГГГГ"'
     )
     return False
 
@@ -64,7 +64,7 @@ async def validate_gender(message: types.Message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            'Пожалуйста выберите из доступных вариантов или '
+            'Пожалуйста, выберите из доступных вариантов или '
             'нажмите "Пропустить"'
         )
         return False
@@ -78,7 +78,7 @@ async def validate_check_info(message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            'Пожалуйста выберите из доступных вариантов.'
+            'Пожалуйста, выберите из доступных вариантов.'
         )
         return False
     return True

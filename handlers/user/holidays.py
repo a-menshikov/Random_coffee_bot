@@ -15,7 +15,7 @@ async def check_and_choice_holidays(message: types.Message):
     await check_holidays_until(message.from_user.id)
     await bot.send_message(
         message.from_user.id,
-        text='Выберите на какой срок выхотите установить каникулы',
+        text='Выберите на какой срок вы хотите установить каникулы',
         reply_markup=holidays_length()
     )
 

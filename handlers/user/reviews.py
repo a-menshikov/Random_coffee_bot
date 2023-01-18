@@ -30,7 +30,7 @@ async def request_review(users_id):
         try:
             await bot.send_message(
                 user_teleg_id,
-                "Пожалуйста оцените Вашу встречу:\n"
+                "Пожалуйста оцените вашу встречу:\n"
                 "(Вы можете выбрать из доступных вариантов "
                 "или написать свой отзыв)",
                 reply_markup=review_markup()
@@ -54,7 +54,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
         try:
             await bot.send_message(
                 message.from_user.id,
-                f"Спасибо за Ваш отзыв. Ваш отзыв \n"
+                f"Спасибо за отзыв. Его текст\n"
                 f"{answer}\n"
                 f"будет записан в базу",
                 reply_markup=main_markup()
@@ -66,7 +66,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
     else:
         await bot.send_message(
             message.from_user.id,
-            "Спасибо за Ваш отзыв.",
+            "Спасибо за ваш отзыв.",
             reply_markup=main_markup()
         )
     await state.reset_state()

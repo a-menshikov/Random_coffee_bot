@@ -22,7 +22,7 @@ async def send_help_texts(message: types.Message):
     """Отправка сообщений примеров."""
     await bot.send_message(
         message.from_user.id,
-        "Вы можете скопировать текст просто на него нажав."
+        "Вы можете скопировать текст просто нажав на него."
     )
     for text in help_texts:
         await sleep(0.05)
