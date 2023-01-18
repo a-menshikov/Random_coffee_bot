@@ -41,7 +41,7 @@ async def start_algoritm(message: types.Message, state: FSMContext):
 
 async def check_and_add_registration_button(message: types.Message):
     """Проверка пользователя для последующих действий."""
-    if message.from_user.id == int(ADMIN_TG_ID):
+    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
         await bot.send_message(
             message.from_user.id,
             text="Привет, Админ. Добро пожаловать в меню администратора",

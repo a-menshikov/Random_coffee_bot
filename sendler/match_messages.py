@@ -51,16 +51,18 @@ async def send_match_messages(match_info: dict, bot: Bot):
             fail_user = users_info[0]
             fail_user_db_id = fail_user[0]
             message = make_message(fail_user, fail=True)
-            try:
-                await bot.send_message(ADMIN_TG_ID,
-                                       message, parse_mode="HTML")
-                logger.info(f'Сообщение админу об отсутствии пары '
-                            f'для пользователя {fail_user_db_id} '
-                            f'отправлено')
-            except Exception as error:
-                logger.error(f'Сообщение админу об отсутствии пары '
-                             f'для пользователя {fail_user_db_id} '
-                             f'не отправлено. Ошибка {error}')
+            for admin in list(map(int, ADMIN_TG_ID.split())):
+                try:
+                    await bot.send_message(admin,
+                                           message, parse_mode="HTML")
+                    logger.info(f'Сообщение админу об отсутствии пары '
+                                f'для пользователя {fail_user_db_id} '
+                                f'отправлено')
+                except Exception as error:
+                    logger.error(f'Сообщение админу об отсутствии пары '
+                                 f'для пользователя {fail_user_db_id} '
+                                 f'не отправлено. Ошибка {error}')
+                    continue
 
 
 def make_message(user_info: tuple, fail: bool = False):

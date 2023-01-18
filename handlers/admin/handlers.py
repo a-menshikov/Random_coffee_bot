@@ -9,7 +9,7 @@ from keyboards.admin import admin_menu, admin_menu_markup, inform, go_back
 @dp.message_handler(text=admin_menu)
 async def admin_menu(message: types.Message):
     """Вывод меню администратора."""
-    if message.from_user.id == int(ADMIN_TG_ID):
+    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
         await bot.send_message(
             message.from_user.id,
             text="Выберите из доступных вариантов:",
