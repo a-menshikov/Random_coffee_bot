@@ -42,7 +42,6 @@ async def start_algoritm(message: types.Message, state: FSMContext):
     await check_message(state)
     mc.prepare()
     res = mc.start()
-    print("retunr-", res)
     await mc.send_and_write(res)
 
 
