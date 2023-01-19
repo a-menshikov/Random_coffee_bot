@@ -129,7 +129,7 @@ void MinimumCostPerfectMatchingExample(string filename)
 
 		res +=to_string(e.first)+ " " + to_string(e.second) + "\n";
 	}
-	myfile.open ("/data/match_algoritm_data/output.txt");
+	myfile.open ("./data/match_algoritm_data/output.txt");
 	myfile << res;
 	myfile.close();
 }
@@ -150,7 +150,7 @@ void MaximumMatchingExample(string filename)
 
 		res +=to_string(e.first)+ " " + to_string(e.second) + "\n";
 	}
-	myfile.open ("/data/match_algoritm_data/output.txt");
+	myfile.open ("./data/match_algoritm_data/output.txt");
 	myfile << res;
 	myfile.close();
 }

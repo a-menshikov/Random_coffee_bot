@@ -60,7 +60,7 @@ class MachingHelper():
     def start(self):
         """Run matching algo"""
         logger.info("Start matching algo")
-        subprocess.call(['./match_algoritm/matchingalogitm', '-f ./data/match_algoritm_data/input.txt --max'])
+        subprocess.call(['./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max'], shell=True)
         res = []
         print(res)
         with open("./data/match_algoritm_data/output.txt", "r") as text:
