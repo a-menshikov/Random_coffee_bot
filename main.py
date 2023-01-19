@@ -92,13 +92,20 @@ async def on_startup(_):
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
     for i in list(map(int, ADMIN_TG_ID.split())):
-        await bot.send_message(i, 'Бот запущен')
+        try:
+            await bot.send_message(i, 'Бот запущен')
+        except Exception as error:
+            logger.error(f'Сообщение о запуске бота не ушло. Ошибка {error}')
 
 
 async def on_shutdown(_):
     """Выполняется во время остановки бота."""
     for i in list(map(int, ADMIN_TG_ID.split())):
-        await bot.send_message(i, 'Бот остановлен')
+        try:
+            await bot.send_message(i, 'Бот остановлен')
+        except Exception as error:
+            logger.error(f'Сообщение об остановке бота не ушло.'
+                         f' Ошибка {error}')
 
 if __name__ == '__main__':
     mc = MachingHelper()
