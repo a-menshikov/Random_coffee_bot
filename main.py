@@ -88,10 +88,21 @@ async def scheduler():
 
 
 async def on_startup(_):
-    """Создание задания."""
+    """Выполняется во время запуска бота."""
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
+    for i in list(map(int, ADMIN_TG_ID.split())):
+        await bot.send_message(i, 'Бот запущен')
+
+
+async def on_shutdown(_):
+    """Выполняется во время остановки бота."""
+    for i in list(map(int, ADMIN_TG_ID.split())):
+        await bot.send_message(i, 'Бот остановлен')
 
 if __name__ == '__main__':
     mc = MachingHelper()
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    executor.start_polling(dp, skip_updates=True,
+                           on_startup=on_startup,
+                           on_shutdown=on_shutdown
+                           )
