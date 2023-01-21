@@ -130,18 +130,18 @@ async def my_pare_check(message: types.Message):
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о своей паре")
     user_id = get_id_from_user_info_table(message.from_user.id)
-    met_id = get_met_id_with_user_last_week(user_id)[0]
-    query = """SELECT first_user_id, second_user_id
-            FROM met_info 
-            WHERE id = ?"""
-    values = (met_id, )
-    users = db_controller.row_factory(query, values).fetchone()
-    if users is None:
+    met_id = get_met_id_with_user_last_week(user_id)
+    if met_id is None:
         await bot.send_message(
             message.from_user.id,
             "Вы не участвовали в последнем распределении."
         )
     else:
+        query = """SELECT first_user_id, second_user_id
+                FROM met_info 
+                WHERE id = ?"""
+        values = (met_id[0], )
+        users = db_controller.row_factory(query, values).fetchone()
         if users['first_user_id'] == str(message.from_user.id):
             pare = get_user_info_by_id(users['second_user_id'])
         else:

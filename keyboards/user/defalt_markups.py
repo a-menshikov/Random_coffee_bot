@@ -116,5 +116,5 @@ def help_texts_markup():
     """Клавиатура с чего начать разговор."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(help_texts)
-    markup.row(back_to_menu)
+    markup.row(return_to_begin_button)
     return markup
