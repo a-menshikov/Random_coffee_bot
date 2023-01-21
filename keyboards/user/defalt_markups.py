@@ -23,6 +23,7 @@ two_week_holidays_message = "2 недели"
 three_week_holidays_message = "3 недели"
 turn_off_holidays = "Отключить"
 back_to_menu = "Вернуться в меню"
+my_pare_button = "Моя пара"
 
 
 def main_markup():
@@ -37,6 +38,7 @@ def menu_markup():
     """Клавиатура главного меню."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(my_profile_message)
+    markup.add(my_pare_button)
     markup.add(my_status_message)
     markup.add(set_holiday_message)
     markup.add(about_bot_message)
@@ -112,10 +114,7 @@ def holidays_length():
 
 def help_texts_markup():
     """Клавиатура с чего начать разговор."""
-    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.row(
-        InlineKeyboardButton(
-            help_texts,
-            callback_data='help_texts'
-        ))
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.row(help_texts)
+    markup.row(back_to_menu)
     return markup

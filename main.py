@@ -74,6 +74,7 @@ async def on_shutdown(_):
             logger.error(f'Сообщение об остановке бота не ушло.'
                          f' Ошибка {error}')
 
+
 if __name__ == '__main__':
     mc = MachingHelper()
     executor.start_polling(dp, skip_updates=True,

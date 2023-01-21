@@ -3,7 +3,8 @@ import datetime
 from aiogram import types
 
 from handlers.decorators import admin_handlers
-from handlers.user import *
+from handlers.user import get_id_from_user_info_table, \
+    get_teleg_id_from_user_info_table
 from keyboards import *
 from loader import bot, db_controller, dp, logger
 from states import ReviewState
@@ -90,7 +91,7 @@ def preparing_list_of_users_id():
 async def save_review(teleg_id, text):
     """Сохранние комментария в БД."""
     user_id = get_id_from_user_info_table(teleg_id)
-    met_id = get_met_id_with_user_last_week(user_id)
+    met_id = get_met_id_with_user_last_week(user_id)[0]
     query = """INSERT INTO mets_reviews (met_id, user_id, comment)
             VALUES (?, ?, ?)"""
     values = (met_id, user_id, text)
@@ -105,7 +106,9 @@ def get_met_id_with_user_last_week(user_id):
         FROM met_info 
         WHERE date
         BETWEEN strftime('%d.%m.%Y', ?) AND strftime('%d.%m.%Y', ?)
-        AND (first_user_id = ? OR second_user_id = ?)"""
+        AND (first_user_id = ? OR second_user_id = ?)
+        ORDER BY id DESC
+        LIMIT 1"""
     values = (start_period, today, user_id, user_id)
-    met_id = db_controller.select_query(query, values).fetchone()[0]
+    met_id = db_controller.select_query(query, values).fetchone()
     return met_id

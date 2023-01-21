@@ -2,13 +2,15 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from handlers.decorators import user_handlers
+from handlers.user.reviews import get_met_id_with_user_last_week
 from handlers.user.get_info_from_table import (
     get_user_data_from_db,
     get_user_status_from_db,
-    get_holidays_status_from_db
+    get_holidays_status_from_db, get_user_info_by_id,
+    get_id_from_user_info_table
 )
 from keyboards.user import *
-from loader import bot, dp, logger
+from loader import bot, dp, logger, db_controller
 
 from handlers.user.new_member import get_gender_from_db, start_registration
 
@@ -120,3 +122,41 @@ async def status_message(message: types.Message):
     await bot.send_message(message.from_user.id, text=status)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"получил информацию о статусе участия")
+
+
+@dp.message_handler(text=my_pare_button)
+@user_handlers
+async def my_pare_check(message: types.Message):
+    user_id = get_id_from_user_info_table(message.from_user.id)
+    met_id = get_met_id_with_user_last_week(user_id)[0]
+    query = """SELECT first_user_id, second_user_id
+            FROM met_info 
+            WHERE id = ?"""
+    values = (met_id, )
+    users = db_controller.row_factory(query, values).fetchone()
+    if users is None:
+        await bot.send_message(
+            message.from_user.id,
+            "Вы не участвовали в последнем распределении."
+        )
+    else:
+        if users['first_user_id'] == str(message.from_user.id):
+            pare = get_user_info_by_id(users['second_user_id'])
+        else:
+            pare = get_user_info_by_id(users['first_user_id'])
+        user_id = pare['teleg_id']
+        user_name = pare['name']
+        user_birthday = pare['birthday']
+        user_about = pare['about']
+        user_gender = get_gender_from_db(pare['gender'])
+        message_text = (f'На этой неделе Ваша пара для кофе: '
+                   f'<a href="tg://user?id={user_id}">{user_name}</a>\n'
+                   f'Дата рождения: {user_birthday}\n'
+                   f'Информация: {user_about}\n'
+                   f'Пол: {user_gender}\n')
+        await bot.send_message(
+            message.from_user.id,
+            message_text,
+            parse_mode="HTML",
+            reply_markup=help_texts_markup()
+        )

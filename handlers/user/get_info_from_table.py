@@ -49,3 +49,10 @@ def get_holidays_status_from_db(user_id):
     values = (user_id,)
     row = db_controller.row_factory(query, values)
     return row.fetchone()
+
+def get_user_info_by_id(user_id):
+    """Получение строки информации по id пользователя"""
+    query = """SELECT * FROM user_info WHERE id=?"""
+    values = (user_id,)
+    row = db_controller.row_factory(query, values)
+    return row.fetchone()
