@@ -38,9 +38,9 @@ async def process_start_command(message: types.Message,
 
 @dp.message_handler(text=algo_start)
 @admin_handlers
-async def start_algoritm(message: types.Message, state: FSMContext):
+async def start_algoritm(message: types.Message):
     """Запуск алгоритма распределения"""
-    await check_message(state)
+    await check_message()
     mc.prepare()
     res = mc.start()
     await mc.send_and_write(res)

@@ -8,10 +8,9 @@ from handlers.user.get_info_from_table import *
 from loader import bot, db_controller, logger
 
 
-async def check_message(state: FSMContext):
+async def check_message():
     """Рассылка проверочного сообщения по всем пользователям."""
     logger.info("Запуск проверки пользователей")
-    await state.reset_state()
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
