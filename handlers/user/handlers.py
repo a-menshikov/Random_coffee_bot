@@ -127,6 +127,8 @@ async def status_message(message: types.Message):
 @dp.message_handler(text=my_pare_button)
 @user_handlers
 async def my_pare_check(message: types.Message):
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"запросил информацию о своей паре")
     user_id = get_id_from_user_info_table(message.from_user.id)
     met_id = get_met_id_with_user_last_week(user_id)[0]
     query = """SELECT first_user_id, second_user_id
@@ -160,3 +162,5 @@ async def my_pare_check(message: types.Message):
             parse_mode="HTML",
             reply_markup=help_texts_markup()
         )
+    logger.info(f"Пользователь с TG_ID {message.from_user.id} "
+                f"получил информацию о своей паре")
