@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup
 
-admin_menu = "Меню администратора"
+admin_menu_button = "Меню администратора"
 inform = "Отчет за прошедшую неделю"
 ban_list = "Бан-лист"
 back_to_main = 'Главное меню'
@@ -9,12 +9,13 @@ remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
 algo_start = "Запуск алгоритма"
 review_messages = "Запуск опроса"
+cancel = "Отмена"
 
 
 def admin_main_markup():
     """Начальная кнопка админа."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(admin_menu)
+    markup.add(admin_menu_button)
     return markup
 
 
@@ -42,4 +43,10 @@ def admin_back_markup():
     """Кнопка назад"""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(go_back)
+    return markup
+
+def admin_cancel_markup():
+    """Кнопка назад"""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(cancel)
     return markup

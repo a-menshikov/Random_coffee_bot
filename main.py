@@ -2,17 +2,17 @@ import asyncio
 
 import aioschedule
 from aiogram import executor, types
+from aiogram.dispatcher import FSMContext
 
 from data import ADMIN_TG_ID
-from handlers.admin import FSMContext
-from handlers.user import (check_message, check_user_in_base,
-                           sheduled_check_holidays)
-from handlers.user.ban_check import check_user_in_ban
-from keyboards import (admin_main_markup, algo_start, main_markup,
-                       start_registr_markup)
+from handlers.user import *
+from handlers.admin import *
+from handlers.user.first_check import check_and_add_registration_button
+from keyboards import algo_start
 from loader import bot, dp, logger
 from match_algoritm import MachingHelper
-from states import AdminData, BannedState, UserData
+
+from handlers.decorators import admin_handlers
 
 
 @dp.message_handler(commands=['start', 'help'], state='*')
@@ -36,46 +36,14 @@ async def process_start_command(message: types.Message,
     await check_and_add_registration_button(message)
 
 
-@dp.message_handler(text=algo_start, state=AdminData.start)
+@dp.message_handler(text=algo_start)
+@admin_handlers
 async def start_algoritm(message: types.Message, state: FSMContext):
     """Запуск алгоритма распределения"""
     await check_message(state)
     mc.prepare()
     res = mc.start()
     await mc.send_and_write(res)
-
-
-async def check_and_add_registration_button(message: types.Message):
-    """Проверка пользователя для последующих действий."""
-    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
-        await bot.send_message(
-            message.from_user.id,
-            text="Привет, Админ. Добро пожаловать в меню администратора",
-            reply_markup=admin_main_markup(),
-        )
-    elif not await check_user_in_base(message):
-        await bot.send_message(
-                message.from_user.id,
-                text="Нажмите кнопку Регистрации для старта.",
-                reply_markup=start_registr_markup()
-            )
-        await UserData.start.set()
-
-    else:
-        if not await check_user_in_ban(message):
-            await bot.send_message(
-                message.from_user.id,
-                text="Нажмите кнопку Меню и выберите из доступных вариантов",
-                reply_markup=main_markup(),
-            )
-        else:
-            await bot.send_message(
-                message.from_user.id,
-                text="К сожалению вы нарушили наши правила и попали в бан. "
-                     "Для решения данного вопроса просим обратиться к "
-                     "администратору @Loravel",
-            )
-            await BannedState.start.set()
 
 
 async def scheduler():

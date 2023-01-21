@@ -1,10 +1,18 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
+
+from handlers.user.first_check import check_and_add_registration_button
+from handlers.user.get_info_from_table import (
+    check_user_in_base,
+    get_id_from_user_info_table
+)
+from keyboards import return_to_begin_markup
 from keyboards.user import (back_message, confirm_markup, main_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
-                            register_reply_markup, skip_message, woman_message)
+                            register_reply_markup, skip_message, woman_message,
+                            return_to_begin_button)
 from loader import bot, db_controller, dp, logger
 from states.states import UserData
 
@@ -13,22 +21,19 @@ from handlers.user.validators import (validate_about, validate_birthday,
                                       validate_name)
 
 
+@dp.message_handler(text=return_to_begin_button, state="*")
+async def return_to_begin(message: types.Message, state: FSMContext):
+    """Вывод меню"""
+    await state.reset_state()
+    await check_and_add_registration_button(message)
+
+
 def get_gender_from_db(status):
     """Получаем пол пользователя по id пола"""
     query = """SELECT gender_name FROM genders WHERE id=?"""
     values = (status,)
     info = db_controller.select_query(query, values)
     return info.fetchone()[0]
-
-
-async def check_user_in_base(message):
-    """Проверяем пользователя на наличие в БД."""
-    query = """SELECT * FROM user_info WHERE teleg_id=?"""
-    values = (message.from_user.id,)
-    info = db_controller.select_query(query, values)
-    if info.fetchone() is None:
-        return False
-    return True
 
 
 @dp.message_handler(state=UserData.check_info)
@@ -118,7 +123,7 @@ async def start_registration(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         'Как вас зовут? (Введите только имя)',
-        reply_markup=types.ReplyKeyboardRemove()
+        reply_markup=return_to_begin_markup()
     )
     await UserData.name.set()
 
@@ -242,11 +247,3 @@ async def answer_gender(message: types.Message, state: FSMContext):
             gender = 2
         await state.update_data(gender=gender)
         await end_registration(state, message)
-
-
-def get_id_from_user_info_table(teleg_id):
-    """Получение id пользователя по телеграм id."""
-    query_id = """SELECT id FROM user_info WHERE teleg_id=?"""
-    values_id = (teleg_id,)
-    id_obj = db_controller.select_query(query_id, values_id)
-    return id_obj.fetchone()[0]

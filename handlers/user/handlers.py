@@ -1,13 +1,20 @@
 from aiogram import types
-from keyboards.user import (about_bot_message, edit_profile_markup,
-                            edit_profile_message, menu_markup, menu_message,
-                            my_profile_message, my_status_message)
-from loader import bot, db_controller, dp, logger
+from aiogram.dispatcher import FSMContext
+
+from handlers.decorators import user_handlers
+from handlers.user.get_info_from_table import (
+    get_user_data_from_db,
+    get_user_status_from_db,
+    get_holidays_status_from_db
+)
+from keyboards.user import *
+from loader import bot, dp, logger
 
 from handlers.user.new_member import get_gender_from_db, start_registration
 
 
-@dp.message_handler(text=menu_message)
+@dp.message_handler(text=[menu_message, back_to_menu])
+@user_handlers
 async def main_menu(message: types.Message):
     """Вывод меню"""
     await bot.send_message(
@@ -17,7 +24,8 @@ async def main_menu(message: types.Message):
     )
 
 
-@dp.callback_query_handler(text=my_profile_message)
+@dp.message_handler(text=my_profile_message)
+@user_handlers
 async def send_profile(message: types.Message):
     """Вывод данных о пользователе"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -41,31 +49,8 @@ async def send_profile(message: types.Message):
     )
 
 
-def get_user_data_from_db(teleg_id):
-    """Получение id пользователя"""
-    query = """SELECT * FROM user_info WHERE teleg_id=?"""
-    values = (teleg_id,)
-    row = db_controller.row_factory(query, values)
-    return row.fetchone()
-
-
-def get_user_status_from_db(user_id):
-    """Получение статуса участия пользователя из БД"""
-    query = """SELECT * FROM user_status WHERE id=?"""
-    values = (user_id,)
-    row = db_controller.row_factory(query, values)
-    return row.fetchone()
-
-
-def get_holidays_status_from_db(user_id):
-    """Получение статуса каникул пользователя из БД"""
-    query = """SELECT * FROM holidays_status WHERE id=?"""
-    values = (user_id,)
-    row = db_controller.row_factory(query, values)
-    return row.fetchone()
-
-
-@dp.callback_query_handler(text=edit_profile_message)
+@dp.message_handler(text=edit_profile_message)
+@user_handlers
 async def edit_profile(message: types.Message):
     """Перенаправление на повторную регистрацию"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -73,7 +58,7 @@ async def edit_profile(message: types.Message):
     await start_registration(message)
 
 
-@dp.callback_query_handler(text=about_bot_message)
+@dp.message_handler(text=about_bot_message)
 async def about_bot_message(message: types.Message):
     """Вывод информации о боте"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -113,7 +98,8 @@ __*Я могу отказаться от участия в боте?*__\n
     )
 
 
-@dp.callback_query_handler(text=my_status_message)
+@dp.message_handler(text=my_status_message)
+@user_handlers
 async def status_message(message: types.Message):
     """Вывод статуса участия в распределении"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "

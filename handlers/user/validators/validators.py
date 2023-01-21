@@ -31,6 +31,13 @@ async def validate_birthday(message: types.Message):
                 'Вы что из будущего?)) Введите правильную дату рождения"'
             )
             return False
+        elif age <= 14:
+            await bot.send_message(
+                message.from_user.id,
+                'Ваш возраст должен быть больше 14 лет. '
+                'Введите правильную дату рождения'
+            )
+            return False
         elif age > 120:
             await bot.send_message(
                 message.from_user.id,

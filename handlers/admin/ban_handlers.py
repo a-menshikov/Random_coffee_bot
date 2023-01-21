@@ -2,6 +2,9 @@ import datetime
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+
+from handlers.admin.handlers import admin_menu
+from handlers.decorators import admin_handlers
 from keyboards import *
 from loader import *
 from states import AdminData
@@ -9,7 +12,16 @@ from states import AdminData
 from handlers.admin.validators import *
 
 
-@dp.message_handler(text=ban_list, state=AdminData.start)
+@dp.message_handler(text=cancel, state="*")
+async def cancel(message: types.Message, state: FSMContext):
+    """Отмена"""
+    await state.finish()
+    await admin_menu(message)
+
+
+
+@dp.message_handler(text=ban_list)
+@admin_handlers
 async def ban_list(message: types.Message):
     """Вывод сообщения с выбором действия по бану."""
     await bot.send_message(
@@ -19,14 +31,15 @@ async def ban_list(message: types.Message):
     )
 
 
-@dp.message_handler(text=add_to_ban_list, state=AdminData.start)
+@dp.message_handler(text=add_to_ban_list)
+@admin_handlers
 async def ban_list_add(message: types.Message):
     """Старт процесса добавления пользователя в бан лист."""
     logger.info("Начало процесса добавления пользователя в бан.")
     await bot.send_message(
         message.from_user.id,
         "Введите id пользователя, которого необходимо забанить:",
-        reply_markup=admin_back_markup()
+        reply_markup=admin_cancel_markup()
     )
     await AdminData.user_ban.set()
 
@@ -90,14 +103,15 @@ async def save_to_ban(banned_user_id, comment):
         db_controller.query(query, values)
 
 
-@dp.message_handler(text=remove_from_ban_list, state=AdminData.start)
+@dp.message_handler(text=remove_from_ban_list)
+@admin_handlers
 async def ban_list_remove(message: types.Message):
     """Запуск процесса удаления пользователя из бана."""
     logger.info("Начало процесса вывода пользователя из бана.")
     await bot.send_message(
         message.from_user.id,
         "Введите id пользователя, которого необходимо убрать из бан листа:",
-        reply_markup=admin_back_markup()
+        reply_markup=admin_cancel_markup()
     )
     await AdminData.user_unban.set()
 

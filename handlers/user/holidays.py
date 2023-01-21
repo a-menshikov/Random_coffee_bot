@@ -1,13 +1,17 @@
 from datetime import date, datetime, timedelta
 
 from aiogram import types
+
+from handlers.decorators import user_handlers
+from handlers.user.get_info_from_table import *
+from keyboards import one_week_holidays_message, two_week_holidays_message, \
+    three_week_holidays_message, turn_off_holidays
 from keyboards.user import holidays_length, set_holiday_message
 from loader import bot, db_controller, dp, logger
 
-from handlers.user import get_id_from_user_info_table
 
-
-@dp.callback_query_handler(text=set_holiday_message)
+@dp.message_handler(text=set_holiday_message)
+@user_handlers
 async def check_and_choice_holidays(message: types.Message):
     """Проверка и выбор срока каникул"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -20,7 +24,8 @@ async def check_and_choice_holidays(message: types.Message):
     )
 
 
-@dp.callback_query_handler(text="one_week_holidays")
+@dp.message_handler(text=one_week_holidays_message)
+@user_handlers
 async def get_one_week_holidays(message: types.Message):
     """Установка каникул на 1 неделю"""
     date_to_return = str(date.today() + timedelta(days=7))
@@ -31,7 +36,8 @@ async def get_one_week_holidays(message: types.Message):
     )
 
 
-@dp.callback_query_handler(text="two_week_holidays")
+@dp.message_handler(text=two_week_holidays_message)
+@user_handlers
 async def get_two_week_holidays(message: types.Message):
     """Установка каникул на 2 недели"""
     date_to_return = str(date.today() + timedelta(days=14))
@@ -42,7 +48,8 @@ async def get_two_week_holidays(message: types.Message):
     )
 
 
-@dp.callback_query_handler(text="three_week_holidays")
+@dp.message_handler(text=three_week_holidays_message)
+@user_handlers
 async def get_three_week_holidays(message: types.Message):
     """Установка каникул на 3 недели"""
     date_to_return = str(date.today() + timedelta(days=21))
@@ -53,7 +60,8 @@ async def get_three_week_holidays(message: types.Message):
     )
 
 
-@dp.callback_query_handler(text="cancel_holidays")
+@dp.message_handler(text=turn_off_holidays)
+@user_handlers
 async def cancel_holidays(message: types.Message):
     """Отключение режима каникул"""
     user_id = get_id_from_user_info_table(message.from_user.id)
@@ -122,11 +130,3 @@ async def sheduled_check_holidays():
                 user_id,
                 text='Режим каникул был отключен'
             )
-
-
-def get_teleg_id_from_user_info_table(id):
-    """Получение id телеграм чата по id пользователя."""
-    query_id = """SELECT teleg_id FROM user_info WHERE id=?"""
-    values_id = (id,)
-    id_obj = db_controller.select_query(query_id, values_id)
-    return id_obj.fetchone()[0]

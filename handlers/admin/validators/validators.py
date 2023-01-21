@@ -1,6 +1,8 @@
 import re
 
 from aiogram import types
+
+from handlers.user import check_id_in_ban_with_status
 from loader import bot, db_controller, logger
 
 
@@ -69,12 +71,4 @@ async def check_id_in_base(user_id):
     return True
 
 
-async def check_id_in_ban_with_status(user_id, status):
-    """Проверяем пользователя на наличие в бане с определенным статусом."""
-    query = """SELECT * FROM ban_list WHERE banned_user_id=? 
-        AND ban_status = ?"""
-    values = (user_id, status)
-    info = db_controller.select_query(query, values)
-    if info.fetchone() is None:
-        return False
-    return True
+

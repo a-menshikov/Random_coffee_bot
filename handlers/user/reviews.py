@@ -1,16 +1,16 @@
 import datetime
 
 from aiogram import types
-from keyboards import main_markup, review_messages, skip_message
-from keyboards.user.review_markups import review_markup
+
+from handlers.decorators import admin_handlers
+from handlers.user import *
+from keyboards import *
 from loader import bot, db_controller, dp, logger
-from states import AdminData, ReviewState
-
-from handlers.user import (get_id_from_user_info_table,
-                           get_teleg_id_from_user_info_table)
+from states import ReviewState
 
 
-@dp.message_handler(text=review_messages, state=AdminData.start)
+@dp.message_handler(text=review_messages)
+@admin_handlers
 async def start_review(message: types.Message):
     """Запускаем процесс сбора отзывов."""
     logger.info("Подготавливаем список ID для запроса отзыва.")
