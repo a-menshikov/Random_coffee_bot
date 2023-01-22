@@ -1,6 +1,5 @@
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                           ReplyKeyboardMarkup)
 
 back_message = '👈 Назад'
 skip_message = '👉 Пропустить'
@@ -10,16 +9,25 @@ menu_message = '🏠 Меню'
 confirm_message = '✅ Да'
 reject_message = '❌ Нет'
 edit_profile_message = "👩🏿‍🎨 Изменить Профиль"
-my_profile_message = "Мой профиль"# Может добавить смайлик
-my_status_message = "Мой статус"# Может добавить смайлик
+my_profile_message = "Мой профиль"
+my_status_message = "Мой статус"
 set_holiday_message = "⛱️ Каникулы"
-about_bot_message = "🤖 О Боте"
+about_bot_message = "🤖 О Боте/FAQ"
 man_message = "👨 Мужской"
 woman_message = "👩 Женский"
 registr_message = "Регистрация"
+return_to_begin_button = "Вернуться в начало"
+help_texts = "С чего начать"
+one_week_holidays_message = "1 неделя"
+two_week_holidays_message = "2 недели"
+three_week_holidays_message = "3 недели"
+turn_off_holidays = "Отключить"
+back_to_menu = "Вернуться в меню"
+my_pare_button = "Моя пара"
 
 
 def main_markup():
+    """Главная клавиатура."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(menu_message)
 
@@ -27,83 +35,86 @@ def main_markup():
 
 
 def menu_markup():
-    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(InlineKeyboardButton(my_profile_message,
-               callback_data=my_profile_message))
-    markup.add(InlineKeyboardButton(
-        my_status_message, callback_data=my_status_message))
-    markup.add(InlineKeyboardButton(set_holiday_message,
-               callback_data=set_holiday_message))
-    markup.add(InlineKeyboardButton(
-        about_bot_message, callback_data=about_bot_message))
-
-
+    """Клавиатура главного меню."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(my_profile_message)
+    markup.add(my_pare_button)
+    markup.add(my_status_message)
+    markup.add(set_holiday_message)
+    markup.add(about_bot_message)
     return markup
+
 
 def edit_profile_markup():
-    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(InlineKeyboardButton(edit_profile_message,
-                                    callback_data=edit_profile_message))
+    """Клавиатура редактирование профиля."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(edit_profile_message)
+    markup.row(back_to_menu)
     return markup
-
 
 
 def confirm_markup():
+    """Клавиатура подтверждения."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(all_right_message)
-    markup.add(back_message)
+    markup.add(back_message, return_to_begin_button)
+    return markup
 
+
+def return_to_begin_markup():
+    """Клавиатура подтверждения."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(return_to_begin_button)
     return markup
 
 
 def start_registr_markup():
+    """Клавиатура начала регистрации."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(registr_message)
 
     return markup
 
-#TODO Добавить кнопку назад в регистрации
+
 def register_can_skip_reply_markup():
+    """Клавиатура назад-пропустить"""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(back_message, skip_message)
+    markup.row(return_to_begin_button)
 
     return markup
 
 
 def register_reply_markup():
+    """Кнопка назад."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(back_message)
+    markup.add(back_message, return_to_begin_button)
 
     return markup
 
 
 def register_man_or_woman_markup():
+    """Клавиатура выбора пола."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(man_message, woman_message)
     markup.row(back_message, skip_message)
+    markup.row(return_to_begin_button)
 
     return markup
 
+
 def holidays_length():
-    markup = InlineKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.row(
-        InlineKeyboardButton(
-            '1 неделя',
-            callback_data='one_week_holidays'
-        ),
-        InlineKeyboardButton(
-            '2 недели',
-            callback_data='two_week_holidays'
-        )
-    )
-    markup.row(
-        InlineKeyboardButton(
-            '3 недели',
-            callback_data='three_week_holidays'
-        ),
-        InlineKeyboardButton(
-            'Отмена',
-            callback_data='cancel_holidays'
-        )
-    )
+    """Выбор длины каникул."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.row(one_week_holidays_message, two_week_holidays_message)
+    markup.row(three_week_holidays_message, turn_off_holidays)
+    markup.row(back_to_menu)
+    return markup
+
+
+def help_texts_markup():
+    """Клавиатура с чего начать разговор."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.row(help_texts)
+    markup.row(return_to_begin_button)
     return markup

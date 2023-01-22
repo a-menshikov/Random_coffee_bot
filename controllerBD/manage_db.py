@@ -48,7 +48,23 @@ class DatabaseManager():
             "(id INTEGER PRIMARY KEY,"
             "status INTEGER NOT NULL,"
             "till_date TEXT,"
-            "FOREIGN KEY (id) REFERENCES user_info(id))"
+            "FOREIGN KEY (id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS mets_reviews"
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "met_id INTEGER NOT NULL,"
+            "user_id INTEGER NOT NULL,"
+            "comment TEXT NOT NULL,"
+            "FOREIGN KEY (met_id) REFERENCES met_info(id)"
+            "FOREIGN KEY (user_id) REFERENCES user_info(id))",
+            "CREATE TABLE IF NOT EXISTS ban_list"
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "banned_user_id INTEGER NOT NULL,"
+            "ban_status INTEGER NOT NULL,"
+            "date_of_ban TEXT NOT NULL,"
+            "comment_to_ban TEXT NOT NULL,"
+            "date_of_unban TEXT NOT NULL,"
+            "comment_to_unban TEXT NOT NULL,"
+            "FOREIGN KEY (banned_user_id) REFERENCES user_info(id))"
         ]
         for query in queries:
             try:
@@ -146,6 +162,21 @@ class DatabaseManager():
                     self.logger.error(f'Информация о встречах пользователя '
                                       f'{first_user} не обновлена. '
                                       f' Ошибка - {error}')
+
+    def row_factory(self, query, values=None):
+        self.conn.row_factory = lite.Row
+        try:
+            if values is None:
+                result = self.conn.execute(query)
+                self.logger.info(f'Запрос {query} отработал')
+            else:
+                result = self.conn.execute(query, values)
+                self.logger.info(f'Запрос {query} со значениями {values}'
+                                 f' отработал')
+            self.conn.commit()
+            return result
+        except Exception as error:
+            self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
     def __del__(self):
         self.conn.close()

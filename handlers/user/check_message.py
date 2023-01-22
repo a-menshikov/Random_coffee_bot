@@ -1,48 +1,55 @@
-import sqlite3
 from asyncio import sleep
+from datetime import date, timedelta
 
-from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import BotBlocked
+from handlers.user.get_info_from_table import *
 
-from loader import bot, dp, logger, db_controller
+from loader import bot, db_controller, logger
 
 
-@dp.message_handler(commands=['check'])
-async def check_message(message: types.Message):
-    await sleep(10)
+async def check_message():
+    """Рассылка проверочного сообщения по всем пользователям."""
+    logger.info("Запуск проверки пользователей")
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
-            text="Через несколько минут будем произведена рассылка"
+            text="Совсем скоро будет произведено распределение пар",
         )
+        await sleep(0.05)
+    logger.info("Все пользователи проверены.")
 
 
 def prepare_user_list():
-    conn = sqlite3.connect('data/coffee_database.db')
-
-    cur = conn.execute("""SELECT user_info.teleg_id FROM user_status 
+    """Подготовка списка id пользователей со статусом готов к встрече."""
+    logger.info("""Подготавливаем список пользователей из базы""")
+    query = """SELECT user_info.teleg_id FROM user_status 
     JOIN user_info ON user_info.id = user_status.id 
-    WHERE user_status.status = 1 """)
-    data = cur.fetchall()
+    WHERE user_status.status = 1 """
+    data = db_controller.select_query(query).fetchall()
     return [element[0] for element in data]
 
 
 async def send_message(teleg_id, **kwargs):
+    """Отправка проверочного сообщения и обработка исключений."""
     try:
         await bot.send_message(teleg_id, **kwargs)
-    except Exception as error:
-        logger.error(f"Не возможно доставить сообщение пользователю  {teleg_id}. "
-                     f"{error}")
+    except BotBlocked:
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
+                     f"Бот заблокирован.")
         await change_status(teleg_id)
+    except Exception as error:
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
+                     f"{error}")
 
 
 async def change_status(teleg_id):
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute(
-        """UPDATE user_status SET status = 0
-        WHERE id = ? """, (teleg_id,))
-    conn.commit()
+    """Смена статуса участия."""
+    user_id = get_id_from_user_info_table(teleg_id)
+    queries = {
+        """UPDATE user_status SET status = 0 WHERE id =?""": (user_id,),
+        """UPDATE holidays_status SET status = 1, till_date = ? 
+        WHERE id = ? """: (str(date.today() + timedelta(days=6)), user_id)
+    }
+    for query, values in queries.items():
+        db_controller.query(query, values)

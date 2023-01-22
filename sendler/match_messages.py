@@ -1,12 +1,15 @@
-from aiogram import Bot
-from loader import db_controller, logger
+from asyncio import sleep
 
+from aiogram import Bot
 from data import ADMIN_TG_ID
+from keyboards import help_texts_markup
+from loader import db_controller, logger
 
 
 async def send_match_messages(match_info: dict, bot: Bot):
     """Рассылка сообщений после распределения пар на неделю."""
     for match in match_info.items():
+        await sleep(0.05)
         users_info = pare_users_query(match)
         if not users_info:
             logger.error(f'Не удалось получить информацию '
@@ -29,7 +32,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
                              f'пользователе {second_user}. Ошибка {error}')
             try:
                 await bot.send_message(second_user_id, first_message,
-                                       parse_mode="HTML")
+                                       parse_mode="HTML",
+                                       reply_markup=help_texts_markup())
                 logger.info(f'Сообщение для пользователя {second_user_id} '
                             f'отправлено')
             except Exception as error:
@@ -37,7 +41,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
                              f'не отправлено. Ошибка {error}')
             try:
                 await bot.send_message(first_user_id, second_message,
-                                       parse_mode="HTML")
+                                       parse_mode="HTML",
+                                       reply_markup=help_texts_markup())
                 logger.info(f'Сообщение для пользователя {first_user_id} '
                             f'отправлено')
             except Exception as error:
@@ -47,16 +52,18 @@ async def send_match_messages(match_info: dict, bot: Bot):
             fail_user = users_info[0]
             fail_user_db_id = fail_user[0]
             message = make_message(fail_user, fail=True)
-            try:
-                await bot.send_message(ADMIN_TG_ID,
-                                       message, parse_mode="HTML")
-                logger.info(f'Сообщение админу об отсутствии пары '
-                            f'для пользователя {fail_user_db_id} '
-                            f'отправлено')
-            except Exception as error:
-                logger.error(f'Сообщение админу об отсутствии пары '
-                             f'для пользователя {fail_user_db_id} '
-                             f'не отправлено. Ошибка {error}')
+            for admin in list(map(int, ADMIN_TG_ID.split())):
+                try:
+                    await bot.send_message(admin,
+                                           message, parse_mode="HTML")
+                    logger.info(f'Сообщение админу об отсутствии пары '
+                                f'для пользователя {fail_user_db_id} '
+                                f'отправлено')
+                except Exception as error:
+                    logger.error(f'Сообщение админу об отсутствии пары '
+                                 f'для пользователя {fail_user_db_id} '
+                                 f'не отправлено. Ошибка {error}')
+                    continue
 
 
 def make_message(user_info: tuple, fail: bool = False):

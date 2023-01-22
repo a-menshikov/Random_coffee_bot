@@ -1,35 +1,39 @@
-import sqlite3
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import ReplyKeyboardRemove
 
-from loader import bot, dp, logger
-from handlers.user.validators import *
-
+from handlers.user.first_check import check_and_add_registration_button
+from handlers.user.get_info_from_table import (
+    check_user_in_base,
+    get_id_from_user_info_table
+)
+from keyboards import return_to_begin_markup
+from keyboards.user import (back_message, confirm_markup, main_markup,
+                            man_message, register_can_skip_reply_markup,
+                            register_man_or_woman_markup,
+                            register_reply_markup, skip_message, woman_message,
+                            return_to_begin_button)
+from loader import bot, db_controller, dp, logger
 from states.states import UserData
-from keyboards.user import *
+
+from handlers.user.validators import (validate_about, validate_birthday,
+                                      validate_check_info, validate_gender,
+                                      validate_name)
+
+
+@dp.message_handler(text=return_to_begin_button, state="*")
+async def return_to_begin(message: types.Message, state: FSMContext):
+    """Вывод меню"""
+    await state.reset_state()
+    await check_and_add_registration_button(message)
 
 
 def get_gender_from_db(status):
     """Получаем пол пользователя по id пола"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT gender_name FROM genders WHERE id=?""", (status,)
-    )
+    query = """SELECT gender_name FROM genders WHERE id=?"""
+    values = (status,)
+    info = db_controller.select_query(query, values)
     return info.fetchone()[0]
-
-
-async def check_user_in_base(message):
-    """Проверяем пользователя на наличие в БД."""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    info = cur.execute(
-        """SELECT * FROM user_info WHERE teleg_id=?""", (message.from_user.id,)
-    )
-    if info.fetchone() is None:
-        return False
-    return True
 
 
 @dp.message_handler(state=UserData.check_info)
@@ -43,8 +47,8 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
     else:
         await bot.send_message(
             message.from_user.id,
-            f'Теперь вы добавлены в нашу БД. '
-            f'И будете участвовать в распределении на следующей неделе.',
+            'Ура! Теперь вы добавлены в базу бота '
+            'и будете участвовать в распределении на следующей неделе.',
             reply_markup=ReplyKeyboardRemove()
         )
         await bot.send_message(
@@ -77,55 +81,38 @@ async def change_data(message: types.Message, state: FSMContext):
 
 def add_to_db(teleg_id, name, birthday, about, gender):
     """Добавляем нового пользователя в базу."""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    cur.execute(
-        """insert into user_info (teleg_id, name, birthday, about, gender) 
-        values (?,?,?,?,?)""", (
-            teleg_id, name, birthday, about, gender
-        ))
-    conn.commit()
+    query = """INSERT INTO user_info (teleg_id, name, birthday, about, gender) 
+        VALUES (?,?,?,?,?)"""
+    values = (teleg_id, name, birthday, about, gender)
+    db_controller.query(query, values)
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"добавлен в БД как новый участник")
 
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    cur.execute(
-        """UPDATE user_info SET name = ?, birthday = ?, about = ?, gender =?
-        WHERE teleg_id = ? """, (
-            name, birthday, about, gender, teleg_id
-        ))
-    conn.commit()
+    query = """UPDATE user_info 
+        SET name = ?, birthday = ?, about = ?, gender = ?
+        WHERE teleg_id = ? """
+    values = (name, birthday, about, gender, teleg_id)
+    db_controller.query(query, values)
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"обновил информацию о себе")
 
 
 def add_new_user_in_status_table(teleg_id):
     """Проставляем статусы участия в таблицах БД"""
-    conn = sqlite3.connect('data/coffee_database.db')
-    cur = conn.cursor()
-    id_obj = cur.execute(
-        """SELECT id FROM user_info WHERE teleg_id=?""", (teleg_id,)
-    )
-    teleg_id = id_obj.fetchone()[0]
-    cur.execute("""insert into user_status (id, status) values (
-    ?,?)""", (
-        teleg_id, 1
-    ))
-    cur.execute("""insert into user_mets (id, met_info) values (
-    ?,?)""", (
-        teleg_id, "{}"
-    ))
-    cur.execute("""insert into holidays_status (id, status, till_date) values (
-        ?,?,?)""", (
-        teleg_id,
-        0,
-        'null'
-    ))
-    conn.commit()
+    user_id = get_id_from_user_info_table(teleg_id)
+    queries = {
+        """insert into user_status (id, status) values (
+    ?,?)""": (user_id, 1),
+        """insert into user_mets (id, met_info) values (
+    ?,?)""": (user_id, "{}"),
+        """insert into holidays_status (id, status, till_date) values (
+        ?,?,?)""": (user_id, 0, 'null')
+    }
+    for query, values in queries.items():
+        db_controller.query(query, values)
 
 
 @dp.message_handler(text="Регистрация", state=UserData.start)
@@ -136,7 +123,7 @@ async def start_registration(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         'Как вас зовут? (Введите только имя)',
-        reply_markup=types.ReplyKeyboardRemove()
+        reply_markup=return_to_begin_markup()
     )
     await UserData.name.set()
 
@@ -174,9 +161,9 @@ async def answer_name(message: types.Message, state: FSMContext):
     name = message.text
     if not validate_name(name):
         await message.answer(
-            f'Что то не так с введенным именем. '
-            f'Имя должно состоять из букв русского или латинского алфавита '
-            f'и быть менее 100 символов."'
+            'Что то не так с введенным именем. '
+            'Имя должно состоять из букв русского или латинского алфавита '
+            'и быть менее 100 символов."'
         )
         return
     await state.update_data(name=name)
