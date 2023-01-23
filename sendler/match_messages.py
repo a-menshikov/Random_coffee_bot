@@ -1,7 +1,7 @@
 from asyncio import sleep
 
 from aiogram import Bot
-from data import ADMIN_TG_ID
+from data import ADMIN_TG_ID, DEFAULT_PARE_iD, DEFAULT_PARE_USERNAME
 from keyboards import help_texts_markup
 from loader import db_controller, logger
 
@@ -50,12 +50,19 @@ async def send_match_messages(match_info: dict, bot: Bot):
                              f'не отправлено. Ошибка {error}')
         else:
             fail_user = users_info[0]
+            fail_user_tg_id = fail_user[1]
             fail_user_db_id = fail_user[0]
-            message = make_message(fail_user, fail=True)
+            default_user_db_id = db_controller.get_defaulf_pare_base_id()
+            fail_match = {fail_user_db_id: default_user_db_id}
+            db_controller.update_mets(fail_match)
+            db_controller.update_all_user_mets(fail_match)
+            messages = make_message(fail_user, fail=True)
+            admin_message = messages[0]
+            user_message = messages[1]
             for admin in list(map(int, ADMIN_TG_ID.split())):
                 try:
                     await bot.send_message(admin,
-                                           message, parse_mode="HTML")
+                                           admin_message, parse_mode="HTML")
                     logger.info(f'Сообщение админу об отсутствии пары '
                                 f'для пользователя {fail_user_db_id} '
                                 f'отправлено')
@@ -64,9 +71,17 @@ async def send_match_messages(match_info: dict, bot: Bot):
                                  f'для пользователя {fail_user_db_id} '
                                  f'не отправлено. Ошибка {error}')
                     continue
+            try:
+                await bot.send_message(fail_user_tg_id, user_message,
+                                       parse_mode="HTML")
+                logger.info(f'Сообщение для пользователя {fail_user_db_id} '
+                            f'отправлено')
+            except Exception as error:
+                logger.error(f'Сообщение для пользователя {fail_user_db_id} '
+                             f'не отправлено. Ошибка {error}')
 
 
-def make_message(user_info: tuple, fail: bool = False):
+def make_message(user_info: tuple, fail: bool = False) -> str | tuple:
     """Формирует строку для отправки."""
     if not fail:
         user_id = user_info[1]
@@ -82,8 +97,12 @@ def make_message(user_info: tuple, fail: bool = False):
     else:
         fail_user_id = user_info[1]
         fail_user_name = user_info[2]
-        message = (f'Без пары на этой неделе: <a href="tg://user?id'
-                   f'={fail_user_id}">{fail_user_name}</a>')
+        message = ((f'Без пары на этой неделе: <a href="tg://user?id'
+                   f'={fail_user_id}">{fail_user_name}</a>'),
+                   (f'На этой неделе Ваша пара для кофе: '
+                    f'<a href="tg://user?id={int(DEFAULT_PARE_iD)}">'
+                    f'{DEFAULT_PARE_USERNAME}</a>\n')
+                   )
     return message
 
 
