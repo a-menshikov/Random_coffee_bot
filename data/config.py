@@ -6,3 +6,5 @@ load_dotenv()
 
 TOKEN = os.getenv('TG_TOKEN')
 ADMIN_TG_ID = os.getenv('ADMIN_TG_ID')
+DEFAULT_PARE_iD = os.getenv('DEFAULT_PARE_iD')
+DEFAULT_PARE_USERNAME = os.getenv('DEFAULT_PARE_USERNAME')
