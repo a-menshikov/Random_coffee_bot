@@ -1,6 +1,7 @@
 import json
 import sqlite3 as lite
 from datetime import datetime
+from data.config import DEFAULT_PARE_iD
 
 
 class DatabaseManager():
@@ -116,7 +117,7 @@ class DatabaseManager():
                     self.logger.info(
                         f'Встреча для польователей {match} записана')
             except Exception as error:
-                self.logger.error(f'Встреча для польователей {match} '
+                self.logger.error(f'Встреча для пользователей {match} '
                                   f'не записана. Ошибка - {error}')
                 continue
 
@@ -177,6 +178,12 @@ class DatabaseManager():
             return result
         except Exception as error:
             self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
+
+    def get_defaulf_pare_base_id(self):
+        """Получить id дефолтного юзера из базы."""
+        query = "SELECT ui.id FROM user_info ui WHERE ui.teleg_id = ?"
+        db_answer = self.select_query(query, (int(DEFAULT_PARE_iD),))
+        return db_answer.fetchone()[0]
 
     def __del__(self):
         self.conn.close()
