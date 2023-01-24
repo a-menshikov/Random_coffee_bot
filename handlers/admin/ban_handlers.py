@@ -3,6 +3,7 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from data import ADMIN_TG_ID
 from handlers.admin.handlers import admin_menu
 from handlers.decorators import admin_handlers
 from keyboards import *
@@ -178,5 +179,10 @@ async def back_to_main(message: types.Message, state: FSMContext):
     await bot.send_message(
         message.from_user.id,
         "Вы в главном меню",
-        reply_markup=admin_main_markup()
+        reply_markup=back_to_main_markup(message)
     )
+
+def back_to_main_markup(message: types.Message):
+    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
+        return admin_main_markup()
+    return main_markup()

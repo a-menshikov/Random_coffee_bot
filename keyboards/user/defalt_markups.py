@@ -24,6 +24,7 @@ three_week_holidays_message = "3 недели"
 turn_off_holidays = "Отключить"
 back_to_menu = "Вернуться в меню"
 my_pare_button = "Моя пара"
+back_to_main = 'Главное меню'
 
 
 def main_markup():
@@ -42,6 +43,7 @@ def menu_markup():
     markup.add(my_status_message)
     markup.add(set_holiday_message)
     markup.add(about_bot_message)
+    markup.add(back_to_main)
     return markup
 
 

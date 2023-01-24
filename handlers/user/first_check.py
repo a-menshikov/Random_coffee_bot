@@ -11,20 +11,19 @@ from states import UserData, BannedState
 
 async def check_and_add_registration_button(message: types.Message):
     """Проверка пользователя для последующих действий."""
-    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
+    if not await check_user_in_base(message):
+        await bot.send_message(
+            message.from_user.id,
+            text="Нажмите кнопку Регистрации для старта.",
+            reply_markup=start_registr_markup()
+        )
+        await UserData.start.set()
+    elif message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
         await bot.send_message(
             message.from_user.id,
             text="Привет, Админ. Добро пожаловать в меню администратора",
             reply_markup=admin_main_markup(),
         )
-    elif not await check_user_in_base(message):
-        await bot.send_message(
-                message.from_user.id,
-                text="Нажмите кнопку Регистрации для старта.",
-                reply_markup=start_registr_markup()
-            )
-        await UserData.start.set()
-
     else:
         if not await check_user_in_ban(message):
             await bot.send_message(

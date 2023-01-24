@@ -1,9 +1,10 @@
 from aiogram.types import ReplyKeyboardMarkup
 
+from keyboards.user.defalt_markups import menu_message, back_to_main
 admin_menu_button = "Меню администратора"
 inform = "Отчет за прошедшую неделю"
 ban_list = "Бан-лист"
-back_to_main = 'Главное меню'
+
 add_to_ban_list = "Добавить в бан-лист"
 remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
@@ -16,6 +17,7 @@ def admin_main_markup():
     """Начальная кнопка админа."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(admin_menu_button)
+    markup.add(menu_message)
     return markup
 
 
