@@ -5,7 +5,7 @@ from sendler.match_messages import send_match_messages
 
 
 class MachingHelper():
-    """Class - interfase for matchingalogitm.exe"""
+    """Class - interfase for matchingalogitm1.exe"""
     vertex_conunt: int
     edges_count: int
 
@@ -60,7 +60,7 @@ class MachingHelper():
     def start(self):
         """Run matching algo"""
         logger.info("Start matching algo")
-        subprocess.call(['./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max'], shell=True)
+        subprocess.call(['./match_algoritm/matchingalogitm1 -f ./data/match_algoritm_data/input.txt --max'], shell=True)
         res = []
         print(res)
         with open("./data/match_algoritm_data/output.txt", "r") as text:

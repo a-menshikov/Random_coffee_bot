@@ -7,11 +7,12 @@ from handlers.user.get_info_from_table import (
     check_user_in_base,
     get_id_from_user_info_table
 )
-from keyboards import return_to_begin_markup
+from keyboards import return_to_begin_markup, registr_message, \
+    edit_profile_message
 from keyboards.user import (back_message, confirm_markup, main_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
-                            register_reply_markup, skip_message, woman_message,
+                            skip_message, woman_message,
                             return_to_begin_button)
 from loader import bot, db_controller, dp, logger
 from states.states import UserData
@@ -115,7 +116,7 @@ def add_new_user_in_status_table(teleg_id):
         db_controller.query(query, values)
 
 
-@dp.message_handler(text="Регистрация", state=UserData.start)
+@dp.message_handler(text=registr_message, state=UserData.start)
 async def start_registration(message: types.Message):
     """Первое состояние. Старт регистрации."""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -147,6 +148,8 @@ async def end_registration(state, message):
     data = await state.get_data()
     name = data.get('name')
     birthday = data.get('birthday')
+    if birthday == 'null':
+        birthday = 'Не указано'
     about = data.get('about')
     if about == 'null':
         about = 'Не указано'
@@ -175,7 +178,7 @@ async def question_birthday(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         'Введите дату рождения в формате ДД.ММ.ГГГГ',
-        reply_markup=register_reply_markup()
+        reply_markup=register_can_skip_reply_markup()
     )
     await UserData.birthday.set()
 
@@ -186,11 +189,13 @@ async def answer_birthday(message: types.Message, state: FSMContext):
     birthday = message.text
     if birthday == back_message:
         await start_registration(message)
+    elif birthday == skip_message:
+            birthday = 'null'
     else:
         if not await validate_birthday(message):
             return
-        await state.update_data(birthday=birthday)
-        await question_about(message)
+    await state.update_data(birthday=birthday)
+    await question_about(message)
 
 
 async def question_about(message: types.Message):

@@ -1,10 +1,9 @@
 from asyncio import sleep
 from datetime import date, timedelta
 
-from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
-from handlers.user.get_info_from_table import *
 
+from handlers.user.get_info_from_table import get_id_from_user_info_table
 from loader import bot, db_controller, logger
 
 

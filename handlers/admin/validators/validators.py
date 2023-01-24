@@ -2,7 +2,7 @@ import re
 
 from aiogram import types
 
-from handlers.user import check_id_in_ban_with_status
+from handlers.user.ban_check import check_id_in_ban_with_status
 from loader import bot, db_controller, logger
 
 

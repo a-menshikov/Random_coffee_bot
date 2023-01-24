@@ -3,8 +3,8 @@ import datetime
 from aiogram import types
 
 from handlers.decorators import admin_handlers
-from handlers.user import get_id_from_user_info_table, \
-    get_teleg_id_from_user_info_table
+from handlers.user.get_info_from_table import get_teleg_id_from_user_info_table, \
+    get_id_from_user_info_table
 from keyboards import *
 from loader import bot, db_controller, dp, logger
 from states import ReviewState

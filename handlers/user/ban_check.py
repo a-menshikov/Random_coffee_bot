@@ -1,6 +1,6 @@
 from aiogram import types
 
-from handlers.user import get_id_from_user_info_table
+from handlers.user.get_info_from_table import get_id_from_user_info_table
 from loader import db_controller
 
 

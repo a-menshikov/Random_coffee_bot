@@ -1,5 +1,4 @@
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 
 from handlers.decorators import user_handlers
 from handlers.user.reviews import get_met_id_with_user_last_week
@@ -38,9 +37,12 @@ async def send_profile(message: types.Message):
     gender_id = data['gender']
     gender_status = get_gender_from_db(gender_id)
     data['gender'] = gender_status
-    birthday = data['birthday'].split('-')
-    birthday.reverse()
-    data['birthday'] = '-'.join(birthday)
+    if data['birthday'] == 'null':
+        data['birthday'] = 'Не указано'
+    else:
+        birthday = data['birthday'].split('-')
+        birthday.reverse()
+        data['birthday'] = '-'.join(birthday)
     await bot.send_message(
         message.from_user.id,
         f"Имя: {data['name']};\n"

@@ -1,2 +1,4 @@
-from .ban_handlers import *
-from .handlers import *
+from .ban_handlers import dp
+from .handlers import dp
+
+__all__=['dp']

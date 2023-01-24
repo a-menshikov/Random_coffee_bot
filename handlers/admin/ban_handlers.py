@@ -19,7 +19,6 @@ async def cancel(message: types.Message, state: FSMContext):
     await admin_menu(message)
 
 
-
 @dp.message_handler(text=ban_list)
 @admin_handlers
 async def ban_list(message: types.Message):
