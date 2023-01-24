@@ -13,8 +13,9 @@ from match_algoritm import MachingHelper
 
 from handlers.decorators import admin_handlers
 from handlers.user import *
-# from handlers.user.unknown_message import dp
-
+from handlers.admin import *
+from handlers.user.unknown_message import dp
+__all__ = ['dp']
 
 @dp.message_handler(text=algo_start)
 @admin_handlers
