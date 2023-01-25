@@ -56,6 +56,8 @@ async def send_match_messages(match_info: dict, bot: Bot):
             db_controller.update_all_user_mets(fail_match)
             await send_match_messages(fail_match, bot)
 
+    logger.info('Рассылка сообщений о новых встречах завершена')
+
 
 def make_message(user_info: tuple) -> str:
     """Формирует сообщение о паре для отправки."""
