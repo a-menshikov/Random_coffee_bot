@@ -1,7 +1,10 @@
 from aiogram import types
 from handlers.decorators import admin_handlers
+from handlers.user.get_info_from_table import get_id_from_user_info_table
+from keyboards import take_part_button, do_not_take_part_button, change_status, \
+    admin_change_status_markup
 from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, inform
-from loader import bot, dp
+from loader import bot, dp, db_controller
 
 
 @dp.message_handler(text=go_back)
@@ -30,3 +33,42 @@ async def inform_message(message: types.Message):
         message.from_user.id,
         "Тут информация о встречах за прошедшую неделю"
     )
+
+
+@dp.message_handler(text=change_status)
+@admin_handlers
+async def change_status_message(message: types.Message):
+    """Вывод отчета."""
+    await bot.send_message(
+        message.from_user.id,
+        "Выберите вариант:",
+        reply_markup=admin_change_status_markup()
+    )
+
+
+@dp.message_handler(text=take_part_button)
+@admin_handlers
+async def take_part_yes(message: types.Message):
+    """Изменение статуса на принимать участие."""
+    change_admin_status(message, 1)
+    await bot.send_message(
+        message.from_user.id,
+        "Теперь вы участвуете в распределении."
+    )
+
+
+@dp.message_handler(text=do_not_take_part_button)
+@admin_handlers
+async def take_part_no(message: types.Message):
+    """Изменение статуса на не принимать участие."""
+    change_admin_status(message, 0)
+    await bot.send_message(
+        message.from_user.id,
+        "Вы изменили статус и теперь не участвуете в распределении."
+    )
+
+def change_admin_status(message: types.Message, status):
+    user_id = get_id_from_user_info_table(message.from_user.id)
+    query = """UPDATE user_status SET status=? WHERE id=?"""
+    values = (status, user_id)
+    db_controller.query(query, values)

@@ -2,13 +2,13 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
+from handlers.admin.ban_handlers import back_to_main_markup
 from handlers.user.first_check import check_and_add_registration_button
 from handlers.user.get_info_from_table import (
     check_user_in_base,
     get_id_from_user_info_table
 )
-from keyboards import return_to_begin_markup, registr_message, \
-    edit_profile_message
+from keyboards import return_to_begin_markup, registr_message
 from keyboards.user import (back_message, confirm_markup, main_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
@@ -55,7 +55,7 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
         await bot.send_message(
             message.from_user.id,
             text="Нажмите кнопку меню и выберите из доступных вариантов",
-            reply_markup=main_markup(),
+            reply_markup=back_to_main_markup(message),
         )
         data = await state.get_data()
         if await check_user_in_base(message):
@@ -148,11 +148,7 @@ async def end_registration(state, message):
     data = await state.get_data()
     name = data.get('name')
     birthday = data.get('birthday')
-    if birthday == 'null':
-        birthday = 'Не указано'
     about = data.get('about')
-    if about == 'null':
-        about = 'Не указано'
     gender = get_gender_from_db(data.get('gender'))
     tg_id = message.from_user.id
     await check_data(tg_id, name, birthday, about, gender)
@@ -190,7 +186,7 @@ async def answer_birthday(message: types.Message, state: FSMContext):
     if birthday == back_message:
         await start_registration(message)
     elif birthday == skip_message:
-            birthday = 'null'
+        birthday = 'Не указано'
     else:
         if not await validate_birthday(message):
             return
@@ -217,7 +213,7 @@ async def answer_about(message: types.Message, state: FSMContext):
         await question_birthday(message)
     else:
         if about == skip_message:
-            about = 'null'
+            about = 'Не указано'
         else:
             if not await validate_about(message):
                 return

@@ -10,7 +10,10 @@ remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
 algo_start = "Запуск алгоритма"
 review_messages = "Запуск опроса"
+change_status = "Изменить статус участия"
 cancel = "Отмена"
+take_part_button = "Принять участие"
+do_not_take_part_button = "Не принимать участие"
 
 
 def admin_main_markup():
@@ -28,6 +31,7 @@ def admin_menu_markup():
     markup.add(ban_list)
     markup.add(algo_start)
     markup.add(review_messages)
+    markup.add(change_status)
     markup.add(back_to_main)
     return markup
 
@@ -37,6 +41,14 @@ def admin_ban_markup():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(add_to_ban_list)
     markup.add(remove_from_ban_list)
+    markup.add(go_back)
+    return markup
+
+def admin_change_status_markup():
+    """Кнопки изменения статуса участия админа"""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(take_part_button)
+    markup.add(do_not_take_part_button)
     markup.add(go_back)
     return markup
 

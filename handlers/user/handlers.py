@@ -32,14 +32,10 @@ async def send_profile(message: types.Message):
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о себе")
     data = dict(get_user_data_from_db(message.from_user.id))
-    if data['about'] == 'null':
-        data['about'] = 'Не указано'
     gender_id = data['gender']
     gender_status = get_gender_from_db(gender_id)
     data['gender'] = gender_status
-    if data['birthday'] == 'null':
-        data['birthday'] = 'Не указано'
-    else:
+    if data['birthday'] != 'Не указано':
         birthday = data['birthday'].split('-')
         birthday.reverse()
         data['birthday'] = '-'.join(birthday)
