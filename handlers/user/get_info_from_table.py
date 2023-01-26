@@ -1,4 +1,4 @@
-from loader import db_controller
+from loader import db_controller, logger
 
 
 def get_id_from_user_info_table(teleg_id):
@@ -57,3 +57,22 @@ def get_user_info_by_id(user_id):
     values = (user_id,)
     row = db_controller.row_factory(query, values)
     return row.fetchone()
+
+
+def get_full_user_info_by_id(user_id):
+    query = (
+        "SELECT u.id, u.teleg_id, "
+        "u.name, u.birthday,"
+        "u.about, g.gender_name "
+        "FROM user_info as u "
+        "LEFT JOIN genders g "
+        "ON g.id = u.gender "
+        "WHERE u.id = ?"
+    )
+    try:
+        result = db_controller.select_query(query, (user_id, )).fetchone()
+    except Exception as error:
+        logger.error(f"{error}")
+        result = None
+    finally:
+        return result

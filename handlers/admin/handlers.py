@@ -1,10 +1,13 @@
 from aiogram import types
 from handlers.decorators import admin_handlers
+from handlers.user.check_message import check_message
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from keyboards import take_part_button, do_not_take_part_button, change_status, \
-    admin_change_status_markup
-from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, inform
+from keyboards import take_part_button, do_not_take_part_button, \
+    change_status, admin_change_status_markup, algo_start
+from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
+    inform
 from loader import bot, dp, db_controller
+from match_algoritm import MachingHelper
 
 
 @dp.message_handler(text=go_back)
@@ -66,6 +69,17 @@ async def take_part_no(message: types.Message):
         message.from_user.id,
         "Вы изменили статус и теперь не участвуете в распределении."
     )
+
+
+@dp.message_handler(text=algo_start)
+@admin_handlers
+async def start_algoritm(message: types.Message):
+    """Запуск алгоритма распределения"""
+    await check_message()
+    mc = MachingHelper()
+    res = mc.start()
+    await mc.send_and_write(res)
+
 
 def change_admin_status(message: types.Message, status):
     user_id = get_id_from_user_info_table(message.from_user.id)

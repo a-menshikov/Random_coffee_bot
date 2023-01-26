@@ -5,26 +5,19 @@ from aiogram import executor, types
 
 from data import ADMIN_TG_ID
 
-from handlers.user.check_message import check_message
 from handlers.user.holidays import sheduled_check_holidays
-from keyboards import algo_start
 from loader import bot, logger
-from match_algoritm import MachingHelper
 
-from handlers.decorators import admin_handlers
-from handlers.user import *
-from handlers.admin import *
+from handlers.user.start_handler import dp
+from handlers.user.new_member import dp
+from handlers.user.handlers import dp
+from handlers.user.help_texts import dp
+from handlers.user.holidays import dp
+from handlers.user.reviews import dp
+from handlers.admin.ban_handlers import dp
+from handlers.admin.handlers import dp
 from handlers.user.unknown_message import dp
 __all__ = ['dp']
-
-@dp.message_handler(text=algo_start)
-@admin_handlers
-async def start_algoritm(message: types.Message):
-    """Запуск алгоритма распределения"""
-    await check_message()
-    mc.prepare()
-    res = mc.start()
-    await mc.send_and_write(res)
 
 
 async def scheduler():
@@ -56,9 +49,7 @@ async def on_shutdown(_):
                          f' Ошибка {error}')
 
 
-
 if __name__ == '__main__':
-    mc = MachingHelper()
     executor.start_polling(dp, skip_updates=True,
                            on_startup=on_startup,
                            on_shutdown=on_shutdown
