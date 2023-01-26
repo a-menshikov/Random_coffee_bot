@@ -1,6 +1,7 @@
 import json
 import sqlite3 as lite
 from datetime import datetime
+from data.config import DEFAULT_PARE_iD
 
 
 class DatabaseManager():
@@ -78,11 +79,8 @@ class DatabaseManager():
         try:
             if values is None:
                 self.cur.execute(query)
-                self.logger.info(f'Запрос {query} отработал')
             else:
                 self.cur.execute(query, values)
-                self.logger.info(f'Запрос {query} со значениями {values}'
-                                 f' отработал')
             self.conn.commit()
         except Exception as error:
             self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
@@ -92,11 +90,8 @@ class DatabaseManager():
         try:
             if values is None:
                 result = self.cur.execute(query)
-                self.logger.info(f'Запрос {query} отработал')
             else:
                 result = self.cur.execute(query, values)
-                self.logger.info(f'Запрос {query} со значениями {values}'
-                                 f' отработал')
             self.conn.commit()
             return result
         except Exception as error:
@@ -113,10 +108,8 @@ class DatabaseManager():
                     query = ('INSERT INTO met_info(first_user_id,'
                              'second_user_id, date) VALUES (?,?,?)')
                     self.query(query, (first_user, second_user, today))
-                    self.logger.info(
-                        f'Встреча для польователей {match} записана')
             except Exception as error:
-                self.logger.error(f'Встреча для польователей {match} '
+                self.logger.error(f'Встреча для пользователей {match} '
                                   f'не записана. Ошибка - {error}')
                 continue
 
@@ -146,8 +139,6 @@ class DatabaseManager():
                 second_user = match[1]
                 try:
                     self.update_one_user_mets(first_user, second_user)
-                    self.logger.info(f'Информация о встречах пользователя '
-                                     f'{first_user} обновлена')
                 except Exception as error:
                     self.logger.error(f'Информация о встречах пользователя '
                                       f'{first_user} не обновлена. '
@@ -156,28 +147,30 @@ class DatabaseManager():
                 second_user = match[0]
                 try:
                     self.update_one_user_mets(first_user, second_user)
-                    self.logger.info(f'Информация о встречах пользователя '
-                                     f'{first_user} обновлена')
                 except Exception as error:
                     self.logger.error(f'Информация о встречах пользователя '
                                       f'{first_user} не обновлена. '
                                       f' Ошибка - {error}')
+
+        self.logger.info('Запись информации о новых встречах завершена')
 
     def row_factory(self, query, values=None):
         self.conn.row_factory = lite.Row
         try:
             if values is None:
                 result = self.conn.execute(query)
-                self.logger.info(f'Запрос {query} отработал')
             else:
                 result = self.conn.execute(query, values)
-                self.logger.info(f'Запрос {query} со значениями {values}'
-                                 f' отработал')
             self.conn.commit()
             return result
         except Exception as error:
             self.logger.error(f'Запрос {query} не отработал. Ошибка {error}')
 
+    def get_defaulf_pare_base_id(self):
+        """Получить id дефолтного юзера из базы."""
+        query = "SELECT ui.id FROM user_info ui WHERE ui.teleg_id = ?"
+        db_answer = self.select_query(query, (int(DEFAULT_PARE_iD),))
+        return db_answer.fetchone()[0]
+
     def __del__(self):
         self.conn.close()
-        self.logger.info('Соединение с базой закрыто')

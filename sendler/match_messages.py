@@ -1,7 +1,6 @@
 from asyncio import sleep
 
 from aiogram import Bot
-from data import ADMIN_TG_ID
 from keyboards import help_texts_markup
 from loader import db_controller, logger
 
@@ -9,7 +8,7 @@ from loader import db_controller, logger
 async def send_match_messages(match_info: dict, bot: Bot):
     """Рассылка сообщений после распределения пар на неделю."""
     for match in match_info.items():
-        await sleep(0.05)
+        await sleep(0.1)
         users_info = pare_users_query(match)
         if not users_info:
             logger.error(f'Не удалось получить информацию '
@@ -51,39 +50,38 @@ async def send_match_messages(match_info: dict, bot: Bot):
         else:
             fail_user = users_info[0]
             fail_user_db_id = fail_user[0]
-            message = make_message(fail_user, fail=True)
-            for admin in list(map(int, ADMIN_TG_ID.split())):
-                try:
-                    await bot.send_message(admin,
-                                           message, parse_mode="HTML")
-                    logger.info(f'Сообщение админу об отсутствии пары '
-                                f'для пользователя {fail_user_db_id} '
-                                f'отправлено')
-                except Exception as error:
-                    logger.error(f'Сообщение админу об отсутствии пары '
-                                 f'для пользователя {fail_user_db_id} '
-                                 f'не отправлено. Ошибка {error}')
-                    continue
+            default_user_db_id = db_controller.get_defaulf_pare_base_id()
+            fail_match = {fail_user_db_id: default_user_db_id}
+            db_controller.update_mets(fail_match)
+            db_controller.update_all_user_mets(fail_match)
+            await send_match_messages(fail_match, bot)
+
+    logger.info('Рассылка сообщений о новых встречах завершена')
 
 
-def make_message(user_info: tuple, fail: bool = False):
-    """Формирует строку для отправки."""
-    if not fail:
-        user_id = user_info[1]
-        user_name = user_info[2]
-        user_birthday = user_info[3]
-        user_about = user_info[4]
-        user_gender = user_info[5]
-        message = (f'На этой неделе Ваша пара для кофе: '
-                   f'<a href="tg://user?id={user_id}">{user_name}</a>\n'
-                   f'Дата рождения: {user_birthday}\n'
-                   f'Информация: {user_about}\n'
-                   f'Пол: {user_gender}\n')
-    else:
-        fail_user_id = user_info[1]
-        fail_user_name = user_info[2]
-        message = (f'Без пары на этой неделе: <a href="tg://user?id'
-                   f'={fail_user_id}">{fail_user_name}</a>')
+def make_message(user_info: tuple) -> str:
+    """Формирует сообщение о паре для отправки."""
+    user_id = user_info[1]
+    user_name = user_info[2]
+    user_birthday = user_info[3]
+    user_about = user_info[4]
+    user_gender = user_info[5]
+
+    base_message = (f'На этой неделе Ваша пара для кофе: '
+                    f'<a href="tg://user?id={user_id}">{user_name}</a>')
+    birth_day_message = f'Дата рождения: {user_birthday}'
+    about_message = f'Информация: {user_about}'
+    gender_message = f'Пол: {user_gender}'
+    row_message_list = [base_message]
+
+    if user_birthday != 'Не указано':
+        row_message_list.append(birth_day_message)
+    if user_about != 'Не указано':
+        row_message_list.append(about_message)
+    if user_gender != 'Не указано':
+        row_message_list.append(gender_message)
+    message = '\n'.join(row_message_list)
+
     return message
 
 
