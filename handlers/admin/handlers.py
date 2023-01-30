@@ -1,6 +1,9 @@
 from asyncio import sleep
 
 from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import BotBlocked
+
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -103,23 +106,60 @@ async def request_message_to_all(message: types.Message):
     await AdminData.message_send.set()
 
 
-@dp.message_handler(state=AdminData.message_send)
-async def get_message_and_send(message: types.Message):
-    message_text = message.text
-    user_list = prepare_user_list().remove(message.from_user.id)
+@dp.message_handler(state=AdminData.message_send, content_types=types.ContentTypes.ANY)
+async def get_message_and_send(message: types.Message, state=FSMContext):
     logger.info("Запуск отправки сообщений всем пользователям")
-    try:
-        for user in user_list:
-            await send_message(
-                teleg_id=user,
-                text=message_text,
-            )
-            await sleep(0.05)
-    except TypeError:
-        logger.error("Список пользователей пуст")
+    user_list = prepare_user_list()
+    if message.photo:
+        message_answer = message.photo[-1].file_id
+        message_caption = message.caption
+        try:
+            for user in user_list:
+                await send_photo(
+                    teleg_id=user,
+                    photo=message_answer,
+                    caption=message_caption
+                )
+                await sleep(0.05)
+        except TypeError:
+            logger.error("Список пользователей пуст")
+        except Exception as er:
+            logger.error(f"Ошибка отправки: {er}")
+    elif message.content_type == 'text':
+        message_answer = message.text
+        try:
+            for user in user_list:
+                await send_message(
+                    teleg_id=user,
+                    text=message_answer,
+                )
+                await sleep(0.05)
+        except TypeError:
+            logger.error("Список пользователей пуст")
+        except Exception as er:
+            logger.error(f"Ошибка отправки: {er}")
+    else:
+        await message.answer("Данный тип сообщения я обработать не могу")
+    await state.finish()
+
+
+
     await bot.send_message(
         message.from_user.id,
         "Сообщения отправлены",
         reply_markup=admin_menu_markup()
     )
     logger.info("Сообщения пользователям доставлены.")
+
+
+async def send_photo(teleg_id, **kwargs):
+    """Отправка проверочного сообщения и обработка исключений."""
+    try:
+        await bot.send_photo(teleg_id, **kwargs)
+    except BotBlocked:
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
+                     f"Бот заблокирован.")
+        await change_status(teleg_id)
+    except Exception as error:
+        logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
+                     f"{error}")
