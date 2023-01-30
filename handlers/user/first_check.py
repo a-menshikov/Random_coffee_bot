@@ -4,7 +4,8 @@ from aiogram.types import ReplyKeyboardRemove
 from data import ADMIN_TG_ID
 from handlers.user.get_info_from_table import check_user_in_base
 from handlers.user.ban_check import check_user_in_ban
-from keyboards import admin_main_markup, start_registr_markup, main_markup
+from keyboards.admin import admin_main_markup
+from keyboards.user import start_registr_markup, main_markup
 from loader import bot
 from states import UserData, BannedState
 

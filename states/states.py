@@ -19,6 +19,7 @@ class AdminData(StatesGroup):
     comment_to_ban = State()
     user_unban = State()
     comment_to_unban = State()
+    message_send = State()
 
 
 class ReviewState(StatesGroup):

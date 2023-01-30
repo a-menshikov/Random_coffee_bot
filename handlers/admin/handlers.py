@@ -1,13 +1,17 @@
+from asyncio import sleep
+
 from aiogram import types
 from handlers.decorators import admin_handlers
-from handlers.user.check_message import check_message
+from handlers.user.check_message import check_message, prepare_user_list, \
+    send_message
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from keyboards import take_part_button, do_not_take_part_button, \
-    change_status, admin_change_status_markup, algo_start
 from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
-    inform
-from loader import bot, dp, db_controller
+    inform, admin_cancel_markup, change_status, admin_change_status_markup, \
+    take_part_button, do_not_take_part_button, algo_start, \
+    send_message_to_all_button
+from loader import bot, dp, db_controller, logger
 from match_algoritm import MachingHelper
+from states import AdminData
 
 
 @dp.message_handler(text=go_back)
@@ -86,3 +90,36 @@ def change_admin_status(message: types.Message, status):
     query = """UPDATE user_status SET status=? WHERE id=?"""
     values = (status, user_id)
     db_controller.query(query, values)
+
+
+@dp.message_handler(text=send_message_to_all_button)
+@admin_handlers
+async def request_message_to_all(message: types.Message):
+    await bot.send_message(
+        message.from_user.id,
+        "Введите сообщение которое будет отправлено всем пользователям",
+        reply_markup=admin_cancel_markup()
+    )
+    await AdminData.message_send.set()
+
+
+@dp.message_handler(state=AdminData.message_send)
+async def get_message_and_send(message: types.Message):
+    message_text = message.text
+    user_list = prepare_user_list().remove(message.from_user.id)
+    logger.info("Запуск отправки сообщений всем пользователям")
+    try:
+        for user in user_list:
+            await send_message(
+                teleg_id=user,
+                text=message_text,
+            )
+            await sleep(0.05)
+    except TypeError:
+        logger.error("Список пользователей пуст")
+    await bot.send_message(
+        message.from_user.id,
+        "Сообщения отправлены",
+        reply_markup=admin_menu_markup()
+    )
+    logger.info("Сообщения пользователям доставлены.")

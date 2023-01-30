@@ -1,7 +1,7 @@
 from asyncio import sleep
 
 from aiogram import Bot
-from keyboards import help_texts_markup
+from keyboards.user import help_texts_markup
 from loader import db_controller, logger
 
 

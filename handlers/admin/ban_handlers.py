@@ -3,14 +3,17 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from data import ADMIN_TG_ID
 from handlers.admin.handlers import admin_menu
+from handlers.admin.validators import ban_validator, comment_validator, \
+    unban_validator
 from handlers.decorators import admin_handlers
-from keyboards import *
-from loader import *
-from states import AdminData
+from keyboards.admin import cancel, ban_list, admin_ban_markup, \
+    add_to_ban_list, admin_cancel_markup, remove_from_ban_list, \
+    back_to_main_markup
+from keyboards.user import back_to_main
+from loader import bot, logger, dp, db_controller
 
-from handlers.admin.validators import *
+from states import AdminData
 
 
 @dp.message_handler(text=cancel, state="*")
@@ -181,8 +184,3 @@ async def back_to_main(message: types.Message, state: FSMContext):
         "Вы в главном меню",
         reply_markup=back_to_main_markup(message)
     )
-
-def back_to_main_markup(message: types.Message):
-    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
-        return admin_main_markup()
-    return main_markup()

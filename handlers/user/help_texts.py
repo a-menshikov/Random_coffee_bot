@@ -3,7 +3,7 @@ from asyncio import sleep
 from aiogram import types
 
 from handlers.decorators import user_handlers
-from keyboards import help_texts
+from keyboards.user import help_texts
 from loader import bot, dp
 
 help_texts_messages = [

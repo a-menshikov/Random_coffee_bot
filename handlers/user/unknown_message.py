@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.types import InputFile
 
 from handlers.decorators import user_handlers
-from keyboards import main_markup
+from keyboards.user import main_markup
 from loader import dp, bot
 
 
@@ -20,6 +20,3 @@ async def unknown_message(message: types.Message):
         message.from_user.id,
         photo=photo
     )
-
-
-

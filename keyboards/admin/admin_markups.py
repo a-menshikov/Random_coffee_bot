@@ -1,6 +1,10 @@
+from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup
 
-from keyboards.user.defalt_markups import menu_message, back_to_main
+from data import ADMIN_TG_ID
+from keyboards.user.defalt_markups import menu_message, back_to_main, \
+    main_markup
+
 admin_menu_button = "Меню администратора"
 inform = "Отчет за прошедшую неделю"
 ban_list = "Бан-лист"
@@ -14,6 +18,7 @@ change_status = "Изменить статус участия"
 cancel = "Отмена"
 take_part_button = "Принять участие"
 do_not_take_part_button = "Не принимать участие"
+send_message_to_all_button = "Отправить сообщение всем пользователям"
 
 
 def admin_main_markup():
@@ -28,6 +33,7 @@ def admin_menu_markup():
     """Меню админа."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(inform)
+    markup.add(send_message_to_all_button)
     markup.add(ban_list)
     markup.add(algo_start)
     markup.add(review_messages)
@@ -64,3 +70,8 @@ def admin_cancel_markup():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(cancel)
     return markup
+
+def back_to_main_markup(message: types.Message):
+    if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
+        return admin_main_markup()
+    return main_markup()

@@ -8,12 +8,12 @@ from handlers.user.get_info_from_table import (
     check_user_in_base,
     get_id_from_user_info_table
 )
-from keyboards import return_to_begin_markup, registr_message
 from keyboards.user import (back_message, confirm_markup, main_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
                             skip_message, woman_message,
-                            return_to_begin_button)
+                            return_to_begin_button, registr_message,
+                            return_to_begin_markup)
 from loader import bot, db_controller, dp, logger
 from states.states import UserData
 

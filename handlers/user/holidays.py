@@ -5,10 +5,11 @@ from aiogram import types
 from handlers.decorators import user_handlers
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_teleg_id_from_user_info_table
-from keyboards import one_week_holidays_message, two_week_holidays_message, \
+from keyboards.user import holidays_length, set_holiday_message, \
+    one_week_holidays_message, two_week_holidays_message, \
     three_week_holidays_message, turn_off_holidays
-from keyboards.user import holidays_length, set_holiday_message
 from loader import bot, db_controller, dp, logger
+
 
 def convert_date(date: date):
     date_str = datetime.strftime(date, '%d.%m.%Y')

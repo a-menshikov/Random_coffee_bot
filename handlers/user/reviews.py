@@ -3,9 +3,11 @@ import datetime
 from aiogram import types
 
 from handlers.decorators import admin_handlers
-from handlers.user.get_info_from_table import get_teleg_id_from_user_info_table, \
+from handlers.user.get_info_from_table import \
+    get_teleg_id_from_user_info_table, \
     get_id_from_user_info_table
-from keyboards import *
+from keyboards.admin import review_messages
+from keyboards.user import review_markup, skip_message, main_markup
 from loader import bot, db_controller, dp, logger
 from states import ReviewState
 
