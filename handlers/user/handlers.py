@@ -139,7 +139,7 @@ async def my_pare_check(message: types.Message):
                 WHERE id = ?"""
         values = (met_id[0], )
         users = db_controller.row_factory(query, values).fetchone()
-        if users['first_user_id'] == str(message.from_user.id):
+        if users['first_user_id'] == user_id:
             user_info = get_full_user_info_by_id(users['second_user_id'])
         else:
             user_info = get_full_user_info_by_id(users['first_user_id'])
