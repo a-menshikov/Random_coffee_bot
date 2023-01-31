@@ -185,13 +185,14 @@ async def answer_birthday(message: types.Message, state: FSMContext):
     birthday = message.text
     if birthday == back_message:
         await start_registration(message)
-    elif birthday == skip_message:
-        birthday = 'Не указано'
     else:
-        if not await validate_birthday(message):
-            return
-    await state.update_data(birthday=birthday)
-    await question_about(message)
+        if birthday == skip_message:
+            birthday = 'Не указано'
+        else:
+            if not await validate_birthday(message):
+                return
+        await state.update_data(birthday=birthday)
+        await question_about(message)
 
 
 async def question_about(message: types.Message):
