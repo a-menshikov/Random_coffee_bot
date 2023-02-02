@@ -5,15 +5,11 @@ from aiogram import types
 from handlers.decorators import user_handlers
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_teleg_id_from_user_info_table
+from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import holidays_length, set_holiday_message, \
     one_week_holidays_message, two_week_holidays_message, \
     three_week_holidays_message, turn_off_holidays
 from loader import bot, db_controller, dp, logger
-
-
-def convert_date(date: date):
-    date_str = datetime.strftime(date, '%d.%m.%Y')
-    return date_str
 
 
 @dp.message_handler(text=set_holiday_message)
@@ -35,13 +31,14 @@ async def check_and_choice_holidays(message: types.Message):
 async def get_one_week_holidays(message: types.Message):
     """Установка каникул на 1 неделю"""
     date_to_return = date.today() + timedelta(days=7)
-    await get_holidays(message, convert_date(date_to_return))
+    await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до {convert_date(date_to_return)} до '
+        text=f'Вы установили каникулы до '
+             f'{date_to_return.strftime("%d.%m.%Y")} до '
              f'12:00 по Московскому времени и начнете участвовать в '
              f'распределении с '
-             f'{convert_date(date_to_return + timedelta(days=1))}.'
+             f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
 
 
@@ -50,13 +47,14 @@ async def get_one_week_holidays(message: types.Message):
 async def get_two_week_holidays(message: types.Message):
     """Установка каникул на 2 недели"""
     date_to_return = date.today() + timedelta(days=14)
-    await get_holidays(message, convert_date(date_to_return))
+    await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до {convert_date(date_to_return)} до '
+        text=f'Вы установили каникулы до '
+             f'{date_to_return.strftime("%d.%m.%Y")} до '
              f'12:00 по Московскому времени и начнете участвовать в '
              f'распределении с '
-             f'{convert_date(date_to_return + timedelta(days=1))}.'
+             f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
 
 
@@ -65,13 +63,14 @@ async def get_two_week_holidays(message: types.Message):
 async def get_three_week_holidays(message: types.Message):
     """Установка каникул на 3 недели"""
     date_to_return = date.today() + timedelta(days=21)
-    await get_holidays(message, convert_date(date_to_return))
+    await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до {convert_date(date_to_return)} до '
+        text=f'Вы установили каникулы до '
+             f'{date_to_return.strftime("%d.%m.%Y")} до '
              f'12:00 по Московскому времени и начнете участвовать в '
              f'распределении с '
-             f'{convert_date(date_to_return + timedelta(days=1))}.'
+             f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
 
 
@@ -114,29 +113,29 @@ async def check_holidays_until(teleg_id):
     user_id = get_id_from_user_info_table(teleg_id)
     query = """SELECT * FROM holidays_status WHERE id = ?"""
     values = (user_id,)
-    row = db_controller.select_query(query, values).fetchone()
-    if row[1] == 0:
+    row = db_controller.row_factory(query, values).fetchone()
+    if row['status'] == 0:
         pass
     else:
         await bot.send_message(
             teleg_id,
-            text=f'Каникулы установлены до {row[2]} до 12:00 по Московскому '
-                 f'времени и начнете участвовать в распределении со '
-                 f'следующего дня.'
+            text=f'Каникулы установлены до '
+                 f'{date_from_db_to_message(row["till_date"])} до 12:00 по '
+                 f'Московскому времени и начнете участвовать в распределении '
+                 f'со следующего дня.'
         )
 
 
 async def sheduled_check_holidays():
     """Отключение режима каникул при окончании срока. Проверка по расписанию"""
-    query = """SELECT * FROM holidays_status WHERE status = 1"""
+    query = """SELECT * FROM holidays_status WHERE status = 1 
+     AND till_date = date('now')"""
     data = db_controller.select_query(query).fetchall()
-    for row in data:
-        date_obj = datetime.strptime(row[2], '%d.%m.%Y')
-        date_obj = date_obj.date()
-        if date_obj == date.today():
+    if data:
+        for row in data:
             user_id = get_teleg_id_from_user_info_table(row[0])
             queries = {
-                """update holidays_status SET status=?, till_date=? 
+                 """update holidays_status SET status=?, till_date=? 
                 WHERE id=?""": (0, "null", row[0]),
                 """UPDATE user_status SET status=? WHERE id = ?""":
                     (1, row[0])

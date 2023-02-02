@@ -99,7 +99,7 @@ async def save_to_ban(banned_user_id, comment):
         VALUES (?, ?, ?, ?, ?, ?)""":
             (banned_user_id, 1, today, comment, 'null', 'null'),
         """UPDATE holidays_status SET status=?, till_date=? WHERE id = ?""":
-            (0, "null", banned_user_id),
+            (0, "Неопределенный срок", banned_user_id),
         """UPDATE user_status SET status=? WHERE id = ? """: (0, banned_user_id)
     }
     for query, values in queries.items():
@@ -163,11 +163,10 @@ async def comment_to_unban_answer(message: types.Message, state: FSMContext):
 
 async def save_to_unban(unbanned_user_id, comment):
     """Сохранние в БД, что пользователь выведен из бана."""
-    today = datetime.date.today()
     queries = {
-        """UPDATE ban_list SET ban_status = ?, date_of_unban = ?, 
+        """UPDATE ban_list SET ban_status = ?, date_of_unban = date('now'), 
         comment_to_unban = ? WHERE banned_user_id = ? """:
-            (0, today, comment, unbanned_user_id),
+            (0, comment, unbanned_user_id),
         """UPDATE user_status SET status=? WHERE id = ? """:
             (1, unbanned_user_id)
     }

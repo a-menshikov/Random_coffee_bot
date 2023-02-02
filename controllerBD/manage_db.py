@@ -99,7 +99,7 @@ class DatabaseManager():
 
     def update_mets(self, match_info: dict):
         """Записывает в met_info информацию о новых встречах."""
-        today = datetime.now().strftime('%d.%m.%Y')
+        today = datetime.now()
         for match in match_info.items():
             try:
                 if all(match):
@@ -115,7 +115,7 @@ class DatabaseManager():
 
     def update_one_user_mets(self, first_user: int, second_user: int):
         """Записывает в user_mets информацию об одном пользователе."""
-        today = datetime.now().strftime('%d.%m.%Y')
+        today = datetime.now()
         all_mets_query = 'SELECT met_info FROM user_mets WHERE id = ?'
         db_result = self.select_query(all_mets_query,
                                       (first_user,)).fetchone()

@@ -8,7 +8,8 @@ from handlers.user.get_info_from_table import (
     check_user_in_base,
     get_id_from_user_info_table
 )
-from keyboards.user import (back_message, confirm_markup, main_markup,
+from handlers.user.work_with_date import date_from_message_to_db
+from keyboards.user import (back_message, confirm_markup,
                             man_message, register_can_skip_reply_markup,
                             register_man_or_woman_markup,
                             skip_message, woman_message,
@@ -82,6 +83,10 @@ async def change_data(message: types.Message, state: FSMContext):
 
 def add_to_db(teleg_id, name, birthday, about, gender):
     """Добавляем нового пользователя в базу."""
+    if birthday == "Не указано":
+        pass
+    else:
+        birthday = date_from_message_to_db(birthday)
     query = """INSERT INTO user_info (teleg_id, name, birthday, about, gender) 
         VALUES (?,?,?,?,?)"""
     values = (teleg_id, name, birthday, about, gender)
@@ -92,6 +97,7 @@ def add_to_db(teleg_id, name, birthday, about, gender):
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
+    birthday = date_from_message_to_db(birthday)
     query = """UPDATE user_info 
         SET name = ?, birthday = ?, about = ?, gender = ?
         WHERE teleg_id = ? """
