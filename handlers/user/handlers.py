@@ -23,7 +23,7 @@ async def main_menu(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         text="Меню:",
-        reply_markup=menu_markup()
+        reply_markup=menu_markup(message)
     )
 
 

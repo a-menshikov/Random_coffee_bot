@@ -168,7 +168,7 @@ async def answer_name(message: types.Message, state: FSMContext):
         await message.answer(
             'Что то не так с введенным именем. '
             'Имя должно состоять из букв русского или латинского алфавита '
-            'и быть менее 100 символов."'
+            'и быть менее 100 символов.'
         )
         return
     await state.update_data(name=name)

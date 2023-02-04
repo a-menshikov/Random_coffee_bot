@@ -35,5 +35,10 @@ def user_handlers(func):
                 "или нажмите кнопку снизу.",
                 reply_markup=start_registr_markup(),
                 )
+            # photo = InputFile("files/help_image.jpg")
+            # await bot.send_photo(
+            #     message.from_user.id,
+            #     photo=photo
+            # )
             await UserData.start.set()
     return wrapped

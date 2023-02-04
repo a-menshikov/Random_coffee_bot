@@ -15,3 +15,8 @@ async def unknown_message(message: types.Message):
         "меню воспользуйтесь кнопкой",
         reply_markup=main_markup()
     )
+    photo = InputFile("files/help_image.jpg")
+    # await bot.send_photo(
+    #     message.from_user.id,
+    #     photo=photo
+    # )
