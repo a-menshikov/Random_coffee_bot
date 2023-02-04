@@ -1,5 +1,4 @@
-from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
-                           ReplyKeyboardMarkup)
+from aiogram.types import ReplyKeyboardMarkup
 
 from data import ADMIN_TG_ID
 
@@ -40,13 +39,12 @@ def main_markup():
 def menu_markup(message):
     """Клавиатура главного меню."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(my_profile_message)
-    markup.add(my_pare_button)
-    markup.add(my_status_message)
-    markup.add(set_holiday_message)
-    markup.add(about_bot_message)
+    markup.row(my_profile_message, my_pare_button)
+    markup.row(my_status_message, set_holiday_message)
     if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
-        markup.add(back_to_main)
+        markup.row(about_bot_message, back_to_main)
+    else:
+        markup.row(about_bot_message, )
     return markup
 
 

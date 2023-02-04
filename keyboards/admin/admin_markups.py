@@ -5,19 +5,19 @@ from keyboards.user.defalt_markups import (back_to_main, menu_markup,
                                            menu_message)
 
 admin_menu_button = "Меню администратора"
-inform = "Отчет за прошедшую неделю"
+inform = "Отчет за неделю"
 ban_list = "Бан-лист"
 
 add_to_ban_list = "Добавить в бан-лист"
 remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
-algo_start = "Запуск алгоритма"
+algo_start = "Алгоритм"
 review_messages = "Запуск опроса"
-change_status = "Изменить статус участия"
+change_status = "Статус участия"
 cancel = "Отмена"
 take_part_button = "Принять участие"
 do_not_take_part_button = "Не принимать участие"
-send_message_to_all_button = "Отправить сообщение всем пользователям"
+send_message_to_all_button = "Сообщение пользователям"
 
 
 def admin_main_markup():
@@ -31,13 +31,9 @@ def admin_main_markup():
 def admin_menu_markup():
     """Меню админа."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
-    markup.add(inform)
-    markup.add(send_message_to_all_button)
-    markup.add(ban_list)
-    markup.add(algo_start)
-    markup.add(review_messages)
-    markup.add(change_status)
-    markup.add(back_to_main)
+    markup.row(inform, send_message_to_all_button)
+    markup.row(ban_list, change_status)
+    markup.row(review_messages, back_to_main)
     return markup
 
 
