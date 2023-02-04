@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from aiogram import types
 
@@ -35,8 +35,8 @@ async def get_one_week_holidays(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         text=f'Вы установили каникулы до '
-             f'{date_to_return.strftime("%d.%m.%Y")} до '
-             f'12:00 по Московскому времени и начнете участвовать в '
+             f'{date_to_return.strftime("%d.%m.%Y")} '
+             f'и начнете участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -51,8 +51,8 @@ async def get_two_week_holidays(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         text=f'Вы установили каникулы до '
-             f'{date_to_return.strftime("%d.%m.%Y")} до '
-             f'12:00 по Московскому времени и начнете участвовать в '
+             f'{date_to_return.strftime("%d.%m.%Y")} '
+             f'и начнете участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -67,8 +67,8 @@ async def get_three_week_holidays(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         text=f'Вы установили каникулы до '
-             f'{date_to_return.strftime("%d.%m.%Y")} до '
-             f'12:00 по Московскому времени и начнете участвовать в '
+             f'{date_to_return.strftime("%d.%m.%Y")} '
+             f'и начнете участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -120,8 +120,8 @@ async def check_holidays_until(teleg_id):
         await bot.send_message(
             teleg_id,
             text=f'Каникулы установлены до '
-                 f'{date_from_db_to_message(row["till_date"])} до 12:00 по '
-                 f'Московскому времени и начнете участвовать в распределении '
+                 f'{date_from_db_to_message(row["till_date"])} '
+                 f'и начнете участвовать в распределении '
                  f'со следующего дня.'
         )
 
@@ -135,7 +135,7 @@ async def sheduled_check_holidays():
         for row in data:
             user_id = get_teleg_id_from_user_info_table(row[0])
             queries = {
-                 """update holidays_status SET status=?, till_date=? 
+                """update holidays_status SET status=?, till_date=? 
                 WHERE id=?""": (0, "null", row[0]),
                 """UPDATE user_status SET status=? WHERE id = ?""":
                     (1, row[0])

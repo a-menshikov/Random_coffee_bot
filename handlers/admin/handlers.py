@@ -106,7 +106,8 @@ async def request_message_to_all(message: types.Message):
     await AdminData.message_send.set()
 
 
-@dp.message_handler(state=AdminData.message_send, content_types=types.ContentTypes.ANY)
+@dp.message_handler(state=AdminData.message_send,
+                    content_types=types.ContentTypes.ANY)
 async def get_message_and_send(message: types.Message, state=FSMContext):
     logger.info("Запуск отправки сообщений всем пользователям")
     user_list = prepare_user_list()
@@ -141,8 +142,6 @@ async def get_message_and_send(message: types.Message, state=FSMContext):
     else:
         await message.answer("Данный тип сообщения я обработать не могу")
     await state.finish()
-
-
 
     await bot.send_message(
         message.from_user.id,
