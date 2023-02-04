@@ -49,13 +49,14 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
     else:
         await bot.send_message(
             message.from_user.id,
-            'Ура! Теперь вы добавлены в базу бота '
-            'и будете участвовать в распределении на следующей неделе.',
+            'Ура! Теперь ты участвуешь в распределении на следующей неделе. '
+            'Бот напомнит: перед распределением придет сообщение, что '
+            'скоро подберут пару.',
             reply_markup=ReplyKeyboardRemove()
         )
         await bot.send_message(
             message.from_user.id,
-            text="Нажмите кнопку меню и выберите из доступных вариантов",
+            text="Воспользуйтесь меню",
             reply_markup=back_to_main_markup(message),
         )
         data = await state.get_data()
@@ -97,7 +98,10 @@ def add_to_db(teleg_id, name, birthday, about, gender):
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-    birthday = date_from_message_to_db(birthday)
+    if birthday == "Не указано":
+        pass
+    else:
+        birthday = date_from_message_to_db(birthday)
     query = """UPDATE user_info 
         SET name = ?, birthday = ?, about = ?, gender = ?
         WHERE teleg_id = ? """
@@ -129,7 +133,7 @@ async def start_registration(message: types.Message):
                 f"начал процесс регистрации")
     await bot.send_message(
         message.from_user.id,
-        'Как вас зовут? (Введите только имя)',
+        'Как тебя представить собеседнику? (Введи только имя)',
         reply_markup=return_to_begin_markup()
     )
     await UserData.name.set()
@@ -139,11 +143,13 @@ async def check_data(tg_id, name, birthday, about, gender):
     """Вывод данных пользователя для проверки"""
     await bot.send_message(
         tg_id,
-        f"Пожалуйста подтвердите ваши данные:\n"
+        f"Пожалуйста подтверди данные:\n"
+        f"Такую карточку увидит твой собеседник при распределении.\n\n"
         f"Имя: {name};\n"
         f"Дата рождения:{birthday};\n"
         f"О себе: {about};\n"
-        f"Пол: {gender};",
+        f"Пол: {gender};\n\n"
+        f"Все верно?",
         reply_markup=confirm_markup()
     )
     await UserData.check_info.set()
@@ -179,7 +185,7 @@ async def question_birthday(message: types.Message):
     """Запрос даты рождения"""
     await bot.send_message(
         message.from_user.id,
-        'Введите дату рождения в формате ДД.ММ.ГГГГ',
+        'Введите пожалуйста дату рождения в формате ДД.ММ.ГГГГ',
         reply_markup=register_can_skip_reply_markup()
     )
     await UserData.birthday.set()
@@ -205,7 +211,7 @@ async def question_about(message: types.Message):
     """Запрос информации о пользователе"""
     await bot.send_message(
         message.from_user.id,
-        "Введите немного информации о себе",
+        "Расскажи немного о себе? Чем ты увлекаешься?",
         reply_markup=register_can_skip_reply_markup()
     )
     await UserData.about.set()
@@ -232,7 +238,7 @@ async def question_gender(message: types.Message):
     """Запрос пола пользователя"""
     await bot.send_message(
         message.from_user.id,
-        "Выберите пол",
+        "Выбери пол",
         reply_markup=register_man_or_woman_markup()
     )
     await UserData.gender.set()

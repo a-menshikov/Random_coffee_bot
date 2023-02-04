@@ -7,7 +7,7 @@ from handlers.user.get_info_from_table import \
     get_teleg_id_from_user_info_table, \
     get_id_from_user_info_table
 from keyboards.admin import review_messages
-from keyboards.user import review_markup, skip_message, main_markup
+from keyboards.user import review_markup, skip_message, menu_markup
 from loader import bot, db_controller, dp, logger
 from states import ReviewState
 
@@ -60,7 +60,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
                 f"Спасибо за отзыв. Его текст\n"
                 f"{answer}\n"
                 f"будет записан в базу",
-                reply_markup=main_markup()
+                reply_markup=menu_markup(message)
             )
         except Exception as error:
             logger.error(f"Сообщение пользователю c {message.from_user.id} "
@@ -70,7 +70,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
         await bot.send_message(
             message.from_user.id,
             "Спасибо за ваш отзыв.",
-            reply_markup=main_markup()
+            reply_markup=menu_markup(message)
         )
     await state.reset_state()
 
