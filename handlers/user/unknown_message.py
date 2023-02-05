@@ -15,7 +15,7 @@ async def unknown_message(message: types.Message):
         reply_markup=menu_markup(message)
     )
     photo = InputFile("files/help_image.jpg")
-    # await bot.send_photo(
-    #     message.from_user.id,
-    #     photo=photo
-    # )
+    await bot.send_photo(
+        message.from_user.id,
+        photo=photo
+    )

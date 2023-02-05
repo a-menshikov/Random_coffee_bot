@@ -11,7 +11,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-match_algoritm/
+match_algoritm_data/
 build/
 develop-eggs/
 dist/
