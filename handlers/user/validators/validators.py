@@ -10,7 +10,7 @@ from loader import bot
 def validate_name(message):
     """Валидация введенных данных в поле Имя"""
     return (re.fullmatch(
-        r"^[a-яА-ЯЁёa-yA-Y\s]{1,100}$",
+        r"^[a-яА-ЯЁёa-zA-Z\s]{1,100}$",
         message
     ) and len(message) <= 100)
 
@@ -24,11 +24,11 @@ async def validate_birthday(message: types.Message):
     ):
         date_obj = datetime.strptime(message.text, '%d.%m.%Y')
         difference = datetime.now() - date_obj
-        age = int(difference.days) / 365
+        age = int(difference.days) / 365.2
         if age < 0:
             await bot.send_message(
                 message.from_user.id,
-                'Вы что из будущего?)) Введите правильную дату рождения"'
+                'Вы что из будущего?)) Введите правильную дату рождения'
             )
             return False
         elif age <= 14:
@@ -49,7 +49,7 @@ async def validate_birthday(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         'Что-то не так с введенными данными. '
-        'Дата должна состоять из цифр и точек в формате ДД.ММ.ГГГГ"'
+        'Дата должна состоять из цифр и точек в формате ДД.ММ.ГГГГ'
     )
     return False
 

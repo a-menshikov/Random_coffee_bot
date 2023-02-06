@@ -11,7 +11,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-# match_algoritm/
 data/match_algoritm_data/input.txt
 data/match_algoritm_data/output.txt
 data/match_algoritm_data/temp.txt
@@ -140,3 +139,6 @@ dmypy.json
 .pyre/
 
 *.db
+
+
+handlers/tests.py

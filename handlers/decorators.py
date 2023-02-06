@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardRemove, InputFile
 from data import ADMIN_TG_ID
 from handlers.user.ban_check import check_user_in_ban
 from handlers.user.get_info_from_table import check_user_in_base
-from keyboards import start_registr_markup
+from keyboards.user import start_registr_markup
 from loader import bot
 from states import UserData
 

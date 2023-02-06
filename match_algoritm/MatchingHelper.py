@@ -62,7 +62,6 @@ class MachingHelper():
         logger.info("Start matching algo")
         subprocess.call(['./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max'], shell=True)
         res = []
-        print(res)
         with open("./data/match_algoritm_data/output.txt", "r") as text:
             res = text.readlines()
         res = [tuple(map(int, i[:-1].split())) for i in res]
@@ -75,4 +74,5 @@ class MachingHelper():
             matches[i] = None
         self.matchings = matches
         logger.info("End matching algo")
+        print(matches)
         return matches

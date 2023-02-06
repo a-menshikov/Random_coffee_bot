@@ -3,9 +3,11 @@ import datetime
 from aiogram import types
 
 from handlers.decorators import admin_handlers
-from handlers.user.get_info_from_table import get_teleg_id_from_user_info_table, \
+from handlers.user.get_info_from_table import \
+    get_teleg_id_from_user_info_table, \
     get_id_from_user_info_table
-from keyboards import *
+from keyboards.admin import review_messages
+from keyboards.user import review_markup, skip_message, menu_markup
 from loader import bot, db_controller, dp, logger
 from states import ReviewState
 
@@ -58,7 +60,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
                 f"Спасибо за отзыв. Его текст\n"
                 f"{answer}\n"
                 f"будет записан в базу",
-                reply_markup=main_markup()
+                reply_markup=menu_markup(message)
             )
         except Exception as error:
             logger.error(f"Сообщение пользователю c {message.from_user.id} "
@@ -68,7 +70,7 @@ async def review_answer(message: types.Message, state=ReviewState.start):
         await bot.send_message(
             message.from_user.id,
             "Спасибо за ваш отзыв.",
-            reply_markup=main_markup()
+            reply_markup=menu_markup(message)
         )
     await state.reset_state()
 
@@ -76,14 +78,11 @@ async def review_answer(message: types.Message, state=ReviewState.start):
 def preparing_list_of_users_id():
     """Выгрузка списка ID пользователей из
     таблицы проведенных встреч за неделю."""
-    today = datetime.date.today()
-    start_period = today - datetime.timedelta(days=7)
     query = """SELECT first_user_id, second_user_id 
     FROM met_info 
     WHERE date
-    BETWEEN strftime('%d.%m.%Y', ?) AND strftime('%d.%m.%Y', ?)"""
-    values = (start_period, today)
-    data = db_controller.select_query(query, values).fetchall()
+    BETWEEN date('now', '-7 days') AND date('now')"""
+    data = db_controller.select_query(query).fetchall()
     logger.info("Список ID для рассылки на отзывы сформирован")
     return [element[0] for element in data] + [element[1] for element in data]
 
@@ -100,15 +99,13 @@ async def save_review(teleg_id, text):
 
 def get_met_id_with_user_last_week(user_id):
     """Получение id встречи по пользователю за прошедшую неделю."""
-    today = datetime.date.today()
-    start_period = today - datetime.timedelta(days=7)
     query = """SELECT id 
         FROM met_info 
         WHERE date
-        BETWEEN strftime('%d.%m.%Y', ?) AND strftime('%d.%m.%Y', ?)
+        BETWEEN date('now', '-7 days') AND date('now')
         AND (first_user_id = ? OR second_user_id = ?)
         ORDER BY id DESC
         LIMIT 1"""
-    values = (start_period, today, user_id, user_id)
+    values = (user_id, user_id)
     met_id = db_controller.select_query(query, values).fetchone()
     return met_id

@@ -8,6 +8,7 @@ from handlers.user.get_info_from_table import (
     get_holidays_status_from_db, get_user_info_by_id,
     get_id_from_user_info_table, get_full_user_info_by_id
 )
+from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import *
 from loader import bot, dp, logger, db_controller
 
@@ -22,7 +23,7 @@ async def main_menu(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         text="Меню:",
-        reply_markup=menu_markup()
+        reply_markup=menu_markup(message)
     )
 
 
@@ -37,9 +38,7 @@ async def send_profile(message: types.Message):
     gender_status = get_gender_from_db(gender_id)
     data['gender'] = gender_status
     if data['birthday'] != 'Не указано':
-        birthday = data['birthday'].split('-')
-        birthday.reverse()
-        data['birthday'] = '-'.join(birthday)
+        data['birthday'] = date_from_db_to_message(data['birthday'])
     await bot.send_message(
         message.from_user.id,
         f"Имя: {data['name']};\n"
@@ -111,9 +110,7 @@ async def status_message(message: types.Message):
         status = "Вы участвуете в распределении пар на следующей неделе"
     else:
         holidays_row = get_holidays_status_from_db(user_row['id'])
-        holidays_till = holidays_row['till_date'].split('-')
-        holidays_till.reverse()
-        holidays_till = '-'.join(holidays_till)
+        holidays_till = date_from_db_to_message(holidays_row['till_date'])
         status = (f"Вы на каникулах до {holidays_till}. "
                   f"В это время пара для встречи вам предложена не будет. "
                   f"После указанной даты статус 'Активен' "

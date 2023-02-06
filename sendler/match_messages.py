@@ -1,7 +1,9 @@
 from asyncio import sleep
 
 from aiogram import Bot
-from keyboards import help_texts_markup
+
+from handlers.user.work_with_date import date_from_db_to_message
+from keyboards.user import help_texts_markup
 from loader import db_controller, logger
 
 
@@ -64,6 +66,10 @@ def make_message(user_info: tuple) -> str:
     user_id = user_info[1]
     user_name = user_info[2]
     user_birthday = user_info[3]
+    if user_birthday == "Не указано":
+        pass
+    else:
+        user_birthday = date_from_db_to_message(user_birthday)
     user_about = user_info[4]
     user_gender = user_info[5]
 
