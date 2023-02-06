@@ -110,7 +110,11 @@ async def status_message(message: types.Message):
         status = "Вы участвуете в распределении пар на следующей неделе"
     else:
         holidays_row = get_holidays_status_from_db(user_row['id'])
-        holidays_till = date_from_db_to_message(holidays_row['till_date'])
+        till_value = holidays_row['till_date']
+        if till_value == 'null' or till_value == 'Неопределенный срок':
+            holidays_till = 'скончания веков'
+        else:
+            holidays_till = date_from_db_to_message(till_value)
         status = (f"Вы на каникулах до {holidays_till}. "
                   f"В это время пара для встречи вам предложена не будет. "
                   f"После указанной даты статус 'Активен' "
