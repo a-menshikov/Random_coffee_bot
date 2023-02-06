@@ -11,7 +11,10 @@ from loader import dp, bot
 async def unknown_message(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        "Я Вас не понимаю. Пожалуйста воспользуйтесь меню.",
+        ("Я Вас не понимаю. Пожалуйста воспользуйтесь меню.\n"
+         "Если меню не видно - скорее всего, оно скрыто самим Телеграмом. "
+         "Открыть его можно нажав в вашем мессенджере кнопку обведенную "
+         "красным квадратом."),
         reply_markup=menu_markup(message)
     )
     photo = InputFile("files/help_image.jpg")
