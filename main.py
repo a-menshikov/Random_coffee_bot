@@ -22,7 +22,7 @@ __all__ = ['dp']
 
 async def scheduler():
     """Расписание выполнения задач."""
-    aioschedule.every().day.at("21:26").do(sheduled_check_holidays)
+    aioschedule.every().day.at("12:00").do(sheduled_check_holidays)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)

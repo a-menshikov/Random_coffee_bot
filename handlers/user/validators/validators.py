@@ -3,7 +3,7 @@ from datetime import datetime
 
 from aiogram import types
 from keyboards.user import (all_right_message, back_message, man_message,
-                            skip_message, woman_message)
+                            skip_message, woman_message, yes_button, no_button)
 from loader import bot
 
 
@@ -89,3 +89,18 @@ async def validate_check_info(message):
         )
         return False
     return True
+
+
+async def validate_review_yes_or_no(message):
+    choice = [yes_button, no_button, skip_message]
+    if message.text not in choice:
+        await bot.send_message(
+            message.from_user.id,
+            'Пожалуйста, выберите из доступных вариантов.'
+        )
+        return False
+    return True
+
+
+async def validate_review_grade(grade):
+    return re.fullmatch(r"^[1-5]{1,1}$", grade)
