@@ -16,6 +16,7 @@ from handlers.user.holidays import dp
 from handlers.user.reviews import dp
 from handlers.admin.ban_handlers import dp
 from handlers.admin.handlers import dp
+from handlers.user.review_history import dp
 from handlers.user.unknown_message import dp
 __all__ = ['dp']
 

@@ -86,10 +86,12 @@ async def answer_review_comment(message: types.Message, state: FSMContext):
     if answer == skip_message:
         answer = "null"
     await state.update_data(comment=answer)
-    user_id = get_id_from_user_info_table(message.from_user.id)
-    await state.update_data(user_id=user_id)
-    met_id = get_met_id_with_user_last_week(user_id)[0]
-    await state.update_data(met_id=met_id)
+    data = await state.get_data()
+    if not data.get('user_id') or not data.get('met_id'):
+        user_id = get_id_from_user_info_table(message.from_user.id)
+        await state.update_data(user_id=user_id)
+        met_id = get_met_id_with_user_last_week(user_id)[0]
+        await state.update_data(met_id=met_id)
     await save_or_update_review(message, state)
 
 
@@ -216,17 +218,5 @@ def get_met_id_with_user_last_three(user_id):
     mets_id = db_controller.select_query(query, values).fetchall()
     return [met_id[0] for met_id in mets_id]
 
-@dp.message_handler(text='Пример')
-@admin_handlers
-async def example(message: types.Message):
-    await bot.send_message(
-        message.from_user.id,
-        """
-№ встречи   |   С кем   |   Распределение
-__________________________________________
-    13  |   Петр    |   23.01.2023
-__________________________________________
-    14  |   Иванdsdsvvxvxvxcvsdsdfsdfxcv    |   30.01.2023
-__________________________________________
-        """
-    )
+
+
