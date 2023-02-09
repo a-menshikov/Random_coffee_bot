@@ -7,7 +7,7 @@ from handlers.decorators import admin_handlers
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_user_info_by_id
 from handlers.user.work_with_date import date_from_db_to_message
-from keyboards.user import review_yes_or_no
+from keyboards.user import review_yes_or_no, my_reviews
 from loader import dp, bot, db_controller
 from states import ReviewState
 
@@ -25,7 +25,7 @@ def list_of_user_mets_id(user_id):
     return [met_id[0] for met_id in met_ids]
 
 
-@dp.message_handler(text='Пример')
+@dp.message_handler(text=my_reviews)
 @admin_handlers
 async def example(message: types.Message):
     user_id = get_id_from_user_info_table(message.from_user.id)
