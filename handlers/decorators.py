@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardRemove, InputFile
+from aiogram.types import ReplyKeyboardRemove
 
 from data import ADMIN_TG_ID
 from handlers.user.ban_check import check_user_in_ban
@@ -25,7 +25,8 @@ def user_handlers(func):
             else:
                 await bot.send_message(
                     message.from_user.id,
-                    "Вы заблокированы. Пожалуйста обратитесь к администратору.",
+                    ("Вы заблокированы. Пожалуйста "
+                     "обратитесь к администратору."),
                     reply_markup=ReplyKeyboardRemove()
                 )
         else:
@@ -35,10 +36,5 @@ def user_handlers(func):
                 "или нажмите кнопку снизу.",
                 reply_markup=start_registr_markup(),
                 )
-            photo = InputFile("files/help_image.jpg")
-            await bot.send_photo(
-                message.from_user.id,
-                photo=photo
-            )
             await UserData.start.set()
     return wrapped
