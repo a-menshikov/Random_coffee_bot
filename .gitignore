@@ -14,7 +14,8 @@ matchingalogitm1
 
 # Distribution / packaging
 .Python
-match_algoritm_data/
+data/match_algoritm_data/
+match_algoritm/
 build/
 develop-eggs/
 dist/
