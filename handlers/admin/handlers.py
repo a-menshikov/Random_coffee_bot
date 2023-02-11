@@ -39,9 +39,11 @@ async def admin_menu(message: types.Message):
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
+    users = db_controller.get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
-        "Тут информация о встречах за прошедшую неделю"
+        f"Всего пользователей - {users['all_users']};\n\n"
+        f"Активных пользователей - {users['active_users']}."
     )
 
 
