@@ -8,12 +8,16 @@ __pycache__/
 
 # C extensions
 *.so
+matchingalogitm.exe
+matchingalogitm1
+
 
 # Distribution / packaging
 .Python
 data/match_algoritm_data/input.txt
 data/match_algoritm_data/output.txt
 data/match_algoritm_data/temp.txt
+
 build/
 develop-eggs/
 dist/

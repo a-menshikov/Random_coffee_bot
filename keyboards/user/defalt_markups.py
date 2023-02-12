@@ -12,6 +12,7 @@ reject_message = '❌ Нет'
 edit_profile_message = "👩🏿‍🎨 Изменить Профиль"
 my_profile_message = "Мой профиль"
 my_status_message = "Мой статус"
+my_reviews = "Мои встречи"
 set_holiday_message = "⛱️ Каникулы"
 about_bot_message = "🤖 О Боте/FAQ"
 man_message = "👨 Мужской"
@@ -41,10 +42,10 @@ def menu_markup(message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(my_profile_message, my_pare_button)
     markup.row(my_status_message, set_holiday_message)
+    markup.row(about_bot_message, my_reviews)
     if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
-        markup.row(about_bot_message, back_to_main)
-    else:
-        markup.row(about_bot_message, )
+        markup.row(back_to_main)
+
     return markup
 
 

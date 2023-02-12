@@ -53,10 +53,14 @@ class DatabaseManager():
             "CREATE TABLE IF NOT EXISTS mets_reviews"
             "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "met_id INTEGER NOT NULL,"
-            "user_id INTEGER NOT NULL,"
+            "who_id INTEGER NOT NULL,"
+            "about_whom_id INTEGER NOT NULL,"
+            "grade INTEGER NOT NULL,"
             "comment TEXT NOT NULL,"
-            "FOREIGN KEY (met_id) REFERENCES met_info(id)"
-            "FOREIGN KEY (user_id) REFERENCES user_info(id))",
+            "date_of_comment TEXT NOT NULL,"
+            "FOREIGN KEY (met_id) REFERENCES met_info(id),"
+            "FOREIGN KEY (who_id) REFERENCES user_info(id),"
+            "FOREIGN KEY (about_whom_id) REFERENCES user_info(id))",
             "CREATE TABLE IF NOT EXISTS ban_list"
             "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "banned_user_id INTEGER NOT NULL,"
