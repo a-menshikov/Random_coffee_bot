@@ -5,7 +5,7 @@ from keyboards.user.defalt_markups import (back_to_main, menu_markup,
                                            menu_message)
 
 admin_menu_button = "Меню администратора"
-inform = "Отчет за неделю"
+inform = "Отчет"
 ban_list = "Бан-лист"
 
 add_to_ban_list = "Добавить в бан-лист"
