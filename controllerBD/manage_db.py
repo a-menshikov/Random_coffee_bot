@@ -176,5 +176,12 @@ class DatabaseManager():
         db_answer = self.select_query(query, (int(DEFAULT_PARE_iD),))
         return db_answer.fetchone()[0]
 
+    def get_user_count_from_db(self):
+        query = "SELECT COUNT(id) FROM user_status"
+        all_users = self.select_query(query).fetchone()
+        query = "SELECT COUNT(id) FROM user_status WHERE status=1"
+        active_users = self.select_query(query).fetchone()
+        return {"all_users": all_users[0], "active_users": active_users[0]}
+
     def __del__(self):
         self.conn.close()
