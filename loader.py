@@ -10,24 +10,32 @@ from data import config
 
 logger = logging.getLogger(__name__)
 
+aiogram_logger = logging.getLogger('aio_logger')
+
 logger.setLevel(logging.INFO)
+aiogram_logger.setLevel(logging.DEBUG)
 
-handler = RotatingFileHandler('my_logger.log', maxBytes=50000000,
-                              backupCount=5)
+main_handler = RotatingFileHandler('my_logger.log', maxBytes=50000000,
+                                   backupCount=5)
+aiogram_handler = RotatingFileHandler('aiogram_logger.log', maxBytes=50000000,
+                                      backupCount=2)
 
-logger.addHandler(handler)
+
+logger.addHandler(main_handler)
+aiogram_logger.addHandler(aiogram_handler)
 
 formatter = logging.Formatter(
     fmt=('%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s'),
     datefmt='%H:%M:%S'
 )
 
-handler.setFormatter(formatter)
+main_handler.setFormatter(formatter)
+aiogram_handler.setFormatter(formatter)
 
 bot = Bot(token=str(config.TOKEN))
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-dp.middleware.setup(LoggingMiddleware(logger=logger))
+dp.middleware.setup(LoggingMiddleware(logger=aiogram_logger))
 
 path = 'data/coffee_database.db'
 db_controller = DatabaseManager(path, logger)
