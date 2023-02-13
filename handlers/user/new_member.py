@@ -146,7 +146,7 @@ async def check_data(tg_id, name, birthday, about, gender):
         f"Пожалуйста подтверди данные:\n"
         f"Такую карточку увидит твой собеседник при распределении.\n\n"
         f"Имя: {name};\n"
-        f"Дата рождения:{birthday};\n"
+        f"Дата рождения: {birthday};\n"
         f"О себе: {about};\n"
         f"Пол: {gender};\n\n"
         f"Все верно?",

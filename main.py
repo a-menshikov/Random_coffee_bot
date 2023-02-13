@@ -38,6 +38,7 @@ async def on_startup(_):
             await bot.send_message(i, 'Бот запущен')
         except Exception as error:
             logger.error(f'Сообщение о запуске бота не ушло. Ошибка {error}')
+    logger.info('Бот запущен')
 
 
 async def on_shutdown(_):
@@ -48,6 +49,7 @@ async def on_shutdown(_):
         except Exception as error:
             logger.error(f'Сообщение об остановке бота не ушло.'
                          f' Ошибка {error}')
+    logger.info('Бот остановлен')
 
 
 if __name__ == '__main__':
