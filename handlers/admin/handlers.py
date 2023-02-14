@@ -4,6 +4,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
+from base_and_services.db_loader import db_session
+from base_and_services.models import UserStatus
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -92,9 +94,8 @@ async def start_algoritm(message: types.Message):
 
 def change_admin_status(message: types.Message, status):
     user_id = get_id_from_user_info_table(message.from_user.id)
-    query = """UPDATE user_status SET status=? WHERE id=?"""
-    values = (status, user_id)
-    db_controller.query(query, values)
+    db_session.query(UserStatus).filter(UserStatus.id == user_id). \
+        update({'status': status})
 
 
 @dp.message_handler(text=send_message_to_all_button)
