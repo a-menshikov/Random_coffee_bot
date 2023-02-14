@@ -164,3 +164,12 @@ async def send_photo(teleg_id, **kwargs):
     except Exception as error:
         logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
                      f"{error}")
+
+
+@dp.message_handler(text="баг")
+@admin_handlers
+async def request_message_to_all(message: types.Message):
+    await bot.send_message(
+        message.from_user.id,
+        f'Твой ник - {message.from_user.username}',
+    )

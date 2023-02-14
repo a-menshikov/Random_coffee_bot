@@ -29,6 +29,6 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 dp.middleware.setup(LoggingMiddleware(logger=logger))
 
-path = 'data/coffee_database.db'
-db_controller = DatabaseManager(path, logger)
-db_controller.create_tables()
+# path = 'data/coffee_database.db'
+# db_controller = DatabaseManager(path, logger)
+# db_controller.create_tables()
