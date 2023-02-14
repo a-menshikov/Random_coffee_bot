@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import BotBlocked
 from base_and_services.db_loader import db_session
 from base_and_services.models import Users, UserStatus, Holidays
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from loader import bot, db_controller, logger
+from loader import bot, logger
 
 
 async def check_message():

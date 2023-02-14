@@ -13,7 +13,7 @@ from keyboards.admin import cancel, ban_list, admin_ban_markup, \
     add_to_ban_list, admin_cancel_markup, remove_from_ban_list, \
     back_to_main_markup
 from keyboards.user import back_to_main
-from loader import bot, logger, dp, db_controller
+from loader import bot, logger, dp
 
 from states import AdminData
 
@@ -101,6 +101,7 @@ async def save_to_ban(banned_user_id, comment):
         update({'status': 0, 'till_date': 'null'})
     db_session.query(UserStatus).filter(UserStatus.id == banned_user_id). \
         update({'status': 0})
+    db_session.commit()
 
 
 @dp.message_handler(text=remove_from_ban_list)
@@ -167,6 +168,7 @@ async def save_to_unban(unbanned_user_id, comment):
               'comment_to_unban': comment})
     db_session.query(UserStatus).filter(UserStatus.id == unbanned_user_id). \
         update({'status': 1})
+    db_session.commit()
 
 
 @dp.message_handler(text=back_to_main, state="*")

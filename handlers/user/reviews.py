@@ -1,14 +1,17 @@
 import datetime
 
 from aiogram import types
+from sqlalchemy import and_, or_, desc
 
+from base_and_services.db_loader import db_session
+from base_and_services.models import MetInfo
 from handlers.decorators import admin_handlers
 from handlers.user.get_info_from_table import \
     get_teleg_id_from_user_info_table, \
     get_id_from_user_info_table
 from keyboards.admin import review_messages
 from keyboards.user import review_markup, skip_message, menu_markup
-from loader import bot, db_controller, dp, logger
+from loader import bot, dp, logger
 from states import ReviewState
 
 
@@ -78,34 +81,35 @@ async def review_answer(message: types.Message, state=ReviewState.start):
 def preparing_list_of_users_id():
     """Выгрузка списка ID пользователей из
     таблицы проведенных встреч за неделю."""
-    query = """SELECT first_user_id, second_user_id 
-    FROM met_info 
-    WHERE date
-    BETWEEN date('now', '-7 days') AND date('now')"""
-    data = db_controller.select_query(query).fetchall()
+    start_period = datetime.date.today() - datetime.timedelta(days=7)
+    data = db_session.query(
+        MetInfo.first_user_id,
+        MetInfo.second_user_id
+    ).filter(
+        MetInfo.date.between(str(start_period), str(datetime.date.today))).all()
     logger.info("Список ID для рассылки на отзывы сформирован")
     return [element[0] for element in data] + [element[1] for element in data]
 
 
 async def save_review(teleg_id, text):
     """Сохранние комментария в БД."""
-    user_id = get_id_from_user_info_table(teleg_id)
-    met_id = get_met_id_with_user_last_week(user_id)[0]
-    query = """INSERT INTO mets_reviews (met_id, user_id, comment)
-            VALUES (?, ?, ?)"""
-    values = (met_id, user_id, text)
-    db_controller.query(query, values)
+    pass
+    # user_id = get_id_from_user_info_table(teleg_id)
+    # met_id = get_met_id_with_user_last_week(user_id)[0]
+    # query = """INSERT INTO mets_reviews (met_id, user_id, comment)
+    #         VALUES (?, ?, ?)"""
+    # values = (met_id, user_id, text)
+    # db_controller.query(query, values)
+    # db_session.add(MetsReviews(met_id=met_id, ))
 
 
 def get_met_id_with_user_last_week(user_id):
     """Получение id встречи по пользователю за прошедшую неделю."""
-    query = """SELECT id 
-        FROM met_info 
-        WHERE date
-        BETWEEN date('now', '-7 days') AND date('now')
-        AND (first_user_id = ? OR second_user_id = ?)
-        ORDER BY id DESC
-        LIMIT 1"""
-    values = (user_id, user_id)
-    met_id = db_controller.select_query(query, values).fetchone()
+    start_period = datetime.date.today() - datetime.timedelta(days=7)
+    met_id = db_session.query(MetInfo.id).filter(
+        and_(MetInfo.date.between(str(start_period), str(datetime.date.today)),
+             or_(
+                 MetInfo.first_user_id == user_id,
+                 MetInfo.second_user_id == user_id
+             ))).order_by(desc(MetInfo.id)).limit(1).one()
     return met_id

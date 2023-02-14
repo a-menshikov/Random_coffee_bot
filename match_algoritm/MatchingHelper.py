@@ -1,6 +1,10 @@
 import subprocess
 import json
-from loader import bot, logger, db_controller
+
+from base_and_services.db_loader import db_session
+from base_and_services.models import UserStatus, UserMets
+from base_and_services.services import update_mets, update_all_user_mets
+from loader import bot, logger
 from sendler.match_messages import send_match_messages
 
 
@@ -17,12 +21,13 @@ class MachingHelper():
         """Prepare for machting algo"""
         logger.info("Prepare matching algo")
         data_from_bd = {}
-        active_users = db_controller.select_query(
-            "SELECT id FROM user_status WHERE status=1").fetchall()
+        active_users = db_session.query(UserStatus.id).\
+            filter(UserStatus.status == 1).all()
         active_users = [i[0] for i in active_users]
         for now_user in active_users:
-            connected_user = db_controller.select_query(
-                f"SELECT met_info FROM user_mets WHERE id={now_user}").fetchone()[0]
+            connected_user = db_session.query(UserMets.met_info).filter(
+                UserMets.id == now_user
+            ).one()[0]
             connected_user = list(json.loads(connected_user).values())
             data_from_bd[now_user] = connected_user
 
@@ -52,8 +57,8 @@ class MachingHelper():
     async def send_and_write(self, t: dict):
         """Send a mets to users"""
         logger.info("Write mets to db")
-        db_controller.update_mets(t)
-        db_controller.update_all_user_mets(t)
+        await update_mets(t)
+        update_all_user_mets(t)
         logger.info("Start send matches")
         await send_match_messages(t, bot)
 

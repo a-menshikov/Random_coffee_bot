@@ -4,7 +4,6 @@ from sqlalchemy import exists, and_
 from base_and_services.db_loader import db_session
 from base_and_services.models import BanList
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from loader import db_controller
 
 
 async def check_user_in_ban(message: types.Message):

@@ -6,6 +6,7 @@ from aiogram.utils.exceptions import BotBlocked
 
 from base_and_services.db_loader import db_session
 from base_and_services.models import UserStatus
+from base_and_services.services import get_user_count_from_db
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -14,7 +15,7 @@ from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     inform, admin_cancel_markup, change_status, admin_change_status_markup, \
     take_part_button, do_not_take_part_button, algo_start, \
     send_message_to_all_button
-from loader import bot, dp, db_controller, logger
+from loader import bot, dp, logger
 from match_algoritm import MachingHelper
 from states import AdminData
 
@@ -41,7 +42,7 @@ async def admin_menu(message: types.Message):
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
-    users = db_controller.get_user_count_from_db()
+    users = get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
         f"Всего пользователей - {users['all_users']};\n\n"

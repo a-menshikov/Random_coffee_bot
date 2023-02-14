@@ -1,7 +1,7 @@
 import json
 from datetime import date
 
-from sqlalchemy import or_, desc, exists
+from sqlalchemy import or_, desc
 
 from base_and_services.db_loader import db_session
 from base_and_services.models import MetInfo, UserMets, Users, UserStatus
@@ -64,6 +64,7 @@ def update_all_user_mets(match_info: dict):
                                   f' Ошибка - {error}')
     logger.info('Запись информации о новых встречах завершена')
 
+
 def get_defaulf_pare_base_id():
     """Получить id дефолтного юзера из базы."""
     return db_session.query(Users.id).filter(
@@ -77,5 +78,3 @@ def get_user_count_from_db():
         UserStatus.status == 1
     ).count()
     return {"all_users": all_users, "active_users": active_users}
-
-

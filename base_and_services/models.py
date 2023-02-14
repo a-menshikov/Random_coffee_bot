@@ -1,7 +1,5 @@
-from sqlalchemy import create_engine, MetaData, Table, Integer, String, \
-    Column, DateTime, ForeignKey, Numeric, Date, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime, date
+from sqlalchemy import Integer, String, Column, ForeignKey, Date, Boolean
+from datetime import date
 
 from base_and_services.db_loader import engine, Base
 

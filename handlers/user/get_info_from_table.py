@@ -2,7 +2,7 @@ from sqlalchemy import exists
 
 from base_and_services.db_loader import db_session
 from base_and_services.models import Users, UserStatus, Holidays, Gender
-from loader import db_controller, logger
+from loader import logger
 
 
 def get_id_from_user_info_table(teleg_id):
@@ -40,6 +40,7 @@ def get_user_status_from_db(user_id):
     ).one()
     return user_status.__dict__
 
+
 def get_holidays_status_from_db(user_id):
     """Получение статуса каникул пользователя из БД"""
     holidays = db_session.query(Holidays).filter(
@@ -52,7 +53,6 @@ def get_user_info_by_id(user_id):
     """Получение строки информации по id пользователя"""
     user = db_session.query(Users).filter(Users.id == user_id).one()
     return user.__dict__
-
 
 
 def get_full_user_info_by_id(user_id):
