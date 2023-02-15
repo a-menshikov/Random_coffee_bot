@@ -40,7 +40,9 @@ async def send_profile(message: types.Message):
     gender_id = data['gender']
     gender_status = get_gender_from_db(gender_id)
     data['gender'] = gender_status
-    if data['birthday'] != 'Не указано':
+    if data['birthday'] is None:
+        data['birthday'] = "Не указано"
+    else:
         data['birthday'] = date_from_db_to_message(data['birthday'])
     await bot.send_message(
         message.from_user.id,

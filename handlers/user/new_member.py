@@ -100,7 +100,7 @@ def add_to_db(teleg_id, name, birthday, about, gender):
 
 def update_profile_db(teleg_id, name, birthday, about, gender):
     """Обновление данных пользователя"""
-    if birthday == "Не указано":
+    if birthday is None:
         pass
     else:
         birthday = date_from_message_to_db(birthday)
@@ -141,7 +141,7 @@ async def check_data(tg_id, name, birthday, about, gender):
         f"Пожалуйста подтверди данные:\n"
         f"Такую карточку увидит твой собеседник при распределении.\n\n"
         f"Имя: {name};\n"
-        f"Дата рождения:{birthday};\n"
+        f"Дата рождения: {birthday};\n"
         f"О себе: {about};\n"
         f"Пол: {gender};\n\n"
         f"Все верно?",
@@ -155,6 +155,8 @@ async def end_registration(state, message):
     data = await state.get_data()
     name = data.get('name')
     birthday = data.get('birthday')
+    if birthday is None:
+        birthday = "Не указано"
     about = data.get('about')
     gender = get_gender_from_db(data.get('gender'))
     tg_id = message.from_user.id

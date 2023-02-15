@@ -3,6 +3,8 @@ import asyncio
 import aioschedule
 from aiogram import executor, types
 
+from base_and_services.add_info_to_db import add_gender_info
+from base_and_services.models import create_tables
 from data import ADMIN_TG_ID
 
 from handlers.user.holidays import sheduled_check_holidays
@@ -30,6 +32,8 @@ async def scheduler():
 
 async def on_startup(_):
     """Выполняется во время запуска бота."""
+    await create_tables()
+    await add_gender_info()
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
     for i in list(map(int, ADMIN_TG_ID.split())):
