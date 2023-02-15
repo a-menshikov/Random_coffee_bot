@@ -73,7 +73,7 @@ def make_message(user_info: tuple) -> str:
     user_about = user_info[4]
     user_gender = user_info[5]
 
-    base_message = (f'На этой неделе Ваша пара для кофе: '
+    base_message = (f'На этой неделе твоя пара для кофе: '
                     f'<a href="tg://user?id={user_id}">{user_name}</a>')
     birth_day_message = f'Дата рождения: {user_birthday}'
     about_message = f'Информация: {user_about}'

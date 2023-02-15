@@ -28,21 +28,21 @@ async def validate_birthday(message: types.Message):
         if age < 0:
             await bot.send_message(
                 message.from_user.id,
-                'Вы что из будущего?)) Введите правильную дату рождения'
+                'Дата из будущего?)) Введи правильную дату рождения'
             )
             return False
         elif age <= 14:
             await bot.send_message(
                 message.from_user.id,
-                'Ваш возраст должен быть больше 14 лет. '
-                'Введите правильную дату рождения'
+                'Твой возраст должен быть больше 14 лет. '
+                'Введи правильную дату рождения'
             )
             return False
         elif age > 120:
             await bot.send_message(
                 message.from_user.id,
                 'Указанный возраст болеее 120 лет. '
-                'Введите правильную дату рождения'
+                'Введи правильную дату рождения'
             )
             return False
         return True
@@ -59,7 +59,7 @@ async def validate_about(message):
     if len(message.text) > 500:
         await bot.send_message(
             message.from_user.id,
-            'Текст должен быть меньше 500 символов. Повторите ввод.'
+            'Текст должен быть меньше 500 символов. Повтори ввод.'
         )
         return False
     return True
@@ -71,8 +71,8 @@ async def validate_gender(message: types.Message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            'Пожалуйста, выберите из доступных вариантов или '
-            'нажмите "Пропустить"'
+            'Пожалуйста, выбери из доступных вариантов или '
+            'нажми "Пропустить"'
         )
         return False
     return True
@@ -85,7 +85,7 @@ async def validate_check_info(message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            'Пожалуйста, выберите из доступных вариантов.'
+            'Пожалуйста, выбери из доступных вариантов.'
         )
         return False
     return True
@@ -96,7 +96,7 @@ async def validate_review_yes_or_no(message):
     if message.text not in choice:
         await bot.send_message(
             message.from_user.id,
-            'Пожалуйста, выберите из доступных вариантов.'
+            'Пожалуйста, выбери из доступных вариантов.'
         )
         return False
     return True

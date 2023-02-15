@@ -51,7 +51,7 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
             message.from_user.id,
             'Ура! Теперь ты участвуешь в распределении на следующей неделе. '
             'Бот напомнит: перед распределением придет сообщение, что '
-            'скоро подберут пару.',
+            'скоро тебе подберут пару.',
             reply_markup=ReplyKeyboardRemove()
         )
         await bot.send_message(
@@ -143,12 +143,11 @@ async def check_data(tg_id, name, birthday, about, gender):
     """Вывод данных пользователя для проверки"""
     await bot.send_message(
         tg_id,
-        f"Пожалуйста подтверди данные:\n"
-        f"Такую карточку увидит твой собеседник при распределении.\n\n"
-        f"Имя: {name};\n"
-        f"Дата рождения: {birthday};\n"
-        f"О себе: {about};\n"
-        f"Пол: {gender};\n\n"
+        f"Такую карточку увидит твой собеседник при распределении:\n\n"
+        f"Имя: {name}\n"
+        f"Дата рождения: {birthday}\n"
+        f"О себе: {about}\n"
+        f"Пол: {gender}\n\n"
         f"Все верно?",
         reply_markup=confirm_markup()
     )
@@ -172,8 +171,8 @@ async def answer_name(message: types.Message, state: FSMContext):
     name = message.text
     if not validate_name(name):
         await message.answer(
-            'Что то не так с введенным именем. '
-            'Имя должно состоять из букв русского или латинского алфавита '
+            'Что-то не так с введенным именем. '
+            'Имя должно состоять из букв русского или латинского алфавитов '
             'и быть менее 100 символов.'
         )
         return
@@ -185,7 +184,7 @@ async def question_birthday(message: types.Message):
     """Запрос даты рождения"""
     await bot.send_message(
         message.from_user.id,
-        'Введите пожалуйста дату рождения в формате ДД.ММ.ГГГГ',
+        'Введи, пожалуйста, дату рождения в формате ДД.ММ.ГГГГ',
         reply_markup=register_can_skip_reply_markup()
     )
     await UserData.birthday.set()
@@ -211,7 +210,7 @@ async def question_about(message: types.Message):
     """Запрос информации о пользователе"""
     await bot.send_message(
         message.from_user.id,
-        "Расскажи немного о себе? Чем ты увлекаешься?",
+        "Расскажи немного о себе?",
         reply_markup=register_can_skip_reply_markup()
     )
     await UserData.about.set()
