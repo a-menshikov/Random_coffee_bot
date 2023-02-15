@@ -157,7 +157,8 @@ async def get_message_and_send(message: types.Message, state=FSMContext):
                     reply_markup=admin_menu_markup()
                 )
     else:
-        await message.answer("Данный тип сообщения я обработать не могу")
+        await message.answer("Данный тип сообщения я обработать не могу",
+                             reply_markup=admin_menu_markup())
     await state.finish()
     logger.info("Сообщения пользователям доставлены.")
 
