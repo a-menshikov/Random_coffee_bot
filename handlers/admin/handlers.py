@@ -14,7 +14,7 @@ from handlers.user.get_info_from_table import get_id_from_user_info_table
 from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     inform, admin_cancel_markup, change_status, admin_change_status_markup, \
     take_part_button, do_not_take_part_button, algo_start, \
-    send_message_to_all_button
+    send_message_to_all_button, cancel
 from loader import bot, dp, logger
 from match_algoritm import MachingHelper
 from states import AdminData
@@ -132,27 +132,32 @@ async def get_message_and_send(message: types.Message, state=FSMContext):
             logger.error(f"Ошибка отправки: {er}")
     elif message.content_type == 'text':
         message_answer = message.text
-        try:
-            for user in user_list:
-                await send_message(
-                    teleg_id=user,
-                    text=message_answer,
-                )
-                await sleep(0.05)
-        except TypeError:
-            logger.error("Список пользователей пуст")
-        except Exception as er:
-            logger.error(f"Ошибка отправки: {er}")
+        if message_answer == cancel:
+            await admin_menu(message)
+            await state.finish()
+        else:
+            try:
+                for user in user_list:
+                    await send_message(
+                        teleg_id=user,
+                        text=message_answer,
+                    )
+                    await sleep(0.05)
+            except TypeError:
+                logger.error("Список пользователей пуст")
+            except Exception as er:
+                logger.error(f"Ошибка отправки: {er}")
+            await bot.send_message(
+                message.from_user.id,
+                "Сообщения отправлены",
+                reply_markup=admin_menu_markup()
+            )
+            logger.info("Сообщения пользователям доставлены.")
     else:
-        await message.answer("Данный тип сообщения я обработать не могу")
-    await state.finish()
+        await message.answer("Данный тип сообщения я обработать не могу",
+                             reply_markup=admin_menu_markup())
+        await state.finish()
 
-    await bot.send_message(
-        message.from_user.id,
-        "Сообщения отправлены",
-        reply_markup=admin_menu_markup()
-    )
-    logger.info("Сообщения пользователям доставлены.")
 
 
 async def send_photo(teleg_id, **kwargs):

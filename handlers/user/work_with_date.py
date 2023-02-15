@@ -2,8 +2,7 @@ import datetime
 
 
 def date_from_db_to_message(date):
-    date_from_db = datetime.datetime.strptime(date, '%Y-%m-%d')
-    date_text = date_from_db.strftime('%d.%m.%Y')
+    date_text = date.strftime('%d.%m.%Y')
     return date_text
 
 

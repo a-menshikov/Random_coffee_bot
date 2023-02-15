@@ -83,7 +83,7 @@ async def cancel_holidays(message: types.Message):
     """Отключение режима каникул"""
     user_id = get_id_from_user_info_table(message.from_user.id)
     db_session.query(Holidays).filter(Holidays.id == user_id). \
-        update({'status': 0, 'till_date': 'null'})
+        update({'status': 0, 'till_date': None})
     db_session.query(UserStatus).filter(UserStatus.id == user_id). \
         update({'status': 1})
     db_session.commit()
@@ -135,7 +135,7 @@ async def sheduled_check_holidays():
         for row in data:
             user_id = get_teleg_id_from_user_info_table(row[0])
             db_session.query(Holidays).filter(Holidays.id == row[0]). \
-                update({'status': 0, 'till_date': 'null'})
+                update({'status': 0, 'till_date': None})
             db_session.query(UserStatus).filter(UserStatus.id == row[0]). \
                 update({'status': 1})
             db_session.commit()

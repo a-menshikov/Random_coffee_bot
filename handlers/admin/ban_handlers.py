@@ -98,7 +98,7 @@ async def save_to_ban(banned_user_id, comment):
                            ban_status=1,
                            comment_to_ban=comment))
     db_session.query(Holidays).filter(Holidays.id == banned_user_id). \
-        update({'status': 0, 'till_date': 'null'})
+        update({'status': 0, 'till_date': None})
     db_session.query(UserStatus).filter(UserStatus.id == banned_user_id). \
         update({'status': 0})
     db_session.commit()

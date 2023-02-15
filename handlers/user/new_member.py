@@ -87,7 +87,7 @@ async def change_data(message: types.Message, state: FSMContext):
 
 def add_to_db(teleg_id, name, birthday, about, gender):
     """Добавляем нового пользователя в базу."""
-    if birthday == "null":
+    if birthday is None:
         pass
     else:
         birthday = date_from_message_to_db(birthday)
@@ -194,7 +194,7 @@ async def answer_birthday(message: types.Message, state: FSMContext):
         await start_registration(message)
     else:
         if birthday == skip_message:
-            birthday = 'null'
+            birthday = None
         else:
             if not await validate_birthday(message):
                 return

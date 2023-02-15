@@ -27,15 +27,15 @@ class BanList(Base):
     ban_status = Column(Boolean, nullable=False)
     date_of_ban = Column(Date, default=date.today())
     comment_to_ban = Column(String(500), nullable=False)
-    date_of_unban = Column(Date, nullable=True, default='null')
-    comment_to_unban = Column(String(500), nullable=True, default='null')
+    date_of_unban = Column(Date, nullable=True, default=None)
+    comment_to_unban = Column(String(500), nullable=True, default=None)
 
 
 class Holidays(Base):
     __tablename__ = 'holidays_status'
     id = Column(Integer, ForeignKey('user_info.id'), primary_key=True)
     status = Column(Boolean, nullable=False, default=0)
-    till_date = Column(Date, nullable=True, default='null')
+    till_date = Column(Date, nullable=True, default=None)
 
 
 class MetInfo(Base):

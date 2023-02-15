@@ -114,7 +114,7 @@ async def status_message(message: types.Message):
     else:
         holidays_row = get_holidays_status_from_db(user_row['id'])
         till_value = holidays_row['till_date']
-        if till_value == 'null' or till_value == 'Неопределенный срок':
+        if till_value is None:
             holidays_till = 'скончания веков'
         else:
             holidays_till = date_from_db_to_message(till_value)

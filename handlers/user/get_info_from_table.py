@@ -7,14 +7,14 @@ from loader import logger
 
 def get_id_from_user_info_table(teleg_id):
     """Получение id пользователя по телеграм id."""
-    id_obj = db_session.query(Users.id).filter(Users.teleg_id == teleg_id).one
-    return id_obj.fetchone()[0]
+    id_obj = db_session.query(Users.id).filter(Users.teleg_id == teleg_id).one()
+    return id_obj[0]
 
 
 def get_teleg_id_from_user_info_table(id):
     """Получение id телеграм чата по id пользователя."""
-    id_obj = db_session.query(Users.teleg_id).filter(Users.id == id).one
-    return id_obj.fetchone()[0]
+    id_obj = db_session.query(Users.teleg_id).filter(Users.id == id).one()
+    return id_obj[0]
 
 
 async def check_user_in_base(message):
