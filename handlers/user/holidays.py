@@ -21,7 +21,7 @@ async def check_and_choice_holidays(message: types.Message):
     await check_holidays_until(message.from_user.id)
     await bot.send_message(
         message.from_user.id,
-        text='Выберите на какой срок вы хотите установить каникулы',
+        text='Выбери на какой срок ты хочешь установить каникулы',
         reply_markup=holidays_length()
     )
 
@@ -34,9 +34,9 @@ async def get_one_week_holidays(message: types.Message):
     await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до '
+        text=f'Ты установил каникулы до '
              f'{date_to_return.strftime("%d.%m.%Y")} '
-             f'и начнете участвовать в '
+             f'и начнёшь участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -50,9 +50,9 @@ async def get_two_week_holidays(message: types.Message):
     await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до '
+        text=f'Ты установил каникулы до '
              f'{date_to_return.strftime("%d.%m.%Y")} '
-             f'и начнете участвовать в '
+             f'и начнёшь участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -66,9 +66,9 @@ async def get_three_week_holidays(message: types.Message):
     await get_holidays(message, date_to_return)
     await bot.send_message(
         message.from_user.id,
-        text=f'Вы установили каникулы до '
+        text=f'Ты установил каникулы до '
              f'{date_to_return.strftime("%d.%m.%Y")} '
-             f'и начнете участвовать в '
+             f'и начнёшь участвовать в '
              f'распределении с '
              f'{(date_to_return + timedelta(days=1)).strftime("%d.%m.%Y")}.'
     )
@@ -120,8 +120,8 @@ async def check_holidays_until(teleg_id):
         await bot.send_message(
             teleg_id,
             text=f'Каникулы установлены до '
-                 f'{date_from_db_to_message(row["till_date"])} '
-                 f'и начнете участвовать в распределении '
+                 f'{date_from_db_to_message(row["till_date"])}.\n'
+                 f'Ты начнешь участвовать в распределении пар '
                  f'со следующего дня.'
         )
 

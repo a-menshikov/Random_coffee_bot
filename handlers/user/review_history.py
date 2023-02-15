@@ -34,7 +34,7 @@ async def example(message: types.Message):
     count_of_mets = len(met_ids)
     if count_of_mets == 0:
         await bot.send_message(message.from_user.id,
-                               "У вас еще не было встреч.")
+                               "У тебя еще не было встреч.")
     else:
         met_id = met_ids[0]
         review_info = get_sqliterow_review(met_id, user_id)
@@ -71,7 +71,7 @@ async def button_press(call: types.CallbackQuery, callback_data: dict,
         )
         await bot.send_message(
             call.from_user.id,
-            "Состоялась ли Ваша встреча?",
+            "Состоялась ли твоя встреча?",
             reply_markup=review_yes_or_no()
         )
         await ReviewState.start.set()
@@ -139,7 +139,7 @@ def prepare_message(user_id, met_id, review_info):
 
     message = (
         f"<b>Дата распределения</b> - {date}.\n"
-        f"<b>Ваша пара</b> – <a href='tg://user?id={pare_info['teleg_id']}'>"
+        f"<b>Твоя пара</b> – <a href='tg://user?id={pare_info['teleg_id']}'>"
         f"{pare_info['name']}</a>\n\n"
         f"<b>Отзыв о встрече:</b>\n"
         f"{review}"

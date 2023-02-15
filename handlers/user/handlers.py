@@ -41,10 +41,10 @@ async def send_profile(message: types.Message):
         data['birthday'] = date_from_db_to_message(data['birthday'])
     await bot.send_message(
         message.from_user.id,
-        f"Имя: {data['name']};\n"
-        f"Дата рождения: {data['birthday']};\n"
-        f"О себе: {data['about']};\n"
-        f"Пол: {data['gender']};",
+        f"Имя: {data['name']}\n"
+        f"Дата рождения: {data['birthday']}\n"
+        f"О себе: {data['about']}\n"
+        f"Пол: {data['gender']}",
         reply_markup=edit_profile_markup()
     )
 
@@ -68,7 +68,7 @@ async def about_bot_message(message: types.Message):
         """*Добро пожаловать в бот для нетворкинга\.*\n
 С помощью бота проходят живые и онлайн встречи 1\-1 для студентов\
  и IT\-специалистов\. Каждую неделю по понедельникам великий рандом\
- подбирает пару\.  Вам нужно самостоятельно договориться о встрече\
+ подбирает пару\.  Тебе нужно самостоятельно договориться о встрече\
  и созвониться\.  Можно встретиться лично, если вы в одном городе\.\n
 Администратор @Loravel\n
 __*FAQ*__\n
@@ -88,11 +88,11 @@ __*Обязательно ли идти на встречу?*__\n
  Небольшое извинение всегда лучше, чем игнорирование\.\n
 __*Сколько длится встреча?*__\n
 Как договоритесь\. Обычно люди общаются 45−60 минут, а иногда\
- и 3 часов мало\n
+ и трёх часов мало\n
 __*Я могу отказаться от участия в боте?*__\n
-Да, отказаться можно в любой момент\. Для этого достаточно просто\
- остановить бота\. Чтобы вернуться, нужно будет запустить\
- его снова\.\n
+Да, отказаться можно в любой момент\. Для этого нужно\
+ остановить бота через функционал Telegram\. Чтобы вернуться, \
+ нужно будет запустить его снова\.\n
 *Удачи\!\)*
 """, parse_mode="MarkdownV2"
     )
@@ -115,8 +115,8 @@ async def status_message(message: types.Message):
             holidays_till = 'скончания веков'
         else:
             holidays_till = date_from_db_to_message(till_value)
-        status = (f"Вы на каникулах до {holidays_till}. "
-                  f"В это время пара для встречи вам предложена не будет. "
+        status = (f"Ты на каникулах до {holidays_till}. "
+                  f"В это время пара для встречи тебе предложена не будет. "
                   f"После указанной даты статус 'Активен' "
                   f"будет восстановлен автоматически")
     await bot.send_message(message.from_user.id, text=status)
@@ -132,7 +132,7 @@ async def my_pare_check(message: types.Message):
     if met_id is None:
         await bot.send_message(
             message.from_user.id,
-            "Вы не участвовали в последнем распределении."
+            "Ты не участвовал в последнем распределении."
         )
     else:
         query = """SELECT first_user_id, second_user_id

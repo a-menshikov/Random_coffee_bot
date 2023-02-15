@@ -35,7 +35,7 @@ async def request_review(users_id):
         try:
             await bot.send_message(
                 user_teleg_id,
-                "Состоялась ли Ваша встреча?",
+                "Состоялась ли твоя встреча?",
                 reply_markup=review_yes_or_no()
             )
             await ReviewState.start.set()
@@ -57,8 +57,8 @@ async def review_answer_yes_or_now(message: types.Message,
     if answer == skip_message:
         await bot.send_message(
             message.from_user.id,
-            "В течении 3-х недель после распределения вы можете оставить отзыв "
-            "перейдя из главного меню.",
+            "Ты можешь оставить отзыв позже. "
+            "Для этого нажми в главном меню кнопку Мои встречи.",
             reply_markup=menu_markup(message)
         )
         await state.reset_state()
@@ -72,7 +72,7 @@ async def review_answer_yes_or_now(message: types.Message,
 async def question_comment(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        "Пожалуйста введите ваш комментарий к отзыву (не более 500 символов).",
+        "Пожалуйста, введи комментарий к оценке (не более 500 символов).",
         reply_markup=review_skip()
     )
     await ReviewState.comment.set()
@@ -98,9 +98,9 @@ async def answer_review_comment(message: types.Message, state: FSMContext):
 async def question_grade(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        "Оцените встречу от 1 до 5, где \n"
-        "    - 1 - Совсем не понравилась,\n"
-        "    - 5 - Все было Супер.",
+        "Оцени встречу от 1 до 5, где \n"
+        "    - 1 - Совсем не понравилось,\n"
+        "    - 5 - Все было супер.",
         reply_markup=review_skip()
     )
     await ReviewState.grade.set()
@@ -112,13 +112,13 @@ async def answer_review_grade(message: types.Message, state: FSMContext):
     if grade == skip_message:
         await bot.send_message(
             message.from_user.id,
-            "В течении 3-х недель вы можете оставить отзыв "
-            "перейдя из главного меню.",
+            "Ты можешь оставить отзыв позже. "
+            "Для этого нажми в главном меню кнопку Мои встречи.",
             reply_markup=menu_markup(message)
         )
         await state.reset_state()
     elif not await validate_review_grade(grade):
-        await bot.send_message(message.from_user.id, "Введите оценку от 1 до 5")
+        await bot.send_message(message.from_user.id, "Введи оценку от 1 до 5")
         return
     else:
         await state.update_data(grade=grade)
@@ -151,7 +151,7 @@ async def save_or_update_review(message, state):
     await state.reset_state()
     await bot.send_message(
         message.from_user.id,
-        "Спасибо за ваш отзыв.",
+        "Спасибо за отзыв.",
         reply_markup=menu_markup(message)
     )
 

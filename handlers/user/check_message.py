@@ -13,7 +13,7 @@ async def check_message():
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
-            text="Совсем скоро будет произведено распределение пар",
+            text="Совсем скоро будет произведено распределение пар.",
         )
         await sleep(0.05)
     logger.info("Все пользователи проверены.")
