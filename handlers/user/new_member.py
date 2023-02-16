@@ -2,6 +2,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import Gender, Users, UserStatus, UserMets, Holidays
 from handlers.admin.ban_handlers import back_to_main_markup
 from handlers.user.first_check import check_and_add_registration_button
 from handlers.user.get_info_from_table import (
@@ -15,12 +17,13 @@ from keyboards.user import (back_message, confirm_markup,
                             skip_message, woman_message,
                             return_to_begin_button, registr_message,
                             return_to_begin_markup)
-from loader import bot, db_controller, dp, logger
+from loader import bot, dp, logger
 from states.states import UserData
 
 from handlers.user.validators import (validate_about, validate_birthday,
                                       validate_check_info, validate_gender,
                                       validate_name)
+
 
 
 @dp.message_handler(text=return_to_begin_button, state="*")
@@ -32,10 +35,10 @@ async def return_to_begin(message: types.Message, state: FSMContext):
 
 def get_gender_from_db(status):
     """Получаем пол пользователя по id пола"""
-    query = """SELECT gender_name FROM genders WHERE id=?"""
-    values = (status,)
-    info = db_controller.select_query(query, values)
-    return info.fetchone()[0]
+    info = db_session.query(Gender.gender_name).filter(
+        Gender.id == status
+    ).one()
+    return info[0]
 
 
 @dp.message_handler(state=UserData.check_info)
@@ -88,10 +91,9 @@ def add_to_db(teleg_id, name, birthday, about, gender):
         pass
     else:
         birthday = date_from_message_to_db(birthday)
-    query = """INSERT INTO user_info (teleg_id, name, birthday, about, gender) 
-        VALUES (?,?,?,?,?)"""
-    values = (teleg_id, name, birthday, about, gender)
-    db_controller.query(query, values)
+    db_session.add(Users(teleg_id=teleg_id, name=name,
+                         birthday=birthday, about=about, gender=gender))
+    db_session.commit()
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"добавлен в БД как новый участник")
 
@@ -102,11 +104,10 @@ def update_profile_db(teleg_id, name, birthday, about, gender):
         pass
     else:
         birthday = date_from_message_to_db(birthday)
-    query = """UPDATE user_info 
-        SET name = ?, birthday = ?, about = ?, gender = ?
-        WHERE teleg_id = ? """
-    values = (name, birthday, about, gender, teleg_id)
-    db_controller.query(query, values)
+    db_session.query(Users).filter(Users.teleg_id == teleg_id). \
+        update({'name': name, 'birthday': birthday,
+                'about': about, 'gender': gender})
+    db_session.commit()
     logger.info(f"Пользователь с TG_ID {teleg_id} "
                 f"обновил информацию о себе")
 
@@ -114,16 +115,10 @@ def update_profile_db(teleg_id, name, birthday, about, gender):
 def add_new_user_in_status_table(teleg_id):
     """Проставляем статусы участия в таблицах БД"""
     user_id = get_id_from_user_info_table(teleg_id)
-    queries = {
-        """insert into user_status (id, status) values (
-    ?,?)""": (user_id, 1),
-        """insert into user_mets (id, met_info) values (
-    ?,?)""": (user_id, "{}"),
-        """insert into holidays_status (id, status, till_date) values (
-        ?,?,?)""": (user_id, 0, 'null')
-    }
-    for query, values in queries.items():
-        db_controller.query(query, values)
+    db_session.add(UserStatus(id=user_id))
+    db_session.add(UserMets(id=user_id))
+    db_session.add(Holidays(id=user_id))
+    db_session.commit()
 
 
 @dp.message_handler(text=registr_message, state=UserData.start)

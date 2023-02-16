@@ -7,7 +7,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
-from controllerBD import DatabaseManager
+from controllerBD.add_info_to_db import add_gender_info
+from controllerBD.models import create_tables
 from data import config
 
 timezone = pytz.timezone('Etc/GMT-3')
@@ -49,6 +50,6 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 dp.middleware.setup(LoggingMiddleware(logger=aiogram_logger))
 
-path = 'data/coffee_database.db'
-db_controller = DatabaseManager(path, logger)
-db_controller.create_tables()
+
+create_tables()
+add_gender_info()
