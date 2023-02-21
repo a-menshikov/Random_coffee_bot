@@ -12,7 +12,7 @@ add_to_ban_list = "Добавить в бан-лист"
 remove_from_ban_list = "Убрать из бана"
 go_back = "Назад"
 algo_start = "Алгоритм"
-review_messages = "Запуск опроса"
+review_messages = "Опрос"
 change_status = "Статус участия"
 cancel = "Отмена"
 take_part_button = "Принять участие"
@@ -33,7 +33,7 @@ def admin_menu_markup():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.row(inform, send_message_to_all_button)
     markup.row(ban_list, change_status)
-    markup.row(review_messages, back_to_main)
+    markup.row(back_to_main,)
     return markup
 
 
