@@ -128,6 +128,7 @@ async def check_holidays_until(teleg_id):
 
 async def sheduled_check_holidays():
     """Отключение режима каникул при окончании срока. Проверка по расписанию"""
+    logger.info('Начало автопроверки статуса каникул')
     query = """SELECT * FROM holidays_status WHERE status = 1 
      AND till_date = date('now')"""
     data = db_controller.select_query(query).fetchall()
@@ -146,3 +147,5 @@ async def sheduled_check_holidays():
                 user_id,
                 text='Режим каникул был отключен'
             )
+            logger.info(f'Каникулы юзера {user_id} отключены автопроверкой')
+    logger.info('Конец автопроверки статуса каникул')
