@@ -1,15 +1,13 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-
 from handlers.decorators import admin_handlers
-from handlers.user.get_info_from_table import \
-    get_teleg_id_from_user_info_table, \
-    get_id_from_user_info_table
-from handlers.user.validators import validate_review_yes_or_no, validate_about, \
-    validate_review_grade
+from handlers.user.get_info_from_table import (
+    get_id_from_user_info_table, get_teleg_id_from_user_info_table)
+from handlers.user.validators import (validate_about, validate_review_grade,
+                                      validate_review_yes_or_no)
 from keyboards.admin import review_messages
-from keyboards.user import skip_message, menu_markup, \
-    review_yes_or_no, no_button, yes_button, review_skip
+from keyboards.user import (menu_markup, no_button, review_skip,
+                            review_yes_or_no, skip_message, yes_button)
 from loader import bot, db_controller, dp, logger
 from states import ReviewState
 
@@ -169,6 +167,7 @@ def get_met_id_with_user_last_week(user_id):
     met_id = db_controller.select_query(query, values).fetchone()
     return met_id
 
+
 async def check_comment_in_bd(user_id, met_id):
     query = """SELECT * FROM mets_reviews WHERE met_id=? AND who_id =?"""
     values = (met_id, user_id)
@@ -205,6 +204,7 @@ def add_review(user_id, met_id, grade, comment):
     logger.info(f"Пользователь с ID {user_id} "
                 f"добавил комментарий о встрече {met_id}")
 
+
 def get_met_id_with_user_last_three(user_id):
     """Получение id встречи по пользователю за прошедшую неделю."""
     query = """SELECT id 
@@ -217,6 +217,3 @@ def get_met_id_with_user_last_three(user_id):
     values = (user_id, user_id)
     mets_id = db_controller.select_query(query, values).fetchall()
     return [met_id[0] for met_id in mets_id]
-
-
-
