@@ -156,11 +156,11 @@ async def get_message_and_send(message: types.Message, state=FSMContext):
                     "Сообщения отправлены",
                     reply_markup=admin_menu_markup()
                 )
+                logger.info("Сообщения пользователям доставлены.")
     else:
         await message.answer("Данный тип сообщения я обработать не могу",
                              reply_markup=admin_menu_markup())
     await state.finish()
-    logger.info("Сообщения пользователям доставлены.")
 
 
 async def send_photo(teleg_id, **kwargs):
