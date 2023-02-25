@@ -70,5 +70,11 @@ class UserStatus(Base):
     status = Column(Integer, nullable=False, default=1)
 
 
+class Username(Base):
+    __tablename__ = 'tg_usernames'
+    id = Column(Integer, ForeignKey('user_info.id'), primary_key=True)
+    username = Column(Text(), nullable=True)
+
+
 def create_tables():
     Base.metadata.create_all(engine)
