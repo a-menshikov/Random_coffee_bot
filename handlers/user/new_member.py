@@ -5,6 +5,7 @@ from aiogram.types import ReplyKeyboardRemove
 from controllerBD.db_loader import db_session
 from controllerBD.models import Gender, Users, UserStatus, UserMets, Holidays
 from handlers.admin.ban_handlers import back_to_main_markup
+from handlers.user.add_username import check_username
 from handlers.user.first_check import check_and_add_registration_button
 from handlers.user.get_info_from_table import (
     check_user_in_base,
@@ -74,7 +75,7 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
                       data.get('birthday'),
                       data.get('about'),
                       data.get('gender'))
-            add_new_user_in_status_table(message.from_user.id)
+            add_new_user_in_status_table(message)
         await state.reset_state()
 
 
@@ -111,12 +112,13 @@ def update_profile_db(teleg_id, name, birthday, about, gender):
                 f"обновил информацию о себе")
 
 
-def add_new_user_in_status_table(teleg_id):
+def add_new_user_in_status_table(message):
     """Проставляем статусы участия в таблицах БД"""
-    user_id = get_id_from_user_info_table(teleg_id)
+    user_id = get_id_from_user_info_table(message.from_user.id)
     db_session.add(UserStatus(id=user_id))
     db_session.add(UserMets(id=user_id))
     db_session.add(Holidays(id=user_id))
+    await check_username(message)
     db_session.commit()
 
 
