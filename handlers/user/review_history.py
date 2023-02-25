@@ -8,6 +8,7 @@ from sqlalchemy.exc import NoResultFound
 from controllerBD.db_loader import db_session
 from controllerBD.models import MetInfo, MetsReview
 from handlers.decorators import user_handlers
+from handlers.user.add_username import check_username
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_user_info_by_id
 from handlers.user.work_with_date import date_from_db_to_message
@@ -30,6 +31,7 @@ def list_of_user_mets_id(user_id):
 @user_handlers
 async def my_reviews(message: types.Message):
     """Выводим карточку с последней встречей"""
+    await check_username(message)
     user_id = get_id_from_user_info_table(message.from_user.id)
     met_ids = list_of_user_mets_id(user_id)
     count_of_mets = len(met_ids)

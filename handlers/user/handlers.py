@@ -3,6 +3,7 @@ from aiogram import types
 from controllerBD.db_loader import db_session
 from controllerBD.models import MetInfo
 from handlers.decorators import user_handlers
+from handlers.user.add_username import check_username
 from handlers.user.reviews import get_met_id_with_user_last_week
 from handlers.user.get_info_from_table import (
     get_user_data_from_db,
@@ -33,6 +34,7 @@ async def main_menu(message: types.Message):
 @user_handlers
 async def send_profile(message: types.Message):
     """Вывод данных о пользователе"""
+    await check_username(message)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о себе")
     data = dict(get_user_data_from_db(message.from_user.id))
@@ -137,6 +139,7 @@ https://t\.me/Loravel\n
 @user_handlers
 async def status_message(message: types.Message):
     """Вывод статуса участия в распределении"""
+    await check_username(message)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о статусе участия")
     user_row = get_user_data_from_db(message.from_user.id)
@@ -162,6 +165,7 @@ async def status_message(message: types.Message):
 @dp.message_handler(text=my_pare_button)
 @user_handlers
 async def my_pare_check(message: types.Message):
+    await check_username(message)
     user_id = get_id_from_user_info_table(message.from_user.id)
     met_id = get_met_id_with_user_last_week(user_id)
     if met_id is None:
