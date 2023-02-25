@@ -1,7 +1,9 @@
 from aiogram import types
+from sqlalchemy import exists, and_
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import BanList
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from loader import db_controller
 
 
 async def check_user_in_ban(message: types.Message):
@@ -14,10 +16,9 @@ async def check_user_in_ban(message: types.Message):
 
 async def check_id_in_ban_with_status(user_id, status):
     """Проверяем пользователя на наличие в бане с определенным статусом."""
-    query = """SELECT * FROM ban_list WHERE banned_user_id=? 
-        AND ban_status = ?"""
-    values = (user_id, status)
-    info = db_controller.select_query(query, values)
-    if info.fetchone() is None:
+    is_exist = db_session.query(exists().where(
+        and_(BanList.banned_user_id == user_id, BanList.ban_status == status)
+    )).scalar()
+    if not is_exist:
         return False
     return True

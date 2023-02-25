@@ -3,6 +3,8 @@ import datetime
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import BanList, Holidays, UserStatus
 from handlers.admin.handlers import admin_menu
 from handlers.admin.validators import ban_validator, comment_validator, \
     unban_validator
@@ -11,7 +13,7 @@ from keyboards.admin import cancel, ban_list, admin_ban_markup, \
     add_to_ban_list, admin_cancel_markup, remove_from_ban_list, \
     back_to_main_markup
 from keyboards.user import back_to_main
-from loader import bot, logger, dp, db_controller
+from loader import bot, logger, dp
 
 from states import AdminData
 
@@ -92,18 +94,14 @@ async def comment_to_ban_answer(message: types.Message, state: FSMContext):
 
 async def save_to_ban(banned_user_id, comment):
     """Запись в БД пользователя с баном."""
-    today = datetime.date.today()
-    queries = {
-        """INSERT INTO ban_list (banned_user_id, ban_status, 
-        date_of_ban, comment_to_ban, date_of_unban, comment_to_unban) 
-        VALUES (?, ?, ?, ?, ?, ?)""":
-            (banned_user_id, 1, today, comment, 'null', 'null'),
-        """UPDATE holidays_status SET status=?, till_date=? WHERE id = ?""":
-            (0, "Неопределенный срок", banned_user_id),
-        """UPDATE user_status SET status=? WHERE id = ? """: (0, banned_user_id)
-    }
-    for query, values in queries.items():
-        db_controller.query(query, values)
+    db_session.add(BanList(banned_user_id=banned_user_id,
+                           ban_status=1,
+                           comment_to_ban=comment))
+    db_session.query(Holidays).filter(Holidays.id == banned_user_id). \
+        update({'status': 0, 'till_date': 'null'})
+    db_session.query(UserStatus).filter(UserStatus.id == banned_user_id). \
+        update({'status': 0})
+    db_session.commit()
 
 
 @dp.message_handler(text=remove_from_ban_list)
@@ -163,15 +161,14 @@ async def comment_to_unban_answer(message: types.Message, state: FSMContext):
 
 async def save_to_unban(unbanned_user_id, comment):
     """Сохранние в БД, что пользователь выведен из бана."""
-    queries = {
-        """UPDATE ban_list SET ban_status = ?, date_of_unban = date('now'), 
-        comment_to_unban = ? WHERE banned_user_id = ? """:
-            (0, comment, unbanned_user_id),
-        """UPDATE user_status SET status=? WHERE id = ? """:
-            (1, unbanned_user_id)
-    }
-    for query, values in queries.items():
-        db_controller.query(query, values)
+    db_session.query(BanList).filter(
+        BanList.banned_user_id == unbanned_user_id
+    ).update({'ban_status': 0,
+              'date_of_unban': datetime.date.today(),
+              'comment_to_unban': comment})
+    db_session.query(UserStatus).filter(UserStatus.id == unbanned_user_id). \
+        update({'status': 1})
+    db_session.commit()
 
 
 @dp.message_handler(text=back_to_main, state="*")

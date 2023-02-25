@@ -4,6 +4,9 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import UserStatus
+from controllerBD.services import get_user_count_from_db
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -12,7 +15,7 @@ from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     inform, admin_cancel_markup, change_status, admin_change_status_markup, \
     take_part_button, do_not_take_part_button, algo_start, \
     send_message_to_all_button, cancel
-from loader import bot, dp, db_controller, logger
+from loader import bot, dp, logger
 from match_algoritm import MachingHelper
 from states import AdminData
 
@@ -39,7 +42,7 @@ async def admin_menu(message: types.Message):
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
-    users = db_controller.get_user_count_from_db()
+    users = get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
         f"Всего пользователей - {users['all_users']};\n\n"
@@ -92,9 +95,8 @@ async def start_algoritm(message: types.Message):
 
 def change_admin_status(message: types.Message, status):
     user_id = get_id_from_user_info_table(message.from_user.id)
-    query = """UPDATE user_status SET status=? WHERE id=?"""
-    values = (status, user_id)
-    db_controller.query(query, values)
+    db_session.query(UserStatus).filter(UserStatus.id == user_id). \
+        update({'status': status})
 
 
 @dp.message_handler(text=send_message_to_all_button)

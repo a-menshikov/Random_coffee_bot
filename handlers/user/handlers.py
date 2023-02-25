@@ -1,16 +1,18 @@
 from aiogram import types
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import MetInfo
 from handlers.decorators import user_handlers
 from handlers.user.reviews import get_met_id_with_user_last_week
 from handlers.user.get_info_from_table import (
     get_user_data_from_db,
     get_user_status_from_db,
-    get_holidays_status_from_db, get_user_info_by_id,
+    get_holidays_status_from_db,
     get_id_from_user_info_table, get_full_user_info_by_id
 )
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import *
-from loader import bot, dp, logger, db_controller
+from loader import bot, dp, logger
 
 from handlers.user.new_member import get_gender_from_db, start_registration
 from sendler import make_message
@@ -168,11 +170,8 @@ async def my_pare_check(message: types.Message):
             "Ты не участвовал в последнем распределении."
         )
     else:
-        query = """SELECT first_user_id, second_user_id
-                FROM met_info 
-                WHERE id = ?"""
-        values = (met_id[0], )
-        users = db_controller.row_factory(query, values).fetchone()
+        users = db_session.query(MetInfo). \
+            filter(MetInfo.id == met_id[0]).one().__dict__
         if users['first_user_id'] == user_id:
             user_info = get_full_user_info_by_id(users['second_user_id'])
         else:

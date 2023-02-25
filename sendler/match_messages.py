@@ -2,9 +2,13 @@ from asyncio import sleep
 
 from aiogram import Bot
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import Users, Gender
+from controllerBD.services import get_defaulf_pare_base_id, update_mets, \
+    update_all_user_mets
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import help_texts_markup
-from loader import db_controller, logger
+from loader import logger
 
 
 async def send_match_messages(match_info: dict, bot: Bot):
@@ -52,10 +56,10 @@ async def send_match_messages(match_info: dict, bot: Bot):
         else:
             fail_user = users_info[0]
             fail_user_db_id = fail_user[0]
-            default_user_db_id = db_controller.get_defaulf_pare_base_id()
+            default_user_db_id = get_defaulf_pare_base_id()
             fail_match = {fail_user_db_id: default_user_db_id}
-            db_controller.update_mets(fail_match)
-            db_controller.update_all_user_mets(fail_match)
+            await update_mets(fail_match)
+            update_all_user_mets(fail_match)
             await send_match_messages(fail_match, bot)
 
     logger.info("Завершение рассылки сообщений о новых встречах")
@@ -93,17 +97,15 @@ def make_message(user_info: tuple) -> str:
 
 def pare_users_query(pare: tuple):
     """Запрашивает информацию по паре юзеров из базы."""
-    query = (
-        "SELECT u.id, u.teleg_id, "
-        "u.name, u.birthday,"
-        "u.about, g.gender_name "
-        "FROM user_info as u "
-        "LEFT JOIN genders g "
-        "ON g.id = u.gender "
-        "WHERE u.id in (?, ?)"
-    )
     try:
-        result = db_controller.select_query(query, pare).fetchall()
+        result = db_session.query(
+            Users.id,
+            Users.teleg_id,
+            Users.name,
+            Users.birthday,
+            Users.about,
+            Gender.gender_name
+        ).join(Gender).filter(Users.id.in_(pare)).all()
     except Exception:
         result = None
     finally:
