@@ -75,7 +75,7 @@ async def confirmation_and_save(message: types.Message, state: FSMContext):
                       data.get('birthday'),
                       data.get('about'),
                       data.get('gender'))
-            add_new_user_in_status_table(message)
+            await add_new_user_in_status_table(message)
         await state.reset_state()
 
 
@@ -112,7 +112,7 @@ def update_profile_db(teleg_id, name, birthday, about, gender):
                 f"обновил информацию о себе")
 
 
-def add_new_user_in_status_table(message):
+async def add_new_user_in_status_table(message):
     """Проставляем статусы участия в таблицах БД"""
     user_id = get_id_from_user_info_table(message.from_user.id)
     db_session.add(UserStatus(id=user_id))
