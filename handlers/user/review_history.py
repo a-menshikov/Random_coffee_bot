@@ -22,7 +22,8 @@ review_callbackdata = CallbackData("dun_w", "position", "edit")
 def list_of_user_mets_id(user_id):
     """Получение id всех встреч пользователя."""
     met_ids = db_session.query(MetInfo.id).filter(
-        or_(MetInfo.first_user_id == user_id, MetInfo.second_user_id == user_id)
+        or_(MetInfo.first_user_id == user_id,
+            MetInfo.second_user_id == user_id)
     ).order_by(desc(MetInfo.id)).limit(10).all()
     return [met_id[0] for met_id in met_ids]
 
@@ -102,7 +103,7 @@ def inline_markup(count_of_mets, position, edit_button):
     markup = InlineKeyboardMarkup(row_width=3)
     if position < (count_of_mets - 1):
         markup.insert(InlineKeyboardButton(
-            f"Пред.",
+            "Пред.",
             callback_data=review_callbackdata.new(
                 position=position+1,
                 edit=0
@@ -115,7 +116,7 @@ def inline_markup(count_of_mets, position, edit_button):
         )))
     if position > 0:
         markup.insert(InlineKeyboardButton(
-            f"След.",
+            "След.",
             callback_data=review_callbackdata.new(
                 position=position-1,
                 edit=0
@@ -174,7 +175,7 @@ def get_sqliterow_review(met_id, user_id):
         review_info = db_session.query(MetsReview).filter(and_(
             MetsReview.met_id == met_id,
             MetsReview.who_id == user_id
-        )).first().__dict__
+        )).one().__dict__
     except NoResultFound:
         review_info = None
     return review_info
