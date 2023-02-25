@@ -25,15 +25,15 @@ def user_handlers(func):
             else:
                 await bot.send_message(
                     message.from_user.id,
-                    ("Вы заблокированы. Пожалуйста "
-                     "обратитесь к администратору."),
+                    ("Ты заблокирован. Пожалуйста, "
+                     "обратись к администратору."),
                     reply_markup=ReplyKeyboardRemove()
                 )
         else:
             await bot.send_message(
                 message.from_user.id,
-                "Вы не зарегистрированы. Введите 'Регистрация' без кавычек "
-                "или нажмите кнопку снизу.",
+                "Ты не зарегистрирован. Введи 'Регистрация' без кавычек "
+                "или нажми кнопку снизу.",
                 reply_markup=start_registr_markup(),
                 )
             await UserData.start.set()

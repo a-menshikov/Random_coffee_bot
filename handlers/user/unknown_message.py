@@ -10,6 +10,6 @@ from loader import dp, bot
 async def unknown_message(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        "Я Вас не понимаю. Пожалуйста воспользуйтесь меню.",
+        "Я тебя не понимаю. Пожалуйста, воспользуйся меню.",
         reply_markup=menu_markup(message)
     )

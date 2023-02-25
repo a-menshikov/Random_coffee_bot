@@ -44,8 +44,8 @@ async def check_and_add_registration_button(message: types.Message):
         else:
             await bot.send_message(
                 message.from_user.id,
-                text="К сожалению вы нарушили наши правила и попали в бан. "
-                     "Для решения данного вопроса просим обратиться к "
+                text="К сожалению ты нарушил наши правила и попал в бан. "
+                     "Для решения данного вопроса обратись к "
                      "администратору @Loravel",
                 reply_markup=ReplyKeyboardRemove()
             )

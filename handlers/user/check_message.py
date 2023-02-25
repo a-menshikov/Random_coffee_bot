@@ -3,8 +3,10 @@ from datetime import date, timedelta
 
 from aiogram.utils.exceptions import BotBlocked
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import Users, UserStatus, Holidays
 from handlers.user.get_info_from_table import get_id_from_user_info_table
-from loader import bot, db_controller, logger
+from loader import bot, logger
 
 
 async def check_message():
@@ -13,7 +15,7 @@ async def check_message():
     for user in prepare_user_list():
         await send_message(
             teleg_id=user,
-            text="Совсем скоро будет произведено распределение пар",
+            text="Совсем скоро будет произведено распределение пар.",
         )
         await sleep(0.05)
     logger.info("Все пользователи проверены.")
@@ -22,10 +24,9 @@ async def check_message():
 def prepare_user_list():
     """Подготовка списка id пользователей со статусом готов к встрече."""
     logger.info("""Подготавливаем список пользователей из базы""")
-    query = """SELECT user_info.teleg_id FROM user_status 
-    JOIN user_info ON user_info.id = user_status.id 
-    WHERE user_status.status = 1 """
-    data = db_controller.select_query(query).fetchall()
+    data = db_session.query(Users.teleg_id).join(UserStatus).filter(
+        UserStatus.status == 1
+    ).all()
     return [element[0] for element in data]
 
 
@@ -45,10 +46,8 @@ async def send_message(teleg_id, **kwargs):
 async def change_status(teleg_id):
     """Смена статуса участия."""
     user_id = get_id_from_user_info_table(teleg_id)
-    queries = {
-        """UPDATE user_status SET status = 0 WHERE id =?""": (user_id,),
-        """UPDATE holidays_status SET status = 1, till_date = ? 
-        WHERE id = ? """: (str(date.today() + timedelta(days=6)), user_id)
-    }
-    for query, values in queries.items():
-        db_controller.query(query, values)
+    db_session.query(UserStatus).filter(UserStatus.id == user_id). \
+        update({'status': 0})
+    db_session.query(Holidays).filter(Holidays.id == user_id). \
+        update({'status': 1,
+                'till_date': str(date.today() + timedelta(days=6))})

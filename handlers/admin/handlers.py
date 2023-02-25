@@ -4,6 +4,9 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import UserStatus
+from controllerBD.services import get_user_count_from_db
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -11,8 +14,8 @@ from handlers.user.get_info_from_table import get_id_from_user_info_table
 from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     inform, admin_cancel_markup, change_status, admin_change_status_markup, \
     take_part_button, do_not_take_part_button, algo_start, \
-    send_message_to_all_button
-from loader import bot, dp, db_controller, logger
+    send_message_to_all_button, cancel
+from loader import bot, dp, logger
 from match_algoritm import MachingHelper
 from states import AdminData
 
@@ -39,7 +42,7 @@ async def admin_menu(message: types.Message):
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
-    users = db_controller.get_user_count_from_db()
+    users = get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
         f"Всего пользователей - {users['all_users']};\n\n"
@@ -92,9 +95,8 @@ async def start_algoritm(message: types.Message):
 
 def change_admin_status(message: types.Message, status):
     user_id = get_id_from_user_info_table(message.from_user.id)
-    query = """UPDATE user_status SET status=? WHERE id=?"""
-    values = (status, user_id)
-    db_controller.query(query, values)
+    db_session.query(UserStatus).filter(UserStatus.id == user_id). \
+        update({'status': status})
 
 
 @dp.message_handler(text=send_message_to_all_button)
@@ -128,29 +130,39 @@ async def get_message_and_send(message: types.Message, state=FSMContext):
             logger.error("Список пользователей пуст")
         except Exception as er:
             logger.error(f"Ошибка отправки: {er}")
+        finally:
+            await bot.send_message(
+                message.from_user.id,
+                "Сообщения отправлены",
+                reply_markup=admin_menu_markup()
+            )
     elif message.content_type == 'text':
         message_answer = message.text
-        try:
-            for user in user_list:
-                await send_message(
-                    teleg_id=user,
-                    text=message_answer,
+        if message_answer == cancel:
+            await admin_menu(message)
+        else:
+            try:
+                for user in user_list:
+                    await send_message(
+                        teleg_id=user,
+                        text=message_answer,
+                    )
+                    await sleep(0.05)
+            except TypeError:
+                logger.error("Список пользователей пуст")
+            except Exception as er:
+                logger.error(f"Ошибка отправки: {er}")
+            finally:
+                await bot.send_message(
+                    message.from_user.id,
+                    "Сообщения отправлены",
+                    reply_markup=admin_menu_markup()
                 )
-                await sleep(0.05)
-        except TypeError:
-            logger.error("Список пользователей пуст")
-        except Exception as er:
-            logger.error(f"Ошибка отправки: {er}")
+                logger.info("Сообщения пользователям доставлены.")
     else:
-        await message.answer("Данный тип сообщения я обработать не могу")
+        await message.answer("Данный тип сообщения я обработать не могу",
+                             reply_markup=admin_menu_markup())
     await state.finish()
-
-    await bot.send_message(
-        message.from_user.id,
-        "Сообщения отправлены",
-        reply_markup=admin_menu_markup()
-    )
-    logger.info("Сообщения пользователям доставлены.")
 
 
 async def send_photo(teleg_id, **kwargs):

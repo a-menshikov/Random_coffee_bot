@@ -1,11 +1,15 @@
 import subprocess
 import json
-from loader import bot, logger, db_controller
+
+from controllerBD.db_loader import db_session
+from controllerBD.models import UserStatus, UserMets
+from controllerBD.services import update_mets, update_all_user_mets
+from loader import bot, logger
 from sendler.match_messages import send_match_messages
 
 
 class MachingHelper():
-    """Class - interfase for matchingalogitm1.exe"""
+    """Класс - интерфейс алгоритма"""
     vertex_conunt: int
     edges_count: int
 
@@ -14,15 +18,16 @@ class MachingHelper():
         self.prepare()
 
     def prepare(self):
-        """Prepare for machting algo"""
-        logger.info("Prepare matching algo")
+        """Подготовка алгоритма"""
+        logger.info("Начало подготовки работы алгоритма")
         data_from_bd = {}
-        active_users = db_controller.select_query(
-            "SELECT id FROM user_status WHERE status=1").fetchall()
+        active_users = db_session.query(UserStatus.id).\
+            filter(UserStatus.status == 1).all()
         active_users = [i[0] for i in active_users]
         for now_user in active_users:
-            connected_user = db_controller.select_query(
-                f"SELECT met_info FROM user_mets WHERE id={now_user}").fetchone()[0]
+            connected_user = db_session.query(UserMets.met_info).filter(
+                UserMets.id == now_user
+            ).one()[0]
             connected_user = list(json.loads(connected_user).values())
             data_from_bd[now_user] = connected_user
 
@@ -48,18 +53,20 @@ class MachingHelper():
             text.write(res)
         with open("./data/match_algoritm_data/temp.txt", "w") as text:
             text.write(temp)
+        logger.info("Завершение подготовки работы алгоритма")
 
     async def send_and_write(self, t: dict):
-        """Send a mets to users"""
-        logger.info("Write mets to db")
-        db_controller.update_mets(t)
-        db_controller.update_all_user_mets(t)
-        logger.info("Start send matches")
+        """Запись результатов в базу и рассылка сообщений"""
+        logger.info("Начало записи новых встреч в базу")
+        await update_mets(t)
+        update_all_user_mets(t)
+        logger.info("Завершение записи новых встреч в базу")
+        logger.info("Начало рассылки сообщений о новых встречах")
         await send_match_messages(t, bot)
 
     def start(self):
-        """Run matching algo"""
-        logger.info("Start matching algo")
+        """Запуск алгоритма"""
+        logger.info("Начало работы алгоритма")
         subprocess.call(['./match_algoritm/matchingalogitm -f ./data/match_algoritm_data/input.txt --max'], shell=True)
         res = []
         with open("./data/match_algoritm_data/output.txt", "r") as text:
@@ -73,6 +80,6 @@ class MachingHelper():
         for i in self.all_active:
             matches[i] = None
         self.matchings = matches
-        logger.info("End matching algo")
-        print(matches)
+        logger.info("Завершение работы алгоритма")
+        logger.info(f'пары {matches}')
         return matches

@@ -2,13 +2,17 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
+from sqlalchemy import or_, desc, and_
+from sqlalchemy.exc import NoResultFound
 
+from controllerBD.db_loader import db_session
+from controllerBD.models import MetInfo, MetsReview
 from handlers.decorators import user_handlers
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_user_info_by_id
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import review_yes_or_no, my_reviews
-from loader import dp, bot, db_controller
+from loader import dp, bot, logger
 from states import ReviewState
 
 review_callbackdata = CallbackData("dun_w", "position", "edit")
@@ -16,25 +20,22 @@ review_callbackdata = CallbackData("dun_w", "position", "edit")
 
 def list_of_user_mets_id(user_id):
     """Получение id всех встреч пользователя."""
-    query = """SELECT id 
-        FROM met_info 
-        WHERE first_user_id = ? OR second_user_id = ?
-        ORDER BY id DESC
-        LIMIT 10"""
-    values = (user_id, user_id)
-    met_ids = db_controller.select_query(query, values).fetchall()
+    met_ids = db_session.query(MetInfo.id).filter(
+        or_(MetInfo.first_user_id == user_id, MetInfo.second_user_id == user_id)
+    ).order_by(desc(MetInfo.id)).limit(10).all()
     return [met_id[0] for met_id in met_ids]
 
 
 @dp.message_handler(text=my_reviews)
 @user_handlers
-async def example(message: types.Message):
+async def my_reviews(message: types.Message):
+    """Выводим карточку с последней встречей"""
     user_id = get_id_from_user_info_table(message.from_user.id)
     met_ids = list_of_user_mets_id(user_id)
     count_of_mets = len(met_ids)
     if count_of_mets == 0:
         await bot.send_message(message.from_user.id,
-                               "У вас еще не было встреч.")
+                               "У тебя еще не было встреч.")
     else:
         met_id = met_ids[0]
         review_info = get_sqliterow_review(met_id, user_id)
@@ -47,11 +48,14 @@ async def example(message: types.Message):
                                parse_mode='HTML',
                                reply_markup=inline_markup(count_of_mets, 0,
                                                           edit_button))
+        logger.info(f'Пользователь {message.from_user.id} получил информация '
+                    f'о последней встрече {met_id}')
 
 
 @dp.callback_query_handler(review_callbackdata.filter())
 async def button_press(call: types.CallbackQuery, callback_data: dict,
                        state: FSMContext):
+    """Выводим информацию о встрече в зависимости от позиции."""
     position = int(callback_data.get('position'))
     user_id = get_id_from_user_info_table(call.from_user.id)
     met_ids = list_of_user_mets_id(user_id)
@@ -71,9 +75,11 @@ async def button_press(call: types.CallbackQuery, callback_data: dict,
         )
         await bot.send_message(
             call.from_user.id,
-            "Состоялась ли Ваша встреча?",
+            "Состоялась ли твоя встреча?",
             reply_markup=review_yes_or_no()
         )
+        logger.info(f'Пользователь {call.from_user.id} начал редактировать '
+                    f'отзыв о встрече {met_id}')
         await ReviewState.start.set()
         user_id = get_id_from_user_info_table(call.from_user.id)
         await state.update_data(user_id=user_id)
@@ -85,9 +91,12 @@ async def button_press(call: types.CallbackQuery, callback_data: dict,
                                     reply_markup=inline_markup(count_of_mets,
                                                                position,
                                                                edit_button))
+        logger.info(f'Пользователь {call.from_user.id} получил информация '
+                    f'о последней встрече {met_id}')
 
 
 def inline_markup(count_of_mets, position, edit_button):
+    """Инлайн-кнопки для карточки встречи."""
     markup = InlineKeyboardMarkup(row_width=3)
     if position < (count_of_mets - 1):
         markup.insert(InlineKeyboardButton(
@@ -114,6 +123,7 @@ def inline_markup(count_of_mets, position, edit_button):
 
 
 def prepare_message(user_id, met_id, review_info):
+    """Подготавливаем сообщение о встрече с коментарием."""
     met_info = get_sqliterow_about_met(met_id)
     date = date_from_db_to_message(met_info['date'])
     if met_info['first_user_id'] == user_id:
@@ -139,7 +149,7 @@ def prepare_message(user_id, met_id, review_info):
 
     message = (
         f"<b>Дата распределения</b> - {date}.\n"
-        f"<b>Ваша пара</b> – <a href='tg://user?id={pare_info['teleg_id']}'>"
+        f"<b>Твоя пара</b> – <a href='tg://user?id={pare_info['teleg_id']}'>"
         f"{pare_info['name']}</a>\n\n"
         f"<b>Отзыв о встрече:</b>\n"
         f"{review}"
@@ -149,14 +159,20 @@ def prepare_message(user_id, met_id, review_info):
 
 
 def get_sqliterow_about_met(met_id):
-    query = """SELECT * FROM met_info WHERE id = ?"""
-    values = (met_id, )
-    met_info = db_controller.row_factory(query, values).fetchone()
+    """Получаем словарь строки MetInfo."""
+    met_info = db_session.query(MetInfo).filter(
+        MetInfo.id == met_id
+    ).one().__dict__
     return met_info
 
 
 def get_sqliterow_review(met_id, user_id):
-    query = """SELECT * FROM mets_reviews WHERE met_id = ? AND who_id = ?"""
-    values = (met_id, user_id)
-    review_info = db_controller.row_factory(query, values).fetchone()
+    """Получаем словарь строки Review."""
+    try:
+        review_info = db_session.query(MetsReview).filter(and_(
+            MetsReview.met_id == met_id,
+            MetsReview.who_id == user_id
+        )).one().__dict__
+    except NoResultFound:
+        review_info = None
     return review_info
