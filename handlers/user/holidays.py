@@ -110,7 +110,7 @@ async def check_holidays_until(teleg_id):
     user_id = get_id_from_user_info_table(teleg_id)
     row = db_session.query(Holidays).filter(
         Holidays.id == user_id
-    ).one().__dict__
+    ).first().__dict__
     if row['status'] == 0:
         pass
     else:

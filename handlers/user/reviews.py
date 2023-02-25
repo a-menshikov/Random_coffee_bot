@@ -179,7 +179,7 @@ def get_met_id_with_user_last_week(user_id):
              or_(
                  MetInfo.first_user_id == user_id,
                  MetInfo.second_user_id == user_id
-             ))).order_by(desc(MetInfo.id)).limit(1).one()
+             ))).order_by(desc(MetInfo.id)).limit(1).first()
     return met_id
 
 
@@ -210,7 +210,7 @@ def add_review(user_id, met_id, grade, comment):
     """Добавление комментария о встрече"""
     users = db_session.query(MetInfo).filter(
         MetInfo.id == met_id
-    ).one().__dict__
+    ).first().__dict__
     if users['first_user_id'] == user_id:
         about_whom_id = users['second_user_id']
     else:

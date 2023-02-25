@@ -25,7 +25,6 @@ from handlers.user.validators import (validate_about, validate_birthday,
                                       validate_name)
 
 
-
 @dp.message_handler(text=return_to_begin_button, state="*")
 async def return_to_begin(message: types.Message, state: FSMContext):
     """Вывод меню"""
@@ -37,7 +36,7 @@ def get_gender_from_db(status):
     """Получаем пол пользователя по id пола"""
     info = db_session.query(Gender.gender_name).filter(
         Gender.id == status
-    ).one()
+    ).first()
     return info[0]
 
 
