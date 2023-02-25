@@ -62,6 +62,12 @@ async def validate_about(message):
             'Текст должен быть меньше 500 символов. Повторите ввод.'
         )
         return False
+    elif not re.fullmatch(r"^[^<>]+$", message.text):
+        await bot.send_message(
+            message.from_user.id,
+            'В тексте запрещено использовать символы <>. Повтори ввод.'
+        )
+        return False
     return True
 
 
