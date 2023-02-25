@@ -71,10 +71,9 @@ class UserStatus(Base):
 
 
 class Username(Base):
-    __tablename__ = 'usernames'
+    __tablename__ = 'tg_usernames'
     id = Column(Integer, ForeignKey('user_info.id'), primary_key=True)
     username = Column(Text(), nullable=True)
-
 
 
 def create_tables():
