@@ -162,7 +162,7 @@ def get_sqliterow_about_met(met_id):
     """Получаем словарь строки MetInfo."""
     met_info = db_session.query(MetInfo).filter(
         MetInfo.id == met_id
-    ).one().__dict__
+    ).first().__dict__
     return met_info
 
 
@@ -172,7 +172,7 @@ def get_sqliterow_review(met_id, user_id):
         review_info = db_session.query(MetsReview).filter(and_(
             MetsReview.met_id == met_id,
             MetsReview.who_id == user_id
-        )).one().__dict__
+        )).first().__dict__
     except NoResultFound:
         review_info = None
     return review_info

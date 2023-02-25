@@ -27,14 +27,14 @@ def update_one_user_mets(first_user: int, second_user: int):
     """Записывает в user_mets информацию об одном пользователе."""
     first_user_mets = db_session.query(UserMets.met_info).filter(
         UserMets.id == first_user
-    ).one()
+    ).first()
     user_mets = json.loads(first_user_mets[0])
     new_met_id = db_session.query(MetInfo.id).filter(
         MetInfo.date == date.today(),
         or_(
             MetInfo.first_user_id == first_user,
             MetInfo.second_user_id == first_user
-        )).order_by(desc(MetInfo.id)).limit(1).one()[0]
+        )).order_by(desc(MetInfo.id)).limit(1).first()[0]
     user_mets[new_met_id] = second_user
     new_mets_value = json.dumps(user_mets)
     db_session.query(UserMets).filter(UserMets.id == first_user). \
@@ -69,7 +69,7 @@ def get_defaulf_pare_base_id():
     """Получить id дефолтного юзера из базы."""
     return db_session.query(Users.id).filter(
         Users.teleg_id == int(DEFAULT_PARE_iD)
-    ).one()[0]
+    ).first()[0]
 
 
 def get_user_count_from_db():

@@ -27,7 +27,7 @@ class MachingHelper():
         for now_user in active_users:
             connected_user = db_session.query(UserMets.met_info).filter(
                 UserMets.id == now_user
-            ).one()[0]
+            ).first()[0]
             connected_user = list(json.loads(connected_user).values())
             data_from_bd[now_user] = connected_user
 

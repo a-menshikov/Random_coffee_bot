@@ -171,7 +171,7 @@ async def my_pare_check(message: types.Message):
         )
     else:
         users = db_session.query(MetInfo). \
-            filter(MetInfo.id == met_id[0]).one().__dict__
+            filter(MetInfo.id == met_id[0]).first().__dict__
         if users['first_user_id'] == user_id:
             user_info = get_full_user_info_by_id(users['second_user_id'])
         else:
