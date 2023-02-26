@@ -4,7 +4,7 @@ from datetime import date
 from sqlalchemy import or_, desc
 
 from .db_loader import db_session
-from .models import MetInfo, UserMets, Users, UserStatus
+from .models import MetInfo, UserMets, Users, UserStatus, Username
 from data import DEFAULT_PARE_iD
 from loader import logger
 
@@ -78,3 +78,25 @@ def get_user_count_from_db():
         UserStatus.status == 1
     ).count()
     return {"all_users": all_users, "active_users": active_users}
+
+
+def get_user_id_from_db(teleg_id: int) -> int:
+    """Получает id юзера в базе по телеграм id"""
+    return db_session.query(Users.id).filter(
+        Users.teleg_id == teleg_id
+    ).first()[0]
+
+
+def get_tg_username_from_db_by_teleg_id(teleg_id: int) -> int:
+    """Получает телеграм-юзернейм по telegram id"""
+    base_id = get_user_id_from_db(teleg_id)
+    return db_session.query(Username.username).filter(
+        Username.id == base_id
+    ).first()[0]
+
+
+def get_tg_username_from_db_by_base_id(base_id: int) -> int:
+    """Получает телеграм-юзернейм по id в базе"""
+    return db_session.query(Username.username).filter(
+        Username.id == base_id
+    ).first()[0]

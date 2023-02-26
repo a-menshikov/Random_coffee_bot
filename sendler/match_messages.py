@@ -5,7 +5,7 @@ from aiogram import Bot
 from controllerBD.db_loader import db_session
 from controllerBD.models import Users, Gender
 from controllerBD.services import get_defaulf_pare_base_id, update_mets, \
-    update_all_user_mets
+    update_all_user_mets, get_tg_username_from_db_by_teleg_id
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import help_texts_markup
 from loader import logger
@@ -76,14 +76,18 @@ def make_message(user_info: tuple) -> str:
         user_birthday = date_from_db_to_message(user_birthday)
     user_about = user_info[4]
     user_gender = user_info[5]
+    user_tg_username = get_tg_username_from_db_by_teleg_id(user_id)
 
     base_message = (f'На этой неделе твоя пара для кофе: '
                     f'<a href="tg://user?id={user_id}">{user_name}</a>')
+    tg_username_message = (f'@{user_tg_username}')
     birth_day_message = f'Дата рождения: {user_birthday}'
     about_message = f'Информация: {user_about}'
     gender_message = f'Пол: {user_gender}'
     row_message_list = [base_message]
 
+    if tg_username_message:
+        row_message_list.append(tg_username_message)
     if user_birthday != 'Не указано':
         row_message_list.append(birth_day_message)
     if user_about != 'Не указано':

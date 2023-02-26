@@ -7,6 +7,7 @@ from sqlalchemy.exc import NoResultFound
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import MetInfo, MetsReview
+from controllerBD.services import get_tg_username_from_db_by_base_id
 from handlers.decorators import user_handlers
 from handlers.user.add_username import check_username
 from handlers.user.get_info_from_table import get_id_from_user_info_table, \
@@ -134,6 +135,11 @@ def prepare_message(user_id, met_id, review_info):
     else:
         pare_id = met_info['first_user_id']
     pare_info = get_user_info_by_id(pare_id)
+    pare_tg_username = get_tg_username_from_db_by_base_id(pare_id)
+    if pare_tg_username:
+        pare_username_for_message = f'@{pare_tg_username}'
+    else:
+        pare_username_for_message = ''
     if review_info:
         grade = review_info['grade']
         if grade == 0:
@@ -153,7 +159,7 @@ def prepare_message(user_id, met_id, review_info):
     message = (
         f"<b>Дата распределения</b> - {date}.\n"
         f"<b>Твоя пара</b> – <a href='tg://user?id={pare_info['teleg_id']}'>"
-        f"{pare_info['name']}</a>\n\n"
+        f"{pare_info['name']}</a> {pare_username_for_message}\n\n"
         f"<b>Отзыв о встрече:</b>\n"
         f"{review}"
 
