@@ -9,7 +9,7 @@ def prepare_user_info():
             FROM mets_reviews as mr 
             LEFT JOIN user_info as ui 
             ON mr.about_whom_id = ui.id
-            LEFT JOIN usernames as un 
+            LEFT JOIN tg_usernames as un 
             ON mr.about_whom_id = un.id
             LEFT JOIN ban_list as bl 
             ON mr.about_whom_id = bl.id
@@ -21,6 +21,7 @@ def prepare_user_info():
     return users
 
 def prepare_report_message(users):
+    message_list = []
     message = ""
     for user in users:
         if not user[3]:
@@ -42,7 +43,9 @@ def prepare_report_message(users):
                        f'Статус: {status}.\n' \
                        f'<b>Штрафных балов - {user[5]}</b>\n' \
                        f'{date} Последний комментарий: {comment}'
+        if len(message + '\n\n' + user_message) > 4095:
 
         message = message + '\n\n' + user_message
+
 
     return message
