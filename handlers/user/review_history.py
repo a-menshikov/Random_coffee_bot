@@ -137,7 +137,7 @@ def prepare_message(user_id, met_id, review_info):
     pare_info = get_user_info_by_id(pare_id)
     pare_tg_username = get_tg_username_from_db_by_base_id(pare_id)
     if pare_tg_username:
-        pare_username_for_message = f'@{pare_tg_username}'
+        pare_username_for_message = f'(@{pare_tg_username})'
     else:
         pare_username_for_message = ''
     if review_info:

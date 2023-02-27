@@ -86,7 +86,7 @@ def make_message(user_info: tuple) -> str:
     gender_message = f'Пол: {user_gender}'
     row_message_list = [base_message]
 
-    if tg_username_message:
+    if user_tg_username:
         row_message_list.append(tg_username_message)
     if user_birthday != 'Не указано':
         row_message_list.append(birth_day_message)
