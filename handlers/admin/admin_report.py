@@ -5,7 +5,7 @@ from handlers.user.work_with_date import date_from_db_to_message
 
 def prepare_user_info():
     query = text("""SELECT mr.about_whom_id, ui.teleg_id, ui.name, un.username, 
-            bl.ban_status, COUNT(*), MAX(mr.met_id), mr.comment, mr.date_of_comment
+            bl.ban_status, COUNT(*), MAX(mr.date_of_comment), mr.comment
             FROM mets_reviews as mr 
             LEFT JOIN user_info as ui 
             ON mr.about_whom_id = ui.id
@@ -36,7 +36,7 @@ def prepare_report_message(users):
             comment = "Комментарий не был добавлен."
         else:
             comment = f"{user[7]}"
-        date = date_from_db_to_message(user[8])
+        date = date_from_db_to_message(user[6])
         user_message = f'ID пользователя: {user[0]};\n' \
                        f'Ник пользователя: <a href="tg://user?id={user[1]}">' \
                        f'{user[2]}</a>{username}.\n' \
@@ -44,8 +44,10 @@ def prepare_report_message(users):
                        f'<b>Штрафных балов - {user[5]}</b>\n' \
                        f'{date} Последний комментарий: {comment}'
         if len(message + '\n\n' + user_message) > 4095:
+            message_list.append(message)
+            message = user_message
+        else:
+            message = message + '\n\n' + user_message
+    message_list.append(message)
 
-        message = message + '\n\n' + user_message
-
-
-    return message
+    return message_list

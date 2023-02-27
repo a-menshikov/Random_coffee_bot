@@ -66,12 +66,13 @@ async def inform_message_1(message: types.Message):
 @admin_handlers
 async def inform_message_2(message: types.Message):
     bad_users = prepare_user_info()
-    message_text = prepare_report_message(bad_users)
-    await bot.send_message(
-        message.from_user.id,
-        f"{message_text}",
-        parse_mode="HTML"
-    )
+    message_list = prepare_report_message(bad_users)
+    for message_text in message_list:
+        await bot.send_message(
+            message.from_user.id,
+            f"{message_text}",
+            parse_mode="HTML"
+        )
 
 
 @dp.message_handler(text=change_status)
