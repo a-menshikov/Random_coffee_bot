@@ -5,7 +5,8 @@ from handlers.user.work_with_date import date_from_db_to_message
 
 def prepare_user_info():
     query = text("""SELECT mr.about_whom_id, ui.teleg_id, ui.name, un.username, 
-            bl.ban_status, COUNT(*), MAX(mr.date_of_comment), mr.comment
+            bl.ban_status, COUNT(*) as cnt_fail, 
+            MAX(mr.date_of_comment) as last_comment, mr.comment
             FROM mets_reviews as mr 
             LEFT JOIN user_info as ui 
             ON mr.about_whom_id = ui.id
