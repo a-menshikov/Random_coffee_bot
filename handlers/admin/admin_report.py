@@ -4,6 +4,7 @@ from handlers.user.work_with_date import date_from_db_to_message
 
 
 def prepare_user_info():
+    """Формируем список """
     query = text("""SELECT mr.about_whom_id, ui.teleg_id, ui.name, un.username, 
             COUNT(
               CASE
@@ -18,7 +19,8 @@ def prepare_user_info():
             ON mr.about_whom_id = ui.id
             LEFT JOIN tg_usernames as un 
             ON mr.about_whom_id = un.id
-            LEFT JOIN (SELECT *, MAX(id) FROM ban_list GROUP BY banned_user_id) as bl 
+            LEFT JOIN (SELECT *, MAX(id) FROM ban_list GROUP BY banned_user_id) 
+            as bl 
             ON mr.about_whom_id = bl.banned_user_id
             WHERE mr.grade = 0
             GROUP BY mr.about_whom_id
@@ -26,6 +28,7 @@ def prepare_user_info():
 
     users = db_session.execute(query)
     return users
+
 
 def prepare_report_message(users):
     message_list = []
@@ -58,7 +61,3 @@ def prepare_report_message(users):
     message_list.append(message)
 
     return message_list
-
-users = prepare_user_info()
-for user in users:
-    print(user)
