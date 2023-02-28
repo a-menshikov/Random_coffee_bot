@@ -19,6 +19,15 @@ take_part_button = "Принять участие"
 do_not_take_part_button = "Не принимать участие"
 send_message_to_all_button = "Сообщение пользователям"
 
+inform_active_users = "Участники"
+inform_bad_users = "Нарушители"
+
+def admin_inform_markup():
+    """Кнопки отчетов."""
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add(inform_active_users, inform_bad_users)
+    markup.add(go_back)
+    return markup
 
 def admin_main_markup():
     """Начальная кнопка админа."""

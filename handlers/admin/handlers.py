@@ -7,6 +7,8 @@ from aiogram.utils.exceptions import BotBlocked
 from controllerBD.db_loader import db_session
 from controllerBD.models import UserStatus
 from controllerBD.services import get_user_count_from_db
+from handlers.admin.admin_report import prepare_user_info, \
+    prepare_report_message
 from handlers.decorators import admin_handlers
 from handlers.user.check_message import check_message, prepare_user_list, \
     send_message
@@ -14,7 +16,8 @@ from handlers.user.get_info_from_table import get_id_from_user_info_table
 from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     inform, admin_cancel_markup, change_status, admin_change_status_markup, \
     take_part_button, do_not_take_part_button, algo_start, \
-    send_message_to_all_button, cancel
+    send_message_to_all_button, cancel, admin_inform_markup, \
+    inform_active_users, inform_bad_users
 from loader import bot, dp, logger
 from match_algoritm import MachingHelper
 from states import AdminData
@@ -42,12 +45,42 @@ async def admin_menu(message: types.Message):
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
+    await bot.send_message(
+        message.from_user.id,
+        "Выберите из доступных вариантов:",
+        reply_markup=admin_inform_markup()
+    )
+
+
+@dp.message_handler(text=inform_active_users)
+@admin_handlers
+async def inform_message_1(message: types.Message):
+    """Вывод сообщения со списком активных пользователей."""
     users = get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
         f"Всего пользователей - {users['all_users']};\n\n"
         f"Активных пользователей - {users['active_users']}."
     )
+
+
+@dp.message_handler(text=inform_bad_users)
+@admin_handlers
+async def inform_message_2(message: types.Message):
+    """Получение сообщения о пользователях со штрафными балами."""
+    bad_users = prepare_user_info()
+    message_list = prepare_report_message(bad_users)
+    if message_list[0] == '':
+        await bot.send_message(
+            message.from_user.id,
+            "Отчёт пустой")
+    else:
+        for message_text in message_list:
+            await bot.send_message(
+                message.from_user.id,
+                f"{message_text}",
+                parse_mode="HTML"
+            )
 
 
 @dp.message_handler(text=change_status)
