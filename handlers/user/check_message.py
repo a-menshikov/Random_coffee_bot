@@ -1,10 +1,9 @@
 from asyncio import sleep
-from datetime import date, timedelta
 
 from aiogram.utils.exceptions import BotBlocked
 
 from controllerBD.db_loader import db_session
-from controllerBD.models import Users, UserStatus, Holidays
+from controllerBD.models import Users, UserStatus
 from handlers.user.get_info_from_table import get_id_from_user_info_table
 from loader import bot, logger
 
@@ -48,4 +47,3 @@ async def change_status(teleg_id):
     user_id = get_id_from_user_info_table(teleg_id)
     db_session.query(UserStatus).filter(UserStatus.id == user_id). \
         update({'status': 0})
-

@@ -22,8 +22,9 @@ from sendler import make_message
 @dp.errors_handler(exception=exceptions.RetryAfter)
 async def exception_handler(update: types.Update,
                             exception: exceptions.RetryAfter):
-    await update.message.answer('Превышен лимит сообщений. Подожди 5 минут')
-    logger.error(f'Пользователь {update.message.from_user.id} флудит')
+    await update.message.answer('Превышен лимит на данный запрос. '
+                                'Подожди 5 минут')
+    logger.info(f'Пользователь {update.message.from_user.id} флудит')
     return True
 
 
