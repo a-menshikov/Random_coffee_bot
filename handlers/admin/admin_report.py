@@ -4,7 +4,7 @@ from handlers.user.work_with_date import date_from_db_to_message
 
 
 def prepare_user_info():
-    """Формируем список """
+    """Формируем список пользователей со штрафными баллами и другой инф."""
     query = text("""SELECT mr.about_whom_id, ui.teleg_id, ui.name, un.username, 
             COUNT(
               CASE
@@ -31,6 +31,7 @@ def prepare_user_info():
 
 
 def prepare_report_message(users):
+    """Подготовка списка сообщений для отправки."""
     message_list = []
     message = ""
     for user in users:

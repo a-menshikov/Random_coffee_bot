@@ -54,7 +54,7 @@ async def inform_message(message: types.Message):
 @dp.message_handler(text=inform_active_users)
 @admin_handlers
 async def inform_message_1(message: types.Message):
-    """Вывод отчета."""
+    """Вывод сообщения со списком активных пользователей."""
     users = get_user_count_from_db()
     await bot.send_message(
         message.from_user.id,
@@ -65,6 +65,7 @@ async def inform_message_1(message: types.Message):
 @dp.message_handler(text=inform_bad_users)
 @admin_handlers
 async def inform_message_2(message: types.Message):
+    """Получение сообщения о пользователях со штрафными балами."""
     bad_users = prepare_user_info()
     message_list = prepare_report_message(bad_users)
     for message_text in message_list:
