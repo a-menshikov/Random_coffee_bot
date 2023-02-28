@@ -51,6 +51,7 @@ async def inform_message(message: types.Message):
         reply_markup=admin_inform_markup()
     )
 
+
 @dp.message_handler(text=inform_active_users)
 @admin_handlers
 async def inform_message_1(message: types.Message):
@@ -62,18 +63,24 @@ async def inform_message_1(message: types.Message):
         f"Активных пользователей - {users['active_users']}."
     )
 
+
 @dp.message_handler(text=inform_bad_users)
 @admin_handlers
 async def inform_message_2(message: types.Message):
     """Получение сообщения о пользователях со штрафными балами."""
     bad_users = prepare_user_info()
     message_list = prepare_report_message(bad_users)
-    for message_text in message_list:
+    if message_list[0] == '':
         await bot.send_message(
             message.from_user.id,
-            f"{message_text}",
-            parse_mode="HTML"
-        )
+            "Отчёт пустой")
+    else:
+        for message_text in message_list:
+            await bot.send_message(
+                message.from_user.id,
+                f"{message_text}",
+                parse_mode="HTML"
+            )
 
 
 @dp.message_handler(text=change_status)

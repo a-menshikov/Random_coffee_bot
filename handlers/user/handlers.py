@@ -150,13 +150,16 @@ async def status_message(message: types.Message):
         holidays_row = get_holidays_status_from_db(user_row['id'])
         till_value = holidays_row['till_date']
         if till_value == 'null' or till_value == 'Неопределенный срок':
-            holidays_till = 'скончания веков'
+            holidays_till = 'неопределенной даты'
         else:
             holidays_till = date_from_db_to_message(till_value)
         status = (f"Ты на каникулах до {holidays_till}. "
                   f"В это время пара для встречи тебе предложена не будет. "
                   f"После указанной даты статус 'Активен' "
-                  f"будет восстановлен автоматически")
+                  f"будет восстановлен автоматически. Если дата не "
+                  f"определена, то отключить каникулы необходимо "
+                  f"вручную кнопкой 'Отключить' в меню 'Каникулы'"
+                  )
     await bot.send_message(message.from_user.id, text=status)
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"получил информацию о статусе участия")
