@@ -1,4 +1,4 @@
-from aiogram import types
+from aiogram import types, exceptions
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import MetInfo
@@ -17,6 +17,14 @@ from loader import bot, dp, logger
 
 from handlers.user.new_member import get_gender_from_db, start_registration
 from sendler import make_message
+
+
+@dp.errors_handler(exception=exceptions.RetryAfter)
+async def exception_handler(update: types.Update,
+                            exception: exceptions.RetryAfter):
+    await update.message.answer('Превышен лимит сообщений. Подожди 5 минут')
+    logger.error(f'Пользователь {update.message.from_user.id} флудит')
+    return True
 
 
 @dp.message_handler(text=[menu_message, back_to_menu])
