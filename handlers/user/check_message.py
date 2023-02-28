@@ -48,6 +48,4 @@ async def change_status(teleg_id):
     user_id = get_id_from_user_info_table(teleg_id)
     db_session.query(UserStatus).filter(UserStatus.id == user_id). \
         update({'status': 0})
-    db_session.query(Holidays).filter(Holidays.id == user_id). \
-        update({'status': 1,
-                'till_date': str(date.today() + timedelta(days=6))})
+
