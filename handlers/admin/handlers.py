@@ -1,6 +1,6 @@
 from asyncio import sleep
 
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
@@ -18,19 +18,19 @@ from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     take_part_button, do_not_take_part_button, algo_start, \
     send_message_to_all_button, cancel, admin_inform_markup, \
     inform_active_users, inform_bad_users
-from loader import bot, dp, logger
+from loader import bot, logger
 from match_algoritm import MachingHelper
 from states import AdminData
 
 
-@dp.message_handler(text=go_back)
+# @dp.message_handler(text=go_back)
 @admin_handlers
-async def go_back(message: types.Message):
+async def go_back_message(message: types.Message):
     """Возврат в меню админа."""
     await admin_menu(message)
 
 
-@dp.message_handler(text=admin_menu_button)
+# @dp.message_handler(text=admin_menu_button)
 @admin_handlers
 async def admin_menu(message: types.Message):
     """Вывод меню администратора."""
@@ -41,7 +41,7 @@ async def admin_menu(message: types.Message):
     )
 
 
-@dp.message_handler(text=inform)
+# @dp.message_handler(text=inform)
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
@@ -52,7 +52,7 @@ async def inform_message(message: types.Message):
     )
 
 
-@dp.message_handler(text=inform_active_users)
+# @dp.message_handler(text=inform_active_users)
 @admin_handlers
 async def inform_message_1(message: types.Message):
     """Вывод сообщения со списком активных пользователей."""
@@ -64,7 +64,7 @@ async def inform_message_1(message: types.Message):
     )
 
 
-@dp.message_handler(text=inform_bad_users)
+# @dp.message_handler(text=inform_bad_users)
 @admin_handlers
 async def inform_message_2(message: types.Message):
     """Получение сообщения о пользователях со штрафными балами."""
@@ -83,7 +83,7 @@ async def inform_message_2(message: types.Message):
             )
 
 
-@dp.message_handler(text=change_status)
+# @dp.message_handler(text=change_status)
 @admin_handlers
 async def change_status_message(message: types.Message):
     """Вывод отчета."""
@@ -94,7 +94,7 @@ async def change_status_message(message: types.Message):
     )
 
 
-@dp.message_handler(text=take_part_button)
+# @dp.message_handler(text=take_part_button)
 @admin_handlers
 async def take_part_yes(message: types.Message):
     """Изменение статуса на принимать участие."""
@@ -105,7 +105,7 @@ async def take_part_yes(message: types.Message):
     )
 
 
-@dp.message_handler(text=do_not_take_part_button)
+# @dp.message_handler(text=do_not_take_part_button)
 @admin_handlers
 async def take_part_no(message: types.Message):
     """Изменение статуса на не принимать участие."""
@@ -116,7 +116,7 @@ async def take_part_no(message: types.Message):
     )
 
 
-@dp.message_handler(text=algo_start)
+# @dp.message_handler(text=algo_start)
 @admin_handlers
 async def start_algoritm(message: types.Message):
     """Запуск алгоритма распределения"""
@@ -132,7 +132,7 @@ def change_admin_status(message: types.Message, status):
         update({'status': status})
 
 
-@dp.message_handler(text=send_message_to_all_button)
+# @dp.message_handler(text=send_message_to_all_button)
 @admin_handlers
 async def request_message_to_all(message: types.Message):
     await bot.send_message(
@@ -143,8 +143,8 @@ async def request_message_to_all(message: types.Message):
     await AdminData.message_send.set()
 
 
-@dp.message_handler(state=AdminData.message_send,
-                    content_types=types.ContentTypes.ANY)
+# @dp.message_handler(state=AdminData.message_send,
+#                     content_types=types.ContentTypes.ANY)
 async def get_message_and_send(message: types.Message, state=FSMContext):
     logger.info("Запуск отправки сообщений всем пользователям")
     user_list = prepare_user_list()
@@ -209,3 +209,20 @@ async def send_photo(teleg_id, **kwargs):
     except Exception as error:
         logger.error(f"Невозможно доставить сообщение пользователю {teleg_id}."
                      f"{error}")
+
+
+def register_admin_handlers(dp: Dispatcher):
+    dp.register_message_handler(go_back_message, text=go_back)
+    dp.register_message_handler(admin_menu, text=admin_menu_button)
+    dp.register_message_handler(inform_message, text=inform)
+    dp.register_message_handler(inform_message_1, text=inform_active_users)
+    dp.register_message_handler(inform_message_2, text=inform_bad_users)
+    dp.register_message_handler(change_status_message, text=change_status)
+    dp.register_message_handler(take_part_yes, text=take_part_button)
+    dp.register_message_handler(take_part_no, text=do_not_take_part_button)
+    dp.register_message_handler(start_algoritm, text=algo_start)
+    dp.register_message_handler(request_message_to_all,
+                                text=send_message_to_all_button)
+    dp.register_message_handler(get_message_and_send,
+                                state=AdminData.message_send,
+                                content_types=types.ContentTypes.ANY)

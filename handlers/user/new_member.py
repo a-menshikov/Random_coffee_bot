@@ -1,4 +1,4 @@
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
@@ -18,7 +18,7 @@ from keyboards.user import (back_message, confirm_markup,
                             skip_message, woman_message,
                             return_to_begin_button, registr_message,
                             return_to_begin_markup)
-from loader import bot, dp, logger
+from loader import bot, logger
 from states.states import UserData
 
 from handlers.user.validators import (validate_about, validate_birthday,
@@ -26,7 +26,7 @@ from handlers.user.validators import (validate_about, validate_birthday,
                                       validate_name)
 
 
-@dp.message_handler(text=return_to_begin_button, state="*")
+# @dp.message_handler(text=return_to_begin_button, state="*")
 async def return_to_begin(message: types.Message, state: FSMContext):
     """Вывод меню"""
     await state.reset_state()
@@ -41,7 +41,7 @@ def get_gender_from_db(status):
     return info[0]
 
 
-@dp.message_handler(state=UserData.check_info)
+# @dp.message_handler(state=UserData.check_info)
 async def confirmation_and_save(message: types.Message, state: FSMContext):
     """Подтверждение пользователем введенных данных"""
     if not await validate_check_info(message):
@@ -122,7 +122,7 @@ async def add_new_user_in_status_table(message):
     db_session.commit()
 
 
-@dp.message_handler(text=registr_message, state=UserData.start)
+# @dp.message_handler(text=registr_message, state=UserData.start)
 async def start_registration(message: types.Message):
     """Первое состояние. Старт регистрации."""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
@@ -161,7 +161,7 @@ async def end_registration(state, message):
     await check_data(tg_id, name, birthday, about, gender)
 
 
-@dp.message_handler(state=UserData.name)
+# @dp.message_handler(state=UserData.name)
 async def answer_name(message: types.Message, state: FSMContext):
     """Второе состояние. Сохранение имени в хранилище памяти."""
     name = message.text
@@ -186,7 +186,7 @@ async def question_birthday(message: types.Message):
     await UserData.birthday.set()
 
 
-@dp.message_handler(state=UserData.birthday)
+# @dp.message_handler(state=UserData.birthday)
 async def answer_birthday(message: types.Message, state: FSMContext):
     """Третье состояние. Сохранение даты рождения в хранилище памяти."""
     birthday = message.text
@@ -212,7 +212,7 @@ async def question_about(message: types.Message):
     await UserData.about.set()
 
 
-@dp.message_handler(state=UserData.about)
+# @dp.message_handler(state=UserData.about)
 async def answer_about(message: types.Message, state: FSMContext):
     """Четвертое состояние.
     Сохранение информации о пользователе в хранилище памяти."""
@@ -239,7 +239,7 @@ async def question_gender(message: types.Message):
     await UserData.gender.set()
 
 
-@dp.message_handler(state=UserData.gender)
+# @dp.message_handler(state=UserData.gender)
 async def answer_gender(message: types.Message, state: FSMContext):
     """Пятое состояние. Сохранение гендера в хранилище памяти."""
     gender = message.text
@@ -256,3 +256,16 @@ async def answer_gender(message: types.Message, state: FSMContext):
             gender = 2
         await state.update_data(gender=gender)
         await end_registration(state, message)
+
+
+def register_new_member_handler(dp: Dispatcher):
+    dp.register_message_handler(return_to_begin, text=return_to_begin_button,
+                                state="*")
+    dp.register_message_handler(confirmation_and_save,
+                                state=UserData.check_info)
+    dp.register_message_handler(start_registration, text=registr_message,
+                                state=UserData.start)
+    dp.register_message_handler(answer_name, state=UserData.name)
+    dp.register_message_handler(answer_birthday, state=UserData.birthday)
+    dp.register_message_handler(answer_about, state=UserData.about)
+    dp.register_message_handler(answer_gender, state=UserData.gender)

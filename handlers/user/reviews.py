@@ -1,6 +1,6 @@
 import datetime
 
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from sqlalchemy import and_, or_, desc, exists
 
@@ -15,11 +15,11 @@ from handlers.user.validators import validate_review_yes_or_no, \
 from keyboards.admin import review_messages
 from keyboards.user import skip_message, menu_markup, \
     review_yes_or_no, no_button, yes_button, review_skip
-from loader import bot, dp, logger
+from loader import bot, logger
 from states import ReviewState
 
 
-@dp.message_handler(text=review_messages)
+# @dp.message_handler(text=review_messages)
 @admin_handlers
 async def start_review(message: types.Message):
     """Запускаем процесс сбора отзывов."""
@@ -44,7 +44,7 @@ async def request_review(users_id):
                 reply_markup=review_yes_or_no()
             )
             await ReviewState.start.set()
-            logger.info(f"Соообщение пользователю {user_teleg_id} "
+            logger.info(f"Сообщение пользователю {user_teleg_id} "
                         f"для оценки встречи отправлено.")
         except Exception as error:
             logger.error(f"Сообщение пользователю c {user_teleg_id} "
@@ -53,7 +53,7 @@ async def request_review(users_id):
     logger.info("Все сообщения разосланы")
 
 
-@dp.message_handler(state=ReviewState.start)
+# @dp.message_handler(state=ReviewState.start)
 async def review_answer_yes_or_now(message: types.Message,
                                    state: FSMContext):
     """Вопрос состоялась ли встреча."""
@@ -87,9 +87,9 @@ async def question_comment(message: types.Message):
     await ReviewState.comment.set()
 
 
-@dp.message_handler(state=ReviewState.comment)
+# @dp.message_handler(state=ReviewState.comment)
 async def answer_review_comment(message: types.Message, state: FSMContext):
-    """Получение комментария к оценки встречи."""
+    """Получение комментария к оценке встречи."""
     if not await validate_about(message):
         return
     answer = message.text
@@ -117,7 +117,7 @@ async def question_grade(message: types.Message):
     await ReviewState.grade.set()
 
 
-@dp.message_handler(state=ReviewState.grade)
+# @dp.message_handler(state=ReviewState.grade)
 async def answer_review_grade(message: types.Message, state: FSMContext):
     """Получение ответа по оценке встречи."""
     grade = message.text
@@ -153,7 +153,7 @@ def preparing_list_of_users_id():
 
 
 async def save_or_update_review(message, state):
-    """Сохранние комментария в БД."""
+    """Сохранение комментария в БД."""
     data = await state.get_data()
     user_id = data.get('user_id')
     met_id = data.get('met_id')
@@ -234,3 +234,12 @@ def add_review(user_id, met_id, grade, comment):
 #    values = (user_id, user_id)
 #    mets_id = db_controller.select_query(query, values).fetchall()
 #    return [met_id[0] for met_id in mets_id]
+
+
+def register_review_handlers(dp: Dispatcher):
+    dp.register_message_handler(start_review, text=review_messages)
+    dp.register_message_handler(review_answer_yes_or_now,
+                                state=ReviewState.start)
+    dp.register_message_handler(answer_review_comment,
+                                state=ReviewState.comment)
+    dp.register_message_handler(answer_review_grade, state=ReviewState.grade)

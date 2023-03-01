@@ -22,12 +22,14 @@ send_message_to_all_button = "Сообщение пользователям"
 inform_active_users = "Участники"
 inform_bad_users = "Нарушители"
 
+
 def admin_inform_markup():
     """Кнопки отчетов."""
     markup = ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
     markup.add(inform_active_users, inform_bad_users)
     markup.add(go_back)
     return markup
+
 
 def admin_main_markup():
     """Начальная кнопка админа."""

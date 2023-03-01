@@ -7,7 +7,9 @@ from loader import logger
 
 def get_id_from_user_info_table(teleg_id):
     """Получение id пользователя по телеграм id."""
-    id_obj = db_session.query(Users.id).filter(Users.teleg_id == teleg_id).first()
+    id_obj = db_session.query(Users.id).filter(
+        Users.teleg_id == teleg_id
+    ).first()
     return id_obj[0]
 
 

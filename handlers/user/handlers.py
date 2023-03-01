@@ -1,4 +1,5 @@
 from aiogram import types, exceptions
+from aiogram.dispatcher import Dispatcher
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import MetInfo
@@ -13,13 +14,13 @@ from handlers.user.get_info_from_table import (
 )
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import *
-from loader import bot, dp, logger
+from loader import bot, logger
 
 from handlers.user.new_member import get_gender_from_db, start_registration
 from sendler import make_message
 
 
-@dp.errors_handler(exception=exceptions.RetryAfter)
+# @dp.errors_handler(exception=exceptions.RetryAfter)
 async def exception_handler(update: types.Update,
                             exception: exceptions.RetryAfter):
     await update.message.answer('Превышен лимит на данный запрос. '
@@ -28,7 +29,7 @@ async def exception_handler(update: types.Update,
     return True
 
 
-@dp.message_handler(text=[menu_message, back_to_menu])
+# @dp.message_handler(text=[menu_message, back_to_menu])
 @user_handlers
 async def main_menu(message: types.Message):
     """Вывод меню"""
@@ -39,7 +40,7 @@ async def main_menu(message: types.Message):
     )
 
 
-@dp.message_handler(text=my_profile_message)
+# @dp.message_handler(text=my_profile_message)
 @user_handlers
 async def send_profile(message: types.Message):
     """Вывод данных о пользователе"""
@@ -62,7 +63,7 @@ async def send_profile(message: types.Message):
     )
 
 
-@dp.message_handler(text=edit_profile_message)
+# @dp.message_handler(text=edit_profile_message)
 @user_handlers
 async def edit_profile(message: types.Message):
     """Перенаправление на повторную регистрацию"""
@@ -71,8 +72,8 @@ async def edit_profile(message: types.Message):
     await start_registration(message)
 
 
-@dp.message_handler(text=about_bot_message)
-async def about_bot_message(message: types.Message):
+# @dp.message_handler(text=about_bot_message)
+async def about_bot(message: types.Message):
     """Вывод информации о боте"""
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"запросил информацию о боте")
@@ -144,7 +145,7 @@ https://t\.me/Loravel\n
     )
 
 
-@dp.message_handler(text=my_status_message)
+# @dp.message_handler(text=my_status_message)
 @user_handlers
 async def status_message(message: types.Message):
     """Вывод статуса участия в распределении"""
@@ -174,7 +175,7 @@ async def status_message(message: types.Message):
                 f"получил информацию о статусе участия")
 
 
-@dp.message_handler(text=my_pare_button)
+# @dp.message_handler(text=my_pare_button)
 @user_handlers
 async def my_pare_check(message: types.Message):
     await check_username(message)
@@ -205,3 +206,14 @@ async def my_pare_check(message: types.Message):
                          f'не отправлено. Ошибка {error}')
     logger.info(f"Пользователь с TG_ID {message.from_user.id} "
                 f"получил информацию о своей паре")
+
+
+def register_user_handlers(dp: Dispatcher):
+    dp.register_errors_handler(exception_handler,
+                               exception=exceptions.RetryAfter)
+    dp.register_message_handler(main_menu, text=[menu_message, back_to_menu])
+    dp.register_message_handler(send_profile, text=my_profile_message)
+    dp.register_message_handler(edit_profile, text=edit_profile_message)
+    dp.register_message_handler(about_bot, text=about_bot_message)
+    dp.register_message_handler(status_message, text=my_status_message)
+    dp.register_message_handler(my_pare_check, text=my_pare_button)
