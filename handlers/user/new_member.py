@@ -116,10 +116,12 @@ async def add_new_user_in_status_table(message):
     """Проставляем статусы участия в таблицах БД"""
     user_id = get_id_from_user_info_table(message.from_user.id)
     db_session.add(UserStatus(id=user_id))
-    db_session.add(UserMets(id=user_id))
-    db_session.add(Holidays(id=user_id))
-    await check_username(message)
     db_session.commit()
+    db_session.add(UserMets(id=user_id))
+    db_session.commit()
+    db_session.add(Holidays(id=user_id))
+    db_session.commit()
+    await check_username(message)
 
 
 # @dp.message_handler(text=registr_message, state=UserData.start)
