@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from aiogram import types
+from aiogram.dispatcher import Dispatcher
 from sqlalchemy import and_
 
 from controllerBD.db_loader import db_session
@@ -13,10 +14,10 @@ from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import holidays_length, set_holiday_message, \
     one_week_holidays_message, two_week_holidays_message, \
     three_week_holidays_message, turn_off_holidays
-from loader import bot, dp, logger
+from loader import bot, logger
 
 
-@dp.message_handler(text=set_holiday_message)
+# @dp.message_handler(text=set_holiday_message)
 @user_handlers
 async def check_and_choice_holidays(message: types.Message):
     """Проверка и выбор срока каникул"""
@@ -40,7 +41,7 @@ def message_for_holidays(date_to_return):
     )
 
 
-@dp.message_handler(text=one_week_holidays_message)
+# @dp.message_handler(text=one_week_holidays_message)
 @user_handlers
 async def get_one_week_holidays(message: types.Message):
     """Установка каникул на 1 неделю"""
@@ -52,7 +53,7 @@ async def get_one_week_holidays(message: types.Message):
     )
 
 
-@dp.message_handler(text=two_week_holidays_message)
+# @dp.message_handler(text=two_week_holidays_message)
 @user_handlers
 async def get_two_week_holidays(message: types.Message):
     """Установка каникул на 2 недели"""
@@ -64,7 +65,7 @@ async def get_two_week_holidays(message: types.Message):
     )
 
 
-@dp.message_handler(text=three_week_holidays_message)
+# @dp.message_handler(text=three_week_holidays_message)
 @user_handlers
 async def get_three_week_holidays(message: types.Message):
     """Установка каникул на 3 недели"""
@@ -76,7 +77,7 @@ async def get_three_week_holidays(message: types.Message):
     )
 
 
-@dp.message_handler(text=turn_off_holidays)
+# @dp.message_handler(text=turn_off_holidays)
 @user_handlers
 async def cancel_holidays(message: types.Message):
     """Отключение режима каникул"""
@@ -145,3 +146,15 @@ async def sheduled_check_holidays():
             )
             logger.info(f'Каникулы юзера {user_id} отключены автопроверкой')
     logger.info('Конец автопроверки статуса каникул')
+
+
+def register_holidays_handlers(dp: Dispatcher):
+    dp.register_message_handler(check_and_choice_holidays,
+                                text=set_holiday_message)
+    dp.register_message_handler(get_one_week_holidays,
+                                text=one_week_holidays_message)
+    dp.register_message_handler(get_two_week_holidays,
+                                text=two_week_holidays_message)
+    dp.register_message_handler(get_three_week_holidays,
+                                text=three_week_holidays_message)
+    dp.register_message_handler(cancel_holidays, text=turn_off_holidays)

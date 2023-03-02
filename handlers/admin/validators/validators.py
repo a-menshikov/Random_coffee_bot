@@ -70,6 +70,3 @@ async def check_id_in_base(user_id):
     if not is_exist:
         return False
     return True
-
-
-

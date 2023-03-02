@@ -1,4 +1,4 @@
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
@@ -14,7 +14,7 @@ from handlers.user.get_info_from_table import get_id_from_user_info_table, \
     get_user_info_by_id
 from handlers.user.work_with_date import date_from_db_to_message
 from keyboards.user import review_yes_or_no, my_reviews
-from loader import dp, bot, logger
+from loader import bot, logger
 from states import ReviewState
 
 review_callbackdata = CallbackData("dun_w", "position", "edit")
@@ -29,9 +29,9 @@ def list_of_user_mets_id(user_id):
     return [met_id[0] for met_id in met_ids]
 
 
-@dp.message_handler(text=my_reviews)
+# @dp.message_handler(text=my_reviews)
 @user_handlers
-async def my_reviews(message: types.Message):
+async def get_my_reviews(message: types.Message):
     """Выводим карточку с последней встречей"""
     await check_username(message)
     user_id = get_id_from_user_info_table(message.from_user.id)
@@ -56,7 +56,7 @@ async def my_reviews(message: types.Message):
                     f'о последней встрече {met_id}')
 
 
-@dp.callback_query_handler(review_callbackdata.filter())
+# @dp.callback_query_handler(review_callbackdata.filter())
 async def button_press(call: types.CallbackQuery, callback_data: dict,
                        state: FSMContext):
     """Выводим информацию о встрече в зависимости от позиции."""
@@ -185,3 +185,9 @@ def get_sqliterow_review(met_id, user_id):
     except NoResultFound:
         review_info = None
     return review_info
+
+
+def register_review_history_handler(dp: Dispatcher):
+    dp.register_message_handler(get_my_reviews, text=my_reviews)
+    dp.register_callback_query_handler(button_press,
+                                       review_callbackdata.filter())

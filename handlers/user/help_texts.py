@@ -1,10 +1,11 @@
 from asyncio import sleep
 
 from aiogram import types
+from aiogram.dispatcher import Dispatcher
 
 from handlers.decorators import user_handlers
 from keyboards.user import help_texts
-from loader import bot, dp
+from loader import bot
 
 help_texts_messages = [
     ("Привет! Я твой собеседник на этой неделе. "
@@ -20,7 +21,7 @@ help_texts_messages = [
 ]
 
 
-@dp.message_handler(text=help_texts)
+# @dp.message_handler(text=help_texts)
 @user_handlers
 async def send_help_texts(message: types.Message):
     """Отправка сообщений примеров."""
@@ -33,3 +34,7 @@ async def send_help_texts(message: types.Message):
         await bot.send_message(message.from_user.id,
                                f'<code>{text}</code>',
                                parse_mode='HTML')
+
+
+def register_help_texts_handlers(dp: Dispatcher):
+    dp.register_message_handler(send_help_texts, text=help_texts)

@@ -1,24 +1,34 @@
 import asyncio
 
 import aioschedule
-from aiogram import executor, types
+from aiogram import executor
 
 from data import ADMIN_TG_ID
 
 from handlers.user.holidays import sheduled_check_holidays
-from loader import bot, logger
+from loader import bot, logger, dp
 
-from handlers.user.start_handler import dp
-from handlers.user.new_member import dp
-from handlers.user.handlers import dp
-from handlers.user.help_texts import dp
-from handlers.user.holidays import dp
-from handlers.user.reviews import dp
-from handlers.admin.ban_handlers import dp
-from handlers.admin.handlers import dp
-from handlers.user.review_history import dp
-from handlers.user.unknown_message import dp
-__all__ = ['dp']
+from handlers.user.start_handler import register_start_handler
+from handlers.user.new_member import register_new_member_handler
+from handlers.user.handlers import register_user_handlers
+from handlers.user.help_texts import register_help_texts_handlers
+from handlers.user.holidays import register_holidays_handlers
+from handlers.user.reviews import register_review_handlers
+from handlers.admin.ban_handlers import register_admin_ban_handlers
+from handlers.admin.handlers import register_admin_handlers
+from handlers.user.review_history import register_review_history_handler
+from handlers.user.unknown_message import register_unknown_message_handler
+
+register_start_handler(dp)
+register_new_member_handler(dp)
+register_user_handlers(dp)
+register_help_texts_handlers(dp)
+register_holidays_handlers(dp)
+register_review_handlers(dp)
+register_review_history_handler(dp)
+register_admin_ban_handlers(dp)
+register_admin_handlers(dp)
+register_unknown_message_handler(dp)
 
 
 async def scheduler():
