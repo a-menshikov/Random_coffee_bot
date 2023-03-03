@@ -1,5 +1,4 @@
 from sqlalchemy import Integer, Column, ForeignKey, Text
-from datetime import date
 
 from .db_loader import engine, Base
 
@@ -25,7 +24,7 @@ class BanList(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     banned_user_id = Column(Integer, ForeignKey('user_info.id'))
     ban_status = Column(Integer, nullable=False, default=1)
-    date_of_ban = Column(Text(), default=str(date.today()))
+    date_of_ban = Column(Text(), nullable=False, default='null')
     comment_to_ban = Column(Text(500), nullable=False)
     date_of_unban = Column(Text(), nullable=False, default='null')
     comment_to_unban = Column(Text(500), nullable=False, default='null')
@@ -43,7 +42,7 @@ class MetInfo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     first_user_id = Column(Integer, ForeignKey('user_info.id'))
     second_user_id = Column(Integer, ForeignKey('user_info.id'))
-    date = Column(Text(), default=str(date.today()))
+    date = Column(Text())
 
 
 class MetsReview(Base):
@@ -54,8 +53,7 @@ class MetsReview(Base):
     about_whom_id = Column(Integer, ForeignKey('user_info.id'))
     grade = Column(Integer, nullable=False)
     comment = Column(Text(500), nullable=True)
-    date_of_comment = Column(Text(), default=str(date.today()),
-                             onupdate=str(date.today()))
+    date_of_comment = Column(Text())
 
 
 class UserMets(Base):

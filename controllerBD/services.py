@@ -16,7 +16,8 @@ async def update_mets(match_info: dict):
                 first_user = match[0]
                 second_user = match[1]
                 db_session.add(MetInfo(first_user_id=first_user,
-                                       second_user_id=second_user))
+                                       second_user_id=second_user,
+                                       date=str(date.today())))
         except Exception as error:
             logger.error(f'Встреча для пользователей {match} '
                          f'не записана. Ошибка - {error}')
