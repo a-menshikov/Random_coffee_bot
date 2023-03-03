@@ -199,7 +199,8 @@ def update_review(user_id, met_id, grade, comment):
         and_(MetsReview.met_id == met_id, MetsReview.who_id == user_id)
     ).update({
         'grade': grade,
-        'comment': comment
+        'comment': comment,
+        'date_of_comment': str(datetime.date.today())
     })
     db_session.commit()
     logger.info(f"Пользователь с ID {user_id} "
@@ -217,7 +218,8 @@ def add_review(user_id, met_id, grade, comment):
         about_whom_id = users['first_user_id']
     db_session.add(MetsReview(met_id=met_id, who_id=user_id,
                               about_whom_id=about_whom_id, grade=grade,
-                              comment=comment))
+                              comment=comment,
+                              date_of_comment=datetime.date.today()))
     db_session.commit()
     logger.info(f"Пользователь с ID {user_id} "
                 f"добавил комментарий о встрече {met_id}")

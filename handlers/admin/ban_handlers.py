@@ -96,7 +96,8 @@ async def save_to_ban(banned_user_id, comment):
     """Запись в БД пользователя с баном."""
     db_session.add(BanList(banned_user_id=banned_user_id,
                            ban_status=1,
-                           comment_to_ban=comment))
+                           comment_to_ban=comment,
+                           date_of_ban=str(datetime.date.today())))
     db_session.query(Holidays).filter(Holidays.id == banned_user_id). \
         update({'status': 0, 'till_date': 'null'})
     db_session.query(UserStatus).filter(UserStatus.id == banned_user_id). \
