@@ -91,13 +91,19 @@ def get_user_id_from_db(teleg_id: int) -> int:
 def get_tg_username_from_db_by_teleg_id(teleg_id: int) -> int:
     """Получает телеграм-юзернейм по telegram id"""
     base_id = get_user_id_from_db(teleg_id)
-    return db_session.query(Username.username).filter(
+    answer = db_session.query(Username.username).filter(
         Username.id == base_id
-    ).first()[0]
+    ).first()
+    if answer:
+        return answer[0]
+    return None
 
 
 def get_tg_username_from_db_by_base_id(base_id: int) -> int:
     """Получает телеграм-юзернейм по id в базе"""
-    return db_session.query(Username.username).filter(
+    answer = db_session.query(Username.username).filter(
         Username.id == base_id
-    ).first()[0]
+    ).first()
+    if answer:
+        return answer[0]
+    return None
