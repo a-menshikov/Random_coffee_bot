@@ -128,7 +128,7 @@ async def check_holidays_until(teleg_id):
 async def sheduled_check_holidays():
     """Отключение режима каникул при окончании срока. Проверка по расписанию"""
     logger.info('Начало автопроверки статуса каникул')
-    data = db_session.query(Holidays).filter(and_(
+    data = db_session.query(Holidays.id).filter(and_(
         Holidays.status == 1,
         Holidays.till_date == str(date.today())
     )).all()
