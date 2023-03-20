@@ -1,9 +1,6 @@
 .env
 *.db
 *.log
-input.txt
-output.txt
-temp.txt
 .git
 venv/
 Dockerfile
