@@ -2,10 +2,10 @@ version: '3.0'
 
 services:
   bot:
-    image: menshikovas/random_coffee_bot:latest
+    image: tbf
     working_dir: /bot
     volumes:
-      - /mnt/e/DEV/random/db:/bot/db
-      - /mnt/e/DEV/random/log:/bot/logs
+      - tbf:/bot/db
+      - tbf:/bot/logs
     restart: always
-    env_file: /mnt/e/DEV/private/random_coffee/data/.env
+    env_file: tbf/.env
