@@ -1,0 +1,11 @@
+version: '3.0'
+
+services:
+  bot:
+    image: tbf
+    working_dir: /bot
+    volumes:
+      - tbf:/bot/db
+      - tbf:/bot/logs
+    restart: always
+    env_file: tbf/.env

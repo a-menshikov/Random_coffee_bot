@@ -82,3 +82,23 @@
 
     Потребуется редактирование пути до файла в match_algoritm/MatchingHelper.py в функции start
     Организация виртуального окружения также потребует команд соответствующих ОС Windows.
+
+## Запуск проекта через Docker
+
+00. Создать в директории data/match_algoritm_data/ пустые файлы input.txt output.txt temp.txt
+
+1. сбилдить образ через Dockerfile
+
+    ```bash
+    docker build
+    ```
+
+2. Заполнить tbf поля в docker-compose.yml
+
+3. Поднять контейнер
+
+    ```bash
+    docker compose up -d
+    ```
+
+Алгоритм компилируется при сборке.

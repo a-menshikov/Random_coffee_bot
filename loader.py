@@ -25,9 +25,10 @@ aiogram_logger = logging.getLogger('aio_logger')
 logger.setLevel(logging.INFO)
 aiogram_logger.setLevel(logging.INFO)
 
-main_handler = RotatingFileHandler('my_logger.log', maxBytes=30000000,
+main_handler = RotatingFileHandler('logs/my_logger.log', maxBytes=30000000,
                                    backupCount=5)
-aiogram_handler = RotatingFileHandler('aiogram_logger.log', maxBytes=30000000,
+aiogram_handler = RotatingFileHandler('logs/aiogram_logger.log',
+                                      maxBytes=30000000,
                                       backupCount=2)
 
 

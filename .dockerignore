@@ -1,0 +1,9 @@
+.env
+*.db
+*.log
+match_algoritm/matchingalogitm
+.git
+venv/
+Dockerfile
+docker-compose.yml
+.dockerignore
