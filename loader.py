@@ -59,7 +59,7 @@ formatter.converter = timetz
 
 main_handler.setFormatter(formatter)
 aiogram_handler.setFormatter(formatter)
-schedule_logger.setFormatter(formatter)
+schedule_handler.setFormatter(formatter)
 
 bot = Bot(token=str(config.TOKEN))
 dp = Dispatcher(bot, storage=MemoryStorage())
