@@ -35,7 +35,7 @@ jobs:
             username: ${{ secrets.USER }}
             key: ${{ secrets.SSH_KEY }}
             script: |
-              cd /home/random_coffee_test/
+              cd /home/random_coffee/
               sudo docker compose down
               sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/random_coffee_bot:latest
               sudo docker pull ${{ secrets.DOCKER_USERNAME }}/random_coffee_bot:latest
