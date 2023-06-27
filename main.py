@@ -3,10 +3,10 @@ import asyncio
 import aioschedule
 from aiogram import executor
 
-from data import ADMIN_TG_ID
+from controllerBD.services import send_message_to_admins
 
 from handlers.user.holidays import sheduled_check_holidays
-from loader import bot, logger, dp
+from loader import logger, dp
 
 from handlers.user.start_handler import register_start_handler
 from handlers.user.new_member import register_new_member_handler
@@ -43,23 +43,21 @@ async def on_startup(_):
     """Выполняется во время запуска бота."""
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
-    for i in list(map(int, ADMIN_TG_ID.split())):
-        try:
-            await bot.send_message(i, 'Бот запущен')
-        except Exception as error:
-            logger.error(f'Сообщение о запуске бота не ушло. Ошибка {error}')
-    logger.info('Бот запущен')
+    message = 'Бот запущен'
+    send_message_to_admins(message)
+    # for i in list(map(int, ADMIN_TG_ID.split())):
+    #     try:
+    #         await bot.send_message(i, 'Бот запущен')
+    #     except Exception as error:
+    #         logger.error(f'Сообщение о запуске бота не ушло. Ошибка {error}')
+    logger.info(message)
 
 
 async def on_shutdown(_):
     """Выполняется во время остановки бота."""
-    for i in list(map(int, ADMIN_TG_ID.split())):
-        try:
-            await bot.send_message(i, 'Бот остановлен')
-        except Exception as error:
-            logger.error(f'Сообщение об остановке бота не ушло.'
-                         f' Ошибка {error}')
-    logger.info('Бот остановлен')
+    message = 'Бот остановлен'
+    send_message_to_admins(message)
+    logger.info(message)
 
 
 if __name__ == '__main__':
