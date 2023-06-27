@@ -125,7 +125,7 @@ async def start_algoritm(message: types.Message):
     await check_message()
     mc = MachingHelper()
     res = mc.start()
-    await send_message_to_admins(f'Создано {len(res)} пар.\n'
+    await send_message_to_admins(f'Количество пар: {len(res)}.\n'
                                  f'Начинаем отправку сообщений.')
     await mc.send_and_write(res)
     await send_message_to_admins('Сообщения пользователям отправлены.\n'
