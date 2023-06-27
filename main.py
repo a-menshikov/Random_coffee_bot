@@ -44,19 +44,14 @@ async def on_startup(_):
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
     message = 'Бот запущен'
-    send_message_to_admins(message)
-    # for i in list(map(int, ADMIN_TG_ID.split())):
-    #     try:
-    #         await bot.send_message(i, 'Бот запущен')
-    #     except Exception as error:
-    #         logger.error(f'Сообщение о запуске бота не ушло. Ошибка {error}')
+    await send_message_to_admins(message)
     logger.info(message)
 
 
 async def on_shutdown(_):
     """Выполняется во время остановки бота."""
     message = 'Бот остановлен'
-    send_message_to_admins(message)
+    await send_message_to_admins(message)
     logger.info(message)
 
 
