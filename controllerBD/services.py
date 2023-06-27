@@ -5,8 +5,8 @@ from sqlalchemy import or_, desc
 
 from .db_loader import db_session
 from .models import MetInfo, UserMets, Users, UserStatus, Username
-from data import DEFAULT_PARE_iD
-from loader import logger
+from data import ADMIN_TG_ID, DEFAULT_PARE_iD
+from loader import bot, logger
 
 
 async def update_mets(match_info: dict):
@@ -107,3 +107,12 @@ def get_tg_username_from_db_by_base_id(base_id: int) -> int:
     if answer:
         return answer[0]
     return None
+
+
+async def send_message_to_admins(message):
+    """Отправляет сообщение списку админов."""
+    for i in list(map(int, ADMIN_TG_ID.split())):
+        try:
+            await bot.send_message(i, message)
+        except Exception as error:
+            logger.error(f'Сообщение {message} не ушло админу {i}. {error}')
