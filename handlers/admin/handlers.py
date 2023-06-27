@@ -6,7 +6,8 @@ from aiogram.utils.exceptions import BotBlocked
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import UserStatus
-from controllerBD.services import get_user_count_from_db
+from controllerBD.services import (get_user_count_from_db,
+                                   send_message_to_admins)
 from handlers.admin.admin_report import prepare_user_info, \
     prepare_report_message
 from handlers.decorators import admin_handlers
@@ -120,10 +121,15 @@ async def take_part_no(message: types.Message):
 @admin_handlers
 async def start_algoritm(message: types.Message):
     """Запуск алгоритма распределения"""
+    await send_message_to_admins('Начинаем распределение')
     await check_message()
     mc = MachingHelper()
     res = mc.start()
+    await send_message_to_admins(f'Создано {len(res)} пар.\n'
+                                 f'Начинаем отправку сообщений.')
     await mc.send_and_write(res)
+    await send_message_to_admins('Сообщения пользователям отправлены.\n'
+                                 'Распределение завершено.')
 
 
 def change_admin_status(message: types.Message, status):
