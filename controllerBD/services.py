@@ -1,14 +1,13 @@
 import json
 from datetime import date
 
-from sqlalchemy import or_, desc
+from sqlalchemy import desc, or_
 
-from .db_loader import db_session
-from .models import MetInfo, UserMets, Users, UserStatus, Username
 from data import ADMIN_TG_ID, DEFAULT_PARE_iD
 from loader import bot, logger
-# from match_algoritm import MachingHelper
-# from handlers.user.check_message import check_message
+
+from .db_loader import db_session
+from .models import MetInfo, UserMets, Username, Users, UserStatus
 
 
 async def update_mets(match_info: dict):

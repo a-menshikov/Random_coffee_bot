@@ -1,37 +1,34 @@
 from asyncio import sleep
 
-from aiogram import types, Dispatcher
+from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
-
 from controllerBD.db_loader import db_session
 from controllerBD.models import UserStatus
-from controllerBD.services import (get_user_count_from_db,
-                                   send_message_to_admins)
-from handlers.admin.admin_report import prepare_user_info, \
-    prepare_report_message
-from handlers.decorators import admin_handlers
-from handlers.user.check_message import check_message, prepare_user_list, \
-    send_message
-from handlers.user.get_info_from_table import get_id_from_user_info_table
-from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
-    inform, admin_cancel_markup, change_status, admin_change_status_markup, \
-    take_part_button, do_not_take_part_button, algo_start, \
-    send_message_to_all_button, cancel, admin_inform_markup, \
-    inform_active_users, inform_bad_users
+from controllerBD.services import get_user_count_from_db
+from keyboards.admin import (admin_cancel_markup, admin_change_status_markup,
+                             admin_inform_markup, admin_menu_button,
+                             admin_menu_markup, algo_start, cancel,
+                             change_status, do_not_take_part_button, go_back,
+                             inform, inform_active_users, inform_bad_users,
+                             send_message_to_all_button, take_part_button)
 from loader import bot, logger
 from match_algoritm.MatchingHelper import start_algoritm
 from states import AdminData
 
+from handlers.admin.admin_report import (prepare_report_message,
+                                         prepare_user_info)
+from handlers.decorators import admin_handlers
+from handlers.user.check_message import prepare_user_list, send_message
+from handlers.user.get_info_from_table import get_id_from_user_info_table
 
-# @dp.message_handler(text=go_back)
+
 @admin_handlers
 async def go_back_message(message: types.Message):
     """Возврат в меню админа."""
     await admin_menu(message)
 
 
-# @dp.message_handler(text=admin_menu_button)
 @admin_handlers
 async def admin_menu(message: types.Message):
     """Вывод меню администратора."""
@@ -42,7 +39,6 @@ async def admin_menu(message: types.Message):
     )
 
 
-# @dp.message_handler(text=inform)
 @admin_handlers
 async def inform_message(message: types.Message):
     """Вывод отчета."""
@@ -53,7 +49,6 @@ async def inform_message(message: types.Message):
     )
 
 
-# @dp.message_handler(text=inform_active_users)
 @admin_handlers
 async def inform_message_1(message: types.Message):
     """Вывод сообщения со списком активных пользователей."""
@@ -65,7 +60,6 @@ async def inform_message_1(message: types.Message):
     )
 
 
-# @dp.message_handler(text=inform_bad_users)
 @admin_handlers
 async def inform_message_2(message: types.Message):
     """Получение сообщения о пользователях со штрафными балами."""
@@ -84,7 +78,6 @@ async def inform_message_2(message: types.Message):
             )
 
 
-# @dp.message_handler(text=change_status)
 @admin_handlers
 async def change_status_message(message: types.Message):
     """Вывод отчета."""
@@ -95,7 +88,6 @@ async def change_status_message(message: types.Message):
     )
 
 
-# @dp.message_handler(text=take_part_button)
 @admin_handlers
 async def take_part_yes(message: types.Message):
     """Изменение статуса на принимать участие."""
@@ -106,7 +98,6 @@ async def take_part_yes(message: types.Message):
     )
 
 
-# @dp.message_handler(text=do_not_take_part_button)
 @admin_handlers
 async def take_part_no(message: types.Message):
     """Изменение статуса на не принимать участие."""
@@ -117,21 +108,9 @@ async def take_part_no(message: types.Message):
     )
 
 
-# @dp.message_handler(text=algo_start)
 @admin_handlers
 async def handler_start_algoritm(message: types.Message):
     await start_algoritm()
-    """Ручной запуск алгоритма распределения."""
-
-    # await send_message_to_admins('Начинаем распределение')
-    # await check_message()
-    # mc = MachingHelper()
-    # res = mc.start()
-    # await send_message_to_admins(f'Количество пар: {len(res)}.\n'
-    #                              f'Начинаем отправку сообщений.')
-    # await mc.send_and_write(res)
-    # await send_message_to_admins('Сообщения пользователям отправлены.\n'
-    #                              'Распределение завершено.')
 
 
 def change_admin_status(message: types.Message, status):
@@ -140,7 +119,6 @@ def change_admin_status(message: types.Message, status):
         update({'status': status})
 
 
-# @dp.message_handler(text=send_message_to_all_button)
 @admin_handlers
 async def request_message_to_all(message: types.Message):
     await bot.send_message(
@@ -151,8 +129,6 @@ async def request_message_to_all(message: types.Message):
     await AdminData.message_send.set()
 
 
-# @dp.message_handler(state=AdminData.message_send,
-#                     content_types=types.ContentTypes.ANY)
 async def get_message_and_send(message: types.Message, state=FSMContext):
     logger.info("Запуск отправки сообщений всем пользователям")
     user_list = prepare_user_list()
