@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import BotBlocked
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import UserStatus
-from controllerBD.services import (get_user_count_from_db, start_algoritm,
+from controllerBD.services import (get_user_count_from_db,
                                    send_message_to_admins)
 from handlers.admin.admin_report import prepare_user_info, \
     prepare_report_message
@@ -20,7 +20,7 @@ from keyboards.admin import admin_menu_button, admin_menu_markup, go_back, \
     send_message_to_all_button, cancel, admin_inform_markup, \
     inform_active_users, inform_bad_users
 from loader import bot, logger
-from match_algoritm import MachingHelper
+from match_algoritm.MatchingHelper import start_algoritm
 from states import AdminData
 
 

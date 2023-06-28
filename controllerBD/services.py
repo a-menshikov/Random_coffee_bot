@@ -118,16 +118,3 @@ async def send_message_to_admins(message):
             await bot.send_message(i, message)
         except Exception as error:
             logger.error(f'Сообщение {message} не ушло админу {i}. {error}')
-
-
-async def start_algoritm():
-    """Запуск алгоритма распределения"""
-    await send_message_to_admins('Начинаем распределение')
-    await check_message()
-    mc = MachingHelper()
-    res = mc.start()
-    await send_message_to_admins(f'Количество пар: {len(res)}.\n'
-                                 f'Начинаем отправку сообщений.')
-    await mc.send_and_write(res)
-    await send_message_to_admins('Сообщения пользователям отправлены.\n'
-                                 'Распределение завершено.')

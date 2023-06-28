@@ -3,7 +3,8 @@ import asyncio
 import aioschedule
 from aiogram import executor
 
-from controllerBD.services import send_message_to_admins, start_algoritm
+from controllerBD.services import send_message_to_admins
+from match_algoritm.MatchingHelper import start_algoritm
 
 from handlers.user.holidays import sheduled_check_holidays
 from loader import logger, dp
@@ -33,8 +34,8 @@ register_unknown_message_handler(dp)
 
 async def scheduler():
     """Расписание выполнения задач."""
-    aioschedule.every().day.at("09:50").do(sheduled_check_holidays)
-    aioschedule.every().wednesday.at("09:52").do(start_algoritm)
+    aioschedule.every().day.at("09:57").do(sheduled_check_holidays)
+    aioschedule.every().wednesday.at("09:59").do(start_algoritm)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
