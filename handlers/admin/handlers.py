@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import BotBlocked
 
 from controllerBD.db_loader import db_session
 from controllerBD.models import UserStatus
-from controllerBD.services import (get_user_count_from_db,
+from controllerBD.services import (get_user_count_from_db, start_algoritm,
                                    send_message_to_admins)
 from handlers.admin.admin_report import prepare_user_info, \
     prepare_report_message
@@ -119,17 +119,19 @@ async def take_part_no(message: types.Message):
 
 # @dp.message_handler(text=algo_start)
 @admin_handlers
-async def start_algoritm(message: types.Message):
-    """Запуск алгоритма распределения"""
-    await send_message_to_admins('Начинаем распределение')
-    await check_message()
-    mc = MachingHelper()
-    res = mc.start()
-    await send_message_to_admins(f'Количество пар: {len(res)}.\n'
-                                 f'Начинаем отправку сообщений.')
-    await mc.send_and_write(res)
-    await send_message_to_admins('Сообщения пользователям отправлены.\n'
-                                 'Распределение завершено.')
+async def handler_start_algoritm(message: types.Message):
+    await start_algoritm()
+    """Ручной запуск алгоритма распределения."""
+
+    # await send_message_to_admins('Начинаем распределение')
+    # await check_message()
+    # mc = MachingHelper()
+    # res = mc.start()
+    # await send_message_to_admins(f'Количество пар: {len(res)}.\n'
+    #                              f'Начинаем отправку сообщений.')
+    # await mc.send_and_write(res)
+    # await send_message_to_admins('Сообщения пользователям отправлены.\n'
+    #                              'Распределение завершено.')
 
 
 def change_admin_status(message: types.Message, status):
@@ -226,7 +228,7 @@ def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(change_status_message, text=change_status)
     dp.register_message_handler(take_part_yes, text=take_part_button)
     dp.register_message_handler(take_part_no, text=do_not_take_part_button)
-    dp.register_message_handler(start_algoritm, text=algo_start)
+    dp.register_message_handler(handler_start_algoritm, text=algo_start)
     dp.register_message_handler(request_message_to_all,
                                 text=send_message_to_all_button)
     dp.register_message_handler(get_message_and_send,

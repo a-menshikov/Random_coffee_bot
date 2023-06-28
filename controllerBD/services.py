@@ -7,6 +7,8 @@ from .db_loader import db_session
 from .models import MetInfo, UserMets, Users, UserStatus, Username
 from data import ADMIN_TG_ID, DEFAULT_PARE_iD
 from loader import bot, logger
+from match_algoritm import MachingHelper
+from handlers.user.check_message import check_message
 
 
 async def update_mets(match_info: dict):
@@ -116,3 +118,16 @@ async def send_message_to_admins(message):
             await bot.send_message(i, message)
         except Exception as error:
             logger.error(f'Сообщение {message} не ушло админу {i}. {error}')
+
+
+async def start_algoritm():
+    """Запуск алгоритма распределения"""
+    await send_message_to_admins('Начинаем распределение')
+    await check_message()
+    mc = MachingHelper()
+    res = mc.start()
+    await send_message_to_admins(f'Количество пар: {len(res)}.\n'
+                                 f'Начинаем отправку сообщений.')
+    await mc.send_and_write(res)
+    await send_message_to_admins('Сообщения пользователям отправлены.\n'
+                                 'Распределение завершено.')
