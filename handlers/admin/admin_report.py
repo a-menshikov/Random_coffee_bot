@@ -24,7 +24,7 @@ def prepare_user_info():
             ON mr.about_whom_id = bl.banned_user_id
             WHERE mr.grade = 0
             GROUP BY mr.about_whom_id
-            ORDER BY mr.date_of_comment DESC""")
+            ORDER BY mr.date_of_comment""")
 
     users = db_session.execute(query)
     return users

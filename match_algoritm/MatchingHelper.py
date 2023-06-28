@@ -1,9 +1,11 @@
-import subprocess
 import json
+import subprocess
 
 from controllerBD.db_loader import db_session
-from controllerBD.models import UserStatus, UserMets
-from controllerBD.services import update_mets, update_all_user_mets
+from controllerBD.models import UserMets, UserStatus
+from controllerBD.services import (send_message_to_admins,
+                                   update_all_user_mets, update_mets)
+from handlers.user.check_message import check_message
 from loader import bot, logger
 from sendler.match_messages import send_match_messages
 
@@ -83,3 +85,16 @@ class MachingHelper():
         logger.info("Завершение работы алгоритма")
         logger.info(f'пары {matches}')
         return matches
+
+
+async def start_algoritm():
+    """Запуск алгоритма распределения"""
+    await send_message_to_admins('Начинаем распределение')
+    await check_message()
+    mc = MachingHelper()
+    res = mc.start()
+    await send_message_to_admins(f'Количество пар: {len(res)}.\n'
+                                 f'Начинаем отправку сообщений.')
+    await mc.send_and_write(res)
+    await send_message_to_admins('Сообщения пользователям отправлены.\n'
+                                 'Распределение завершено.')

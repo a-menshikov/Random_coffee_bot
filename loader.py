@@ -22,18 +22,32 @@ logger = logging.getLogger('main_logger')
 
 aiogram_logger = logging.getLogger('aio_logger')
 
+schedule_logger = logging.getLogger('schedule')
+
 logger.setLevel(logging.INFO)
 aiogram_logger.setLevel(logging.INFO)
+schedule_logger.setLevel(level=logging.DEBUG)
 
-main_handler = RotatingFileHandler('logs/my_logger.log', maxBytes=30000000,
-                                   backupCount=5)
-aiogram_handler = RotatingFileHandler('logs/aiogram_logger.log',
-                                      maxBytes=30000000,
-                                      backupCount=2)
+main_handler = RotatingFileHandler(
+    'logs/my_logger.log',
+    maxBytes=30000000,
+    backupCount=5,
+)
+aiogram_handler = RotatingFileHandler(
+    'logs/aiogram_logger.log',
+    maxBytes=30000000,
+    backupCount=2,
+)
+schedule_handler = RotatingFileHandler(
+    'logs/schedule_logger.log',
+    maxBytes=30000000,
+    backupCount=2,
+)
 
 
 logger.addHandler(main_handler)
 aiogram_logger.addHandler(aiogram_handler)
+schedule_logger.addHandler(schedule_handler)
 
 formatter = logging.Formatter(
     fmt=('%(asctime)s.%(msecs)d %(levelname)s '
@@ -45,6 +59,7 @@ formatter.converter = timetz
 
 main_handler.setFormatter(formatter)
 aiogram_handler.setFormatter(formatter)
+schedule_handler.setFormatter(formatter)
 
 bot = Bot(token=str(config.TOKEN))
 dp = Dispatcher(bot, storage=MemoryStorage())
