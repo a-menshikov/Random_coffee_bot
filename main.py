@@ -33,7 +33,7 @@ register_unknown_message_handler(dp)
 async def scheduler():
     """Расписание выполнения задач."""
     aioschedule.every().day.at("13:00").do(sheduled_check_holidays)
-    aioschedule.every().monday.at("10:20").do(start_algoritm)
+    aioschedule.every().monday.at("06:37").do(start_algoritm)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)

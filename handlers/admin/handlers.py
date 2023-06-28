@@ -110,6 +110,7 @@ async def take_part_no(message: types.Message):
 
 @admin_handlers
 async def handler_start_algoritm(message: types.Message):
+    """Ручной запуск алгоритма."""
     await start_algoritm()
 
 
