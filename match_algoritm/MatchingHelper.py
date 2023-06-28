@@ -1,9 +1,11 @@
-import subprocess
 import json
+import subprocess
 
 from controllerBD.db_loader import db_session
-from controllerBD.models import UserStatus, UserMets
-from controllerBD.services import update_mets, update_all_user_mets, send_message_to_admins, check_message
+from controllerBD.models import UserMets, UserStatus
+from controllerBD.services import (send_message_to_admins,
+                                   update_all_user_mets, update_mets)
+from handlers.user.check_message import check_message
 from loader import bot, logger
 from sendler.match_messages import send_match_messages
 

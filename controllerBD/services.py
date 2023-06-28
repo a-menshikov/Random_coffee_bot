@@ -7,8 +7,8 @@ from .db_loader import db_session
 from .models import MetInfo, UserMets, Users, UserStatus, Username
 from data import ADMIN_TG_ID, DEFAULT_PARE_iD
 from loader import bot, logger
-from match_algoritm import MachingHelper
-from handlers.user.check_message import check_message
+# from match_algoritm import MachingHelper
+# from handlers.user.check_message import check_message
 
 
 async def update_mets(match_info: dict):
