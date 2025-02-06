@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, Session
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-engine = create_engine('sqlite:///db/coffee_database.db')
-engine.connect()
-db_session = Session(bind=engine)
+from data.config import DB_DSN
+
+engine = create_engine(DB_DSN, pool_pre_ping=True, isolation_level='AUTOCOMMIT')
+Session = sessionmaker(bind=engine)
 
 Base = declarative_base()

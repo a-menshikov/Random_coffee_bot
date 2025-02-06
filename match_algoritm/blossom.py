@@ -3,13 +3,15 @@ def get_maximum_matching(graph, matching, i):
     print(i)
     augmenting_path = get_augmenting_path(graph, matching)
     if len(augmenting_path) > 0:
-        return get_maximum_matching(graph, matching.augment(augmenting_path), i+1)
+        return get_maximum_matching(graph, matching.augment(augmenting_path), i + 1)
     else:
         return matching
 
 
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 """Получить наибольший поток в графе"""
+
+
 def get_augmenting_path(graph, matching):
     forest = Forest()
     graph.unmark_all_edges()
@@ -31,14 +33,14 @@ def get_augmenting_path(graph, matching):
                 else:
                     if forest.get_root(v) != forest.get_root(w):
                         path = forest.get_path_from_root_to(
-                            v) + forest.get_path_to_root_from(w)
+                            v
+                        ) + forest.get_path_to_root_from(w)
                         return path
                     else:
                         blossom = forest.get_blossom(v, w)
                         graph_prime = graph.contract(blossom)
                         matching_prime = matching.contract(blossom)
-                        path_prime = get_augmenting_path(
-                            graph_prime, matching_prime)
+                        path_prime = get_augmenting_path(graph_prime, matching_prime)
                         path = graph.lift_path(path_prime, blossom)
                         return path
             graph.mark_edge(e)
@@ -61,13 +63,15 @@ class Graph:
 
     def __assert_representation(self):
         for t in self.adjacency:
-            assert len(
-                self.adjacency[t]) > 0, 'Если вершина существует в матрице смежности, она должна иметь хотя бы одного соседа.'
+            assert (
+                len(self.adjacency[t]) > 0
+            ), "Если вершина существует в матрице смежности, она должна иметь хотя бы одного соседа."
             for u in self.adjacency[t]:
                 self.__assert_edge_exists((t, u))
         for t in self.unmarked_adjacency:
-            assert len(
-                self.unmarked_adjacency[t]) > 0, 'Если вершина существует в непомеченной матрице смежности, она должна иметь хотя бы одного соседа.'
+            assert (
+                len(self.unmarked_adjacency[t]) > 0
+            ), "Если вершина существует в непомеченной матрице смежности, она должна иметь хотя бы одного соседа."
             for u in self.unmarked_adjacency[t]:
                 self.__assert_edge_exists((t, u))
                 self.__assert_unmarked_edge_exists((t, u))
@@ -75,38 +79,52 @@ class Graph:
     def __assert_edge_exists(self, edge):
         v, w = edge
         assert (v in self.adjacency) and (
-            w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
+            w in self.adjacency[v]
+        ), "Край должен существовать в матрице смежности"
         assert (w in self.adjacency) and (
-            v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
+            v in self.adjacency[w]
+        ), "Взаимное ребро должно существовать в матрице смежности"
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
         print(v, w)
         assert (v not in self.adjacency) or (
-            w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
+            w not in self.adjacency[v]
+        ), "Ребро не должно существовать в матрице смежности"
         assert (w not in self.adjacency) or (
-            v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
+            v not in self.adjacency[w]
+        ), "Взаимное ребро не должно существовать в матрице смежности"
 
     def __assert_unmarked_edge_exists(self, edge):
         v, w = edge
         assert (v in self.unmarked_adjacency) and (
-            w in self.unmarked_adjacency[v]), 'Ребро должно существовать в непомеченной матрице смежности'
+            w in self.unmarked_adjacency[v]
+        ), "Ребро должно существовать в непомеченной матрице смежности"
         assert (w in self.unmarked_adjacency) and (
-            v in self.unmarked_adjacency[w]), 'Взаимное ребро должно существовать в непомеченной матрице смежности'
+            v in self.unmarked_adjacency[w]
+        ), "Взаимное ребро должно существовать в непомеченной матрице смежности"
 
     def __assert_unmarked_edge_does_not_exist(self, edge):
         v, w = edge
         assert (v not in self.unmarked_adjacency) or (
-            w not in self.unmarked_adjacency[v]), 'Ребро не должно существовать в непомеченной матрице смежности'
+            w not in self.unmarked_adjacency[v]
+        ), "Ребро не должно существовать в непомеченной матрице смежности"
         assert (w not in self.unmarked_adjacency) or (
-            v not in self.unmarked_adjacency[w]), 'Обратное ребро не должно существовать в непомеченной матрице смежности'
+            v not in self.unmarked_adjacency[w]
+        ), "Обратное ребро не должно существовать в непомеченной матрице смежности"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
+        assert (
+            vertice in self.adjacency
+        ), "Вершина должна существовать в матрице смежности"
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.adjacency, 'Вершина не должна существовать в матрице смежности'
-        assert vertice not in self.unmarked_adjacency, 'Вершина не должна существовать в непомеченной матрице смежности'
+        assert (
+            vertice not in self.adjacency
+        ), "Вершина не должна существовать в матрице смежности"
+        assert (
+            vertice not in self.unmarked_adjacency
+        ), "Вершина не должна существовать в непомеченной матрице смежности"
 
     """Копировать граф"""
 
@@ -219,7 +237,7 @@ class Graph:
         if len(path) == 0:
             return path
         if len(path) == 1:
-            assert False, 'Путь не может содержать ровно одну вершину'
+            assert False, "Путь не может содержать ровно одну вершину"
         if path[0] == blossom.get_id():
 
             ############################################################################################################
@@ -237,7 +255,9 @@ class Graph:
                 blossom_path.append(v)
                 if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
                     return blossom_path + path[1:]
-            assert False, 'At least one path with even edges must exist through the blossom'
+            assert (
+                False
+            ), "At least one path with even edges must exist through the blossom"
         if path[-1] == blossom.get_id():
 
             ############################################################################################################
@@ -254,10 +274,12 @@ class Graph:
                 blossom_path.append(v)
                 if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
                     return path[:-1] + list(reversed(blossom_path))
-            assert False, 'At least one path with even edges must exist through the blossom'
+            assert (
+                False
+            ), "At least one path with even edges must exist through the blossom"
         for i, v in enumerate(path):
             if v == blossom.get_id():
-                u, w = path[i-1], path[i+1]
+                u, w = path[i - 1], path[i + 1]
                 if u in self.adjacency[blossom.get_base()]:
 
                     ####################################################################################################
@@ -268,13 +290,15 @@ class Graph:
                     for v in blossom.traverse_left():
                         blossom_path.append(v)
                         if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + blossom_path + path[i+1:]
+                            return path[:i] + blossom_path + path[i + 1 :]
                     blossom_path = []
                     for v in blossom.traverse_right():
                         blossom_path.append(v)
                         if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + blossom_path + path[i+1:]
-                    assert False, 'At least one path with even edges must exist through the blossom'
+                            return path[:i] + blossom_path + path[i + 1 :]
+                    assert (
+                        False
+                    ), "At least one path with even edges must exist through the blossom"
                 elif w in self.adjacency[blossom.get_base()]:
 
                     ####################################################################################################
@@ -285,15 +309,23 @@ class Graph:
                     for v in blossom.traverse_left():
                         blossom_path.append(v)
                         if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + list(reversed(blossom_path)) + path[i+1:]
+                            return (
+                                path[:i] + list(reversed(blossom_path)) + path[i + 1 :]
+                            )
                     blossom_path = []
                     for v in blossom.traverse_right():
                         blossom_path.append(v)
                         if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + list(reversed(blossom_path)) + path[i+1:]
-                    assert False, 'Через цветок должен существовать хотя бы один путь с ровными краями.'
+                            return (
+                                path[:i] + list(reversed(blossom_path)) + path[i + 1 :]
+                            )
+                    assert (
+                        False
+                    ), "Через цветок должен существовать хотя бы один путь с ровными краями."
                 else:
-                    assert False, 'Ровно одна сторона пути должна быть инцидентна основанию цветка.'
+                    assert (
+                        False
+                    ), "Ровно одна сторона пути должна быть инцидентна основанию цветка."
         return path
 
 
@@ -319,43 +351,61 @@ class Matching:
     def __assert_edge_exists(self, edge):
         v, w = edge
         assert (v in self.adjacency) and (
-            w in self.adjacency[v]), 'Край должен существовать в матрице смежности'
+            w in self.adjacency[v]
+        ), "Край должен существовать в матрице смежности"
         assert (w in self.adjacency) and (
-            v in self.adjacency[w]), 'Взаимное ребро должно существовать в матрице смежности'
-        assert edge in self.edges, 'Край должен существовать в наборе ребер'
+            v in self.adjacency[w]
+        ), "Взаимное ребро должно существовать в матрице смежности"
+        assert edge in self.edges, "Край должен существовать в наборе ребер"
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
         assert (v not in self.adjacency) or (
-            w not in self.adjacency[v]), 'Ребро не должно существовать в матрице смежности'
+            w not in self.adjacency[v]
+        ), "Ребро не должно существовать в матрице смежности"
         assert (w not in self.adjacency) or (
-            v not in self.adjacency[w]), 'Взаимное ребро не должно существовать в матрице смежности'
-        assert edge not in self.edges, 'Ребро не должно существовать в наборе ребер'
+            v not in self.adjacency[w]
+        ), "Взаимное ребро не должно существовать в матрице смежности"
+        assert edge not in self.edges, "Ребро не должно существовать в наборе ребер"
 
     def __assert_vertice_is_exposed(self, vertice):
-        assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
-        assert vertice in self.exposed_vertices, 'Вершина должна существовать в наборе вершин.'
-        assert len(self.adjacency[vertice]
-                   ) == 0, 'Вершина не должна иметь соседей'
+        assert (
+            vertice in self.adjacency
+        ), "Вершина должна существовать в матрице смежности"
+        assert (
+            vertice in self.exposed_vertices
+        ), "Вершина должна существовать в наборе вершин."
+        assert len(self.adjacency[vertice]) == 0, "Вершина не должна иметь соседей"
 
     def __assert_vertice_is_not_exposed(self, vertice):
-        assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
-        assert vertice not in self.exposed_vertices, 'Вершина должна существовать в наборе вершин'
-        assert len(
-            self.adjacency[vertice]) == 1, 'Вершина должна иметь ровно одного соседа'
+        assert (
+            vertice in self.adjacency
+        ), "Вершина должна существовать в матрице смежности"
+        assert (
+            vertice not in self.exposed_vertices
+        ), "Вершина должна существовать в наборе вершин"
+        assert (
+            len(self.adjacency[vertice]) == 1
+        ), "Вершина должна иметь ровно одного соседа"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.adjacency, 'Вершина должна существовать в матрице смежности'
+        assert (
+            vertice in self.adjacency
+        ), "Вершина должна существовать в матрице смежности"
         if vertice in self.exposed_vertices:
-            assert len(
-                self.adjacency[vertice]) == 0, 'Если вершина открыта, у нее не должно быть соседей'
+            assert (
+                len(self.adjacency[vertice]) == 0
+            ), "Если вершина открыта, у нее не должно быть соседей"
         else:
-            assert len(
-                self.adjacency[vertice]) == 1, 'Если вершина не открыта, она должна иметь ровно одного соседа.'
+            assert (
+                len(self.adjacency[vertice]) == 1
+            ), "Если вершина не открыта, она должна иметь ровно одного соседа."
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.adjacency, 'Вершина не должна существовать в матрице смежности'
-        assert vertice not in self.exposed_vertices, 'Вершина не должна быть открыта'
+        assert (
+            vertice not in self.adjacency
+        ), "Вершина не должна существовать в матрице смежности"
+        assert vertice not in self.exposed_vertices, "Вершина не должна быть открыта"
 
     def copy(self):
         self.__assert_representation()
@@ -377,8 +427,8 @@ class Matching:
         matching.__assert_vertice_is_exposed(path[-1])
         matching.exposed_vertices.remove(path[0])
         matching.exposed_vertices.remove(path[-1])
-        for i in range(len(path)-1):
-            v, w = path[i], path[i+1]
+        for i in range(len(path) - 1):
+            v, w = path[i], path[i + 1]
             edge = tuple(sorted((v, w)))
             if edge in matching.edges:
                 matching.__assert_edge_exists(edge)
@@ -456,24 +506,34 @@ class Forest:
     def __assert_representation(self):
         for vertice in self.roots:
             self.__assert_vertice_exists(vertice)
-        assert self.roots.keys() == self.distances_to_root.keys(
-        ), 'Корни и расстояния до корня должны иметь одинаковые ключи'
-        assert self.roots.keys() == self.parents.keys(
-        ), 'Корни и родители mut имеют одинаковые ключи'
+        assert (
+            self.roots.keys() == self.distances_to_root.keys()
+        ), "Корни и расстояния до корня должны иметь одинаковые ключи"
+        assert (
+            self.roots.keys() == self.parents.keys()
+        ), "Корни и родители mut имеют одинаковые ключи"
         for vertice in self.unmarked_even_vertices:
             self.__assert_vertice_exists(vertice)
-            assert self.distances_to_root[vertice] % 2 == 0, 'Неотмеченная четная вершина должна иметь четное расстояние до корня'
+            assert (
+                self.distances_to_root[vertice] % 2 == 0
+            ), "Неотмеченная четная вершина должна иметь четное расстояние до корня"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.roots, 'Вершина должна иметь корень'
-        assert vertice in self.distances_to_root, 'Вершина должна иметь расстояние до корня'
-        assert vertice in self.parents, 'Вершина должна иметь родителя'
+        assert vertice in self.roots, "Вершина должна иметь корень"
+        assert (
+            vertice in self.distances_to_root
+        ), "Вершина должна иметь расстояние до корня"
+        assert vertice in self.parents, "Вершина должна иметь родителя"
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.roots, 'Вершина не должна иметь корня'
-        assert vertice not in self.distances_to_root, 'Вершина не должна иметь расстояние до корня'
-        assert vertice not in self.unmarked_even_vertices, 'Вершина не должна существовать в наборе непомеченных четных вершин.'
-        assert vertice not in self.parents, 'Вершина не должна иметь родителя'
+        assert vertice not in self.roots, "Вершина не должна иметь корня"
+        assert (
+            vertice not in self.distances_to_root
+        ), "Вершина не должна иметь расстояние до корня"
+        assert (
+            vertice not in self.unmarked_even_vertices
+        ), "Вершина не должна существовать в наборе непомеченных четных вершин."
+        assert vertice not in self.parents, "Вершина не должна иметь родителя"
 
     def add_singleton_tree(self, vertice):
         self.__assert_vertice_does_not_exist(vertice)
@@ -493,7 +553,9 @@ class Forest:
     def mark_vertice(self, vertice):
         self.__assert_vertice_exists(vertice)
         if self.distances_to_root[vertice] % 2 == 0:
-            assert vertice in self.unmarked_even_vertices, 'Если вершина имеет четное расстояние до корня, она должна существовать в наборе непомеченных четных вершин.'
+            assert (
+                vertice in self.unmarked_even_vertices
+            ), "Если вершина имеет четное расстояние до корня, она должна существовать в наборе непомеченных четных вершин."
             self.unmarked_even_vertices.remove(vertice)
         self.__assert_representation()
 
@@ -520,7 +582,9 @@ class Forest:
                 self.unmarked_even_vertices.add(w)
             self.parents[w] = v
         else:
-            assert False, 'По крайней мере, одна инцидентная вершина не должна существовать'
+            assert (
+                False
+            ), "По крайней мере, одна инцидентная вершина не должна существовать"
         self.__assert_representation()
 
     def get_distance_to_root(self, vertice):
@@ -548,7 +612,8 @@ class Forest:
             parent = self.parents[parent]
         path.append(root)
         assert len(set(path)) == len(
-            path), 'Путь к корню не должен содержать повторяющихся вершин.'
+            path
+        ), "Путь к корню не должен содержать повторяющихся вершин."
         return path
 
     def get_blossom(self, v, w):
@@ -564,19 +629,22 @@ class Forest:
                 break
             else:
                 v_blossom_vertices.append(u)
-        assert common_ancestor is not None, 'Должен существовать общий предок'
+        assert common_ancestor is not None, "Должен существовать общий предок"
         w_blossom_vertices = []
         for u in w_path:
             if u == common_ancestor:
                 break
             else:
                 w_blossom_vertices.append(u)
-        blossom_vertices = [common_ancestor] + \
-            list(reversed(v_blossom_vertices)) + w_blossom_vertices
+        blossom_vertices = (
+            [common_ancestor] + list(reversed(v_blossom_vertices)) + w_blossom_vertices
+        )
         assert len(set(blossom_vertices)) == len(
-            blossom_vertices), 'Цветок не должен содержать повторяющихся вершин.'
-        assert len(
-            blossom_vertices) % 2 != 0, 'Цветок должен содержать нечетное количество вершин'
+            blossom_vertices
+        ), "Цветок не должен содержать повторяющихся вершин."
+        assert (
+            len(blossom_vertices) % 2 != 0
+        ), "Цветок должен содержать нечетное количество вершин"
         blossom = Blossom(blossom_vertices, common_ancestor)
         return blossom
 
@@ -593,11 +661,13 @@ class Blossom:
         self.__assert_representation()
 
     def __assert_representation(self):
-        assert self.vertices[0] == self.base, 'Цветок должен начинаться с базовой вершины'
-        assert len(
-            self.vertices) % 2 != 0, 'Цветок должен иметь нечетное количество вершин'
-        assert len(
-            self.vertices) >= 3, 'Цветок должен иметь не менее трех вершин.'
+        assert (
+            self.vertices[0] == self.base
+        ), "Цветок должен начинаться с базовой вершины"
+        assert (
+            len(self.vertices) % 2 != 0
+        ), "Цветок должен иметь нечетное количество вершин"
+        assert len(self.vertices) >= 3, "Цветок должен иметь не менее трех вершин."
 
     def get_id(self):
         self.__assert_representation()

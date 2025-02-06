@@ -1,11 +1,29 @@
-version: '3.0'
+version: '3.8'
 
 services:
-  bot:
-    image: tbf
-    working_dir: /bot
-    volumes:
-      - tbf:/bot/db
-      - tbf:/bot/logs
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: random-coffee-bot
+    env_file:
+      - .env
+    environment:
+      - DB_DSN=postgresql://bot_user:bot_password@db:5432/bot_database
+    depends_on:
+      - db
     restart: always
-    env_file: tbf/.env
+
+  db:
+    image: postgres:latest
+    container_name: postgres-random-coffee
+    environment:
+      POSTGRES_USER: bot_user
+      POSTGRES_PASSWORD: bot_password
+      POSTGRES_DB: bot_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:

@@ -1,20 +1,24 @@
 import datetime
 
-from aiogram import types, Dispatcher
+from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
-from controllerBD.db_loader import db_session
+from controllerBD.db_loader import Session
 from controllerBD.models import BanList, Holidays, UserStatus
 from handlers.admin.handlers import admin_menu
-from handlers.admin.validators import ban_validator, comment_validator, \
-    unban_validator
+from handlers.admin.validators import ban_validator, comment_validator, unban_validator
 from handlers.decorators import admin_handlers
-from keyboards.admin import cancel, ban_list, admin_ban_markup, \
-    add_to_ban_list, admin_cancel_markup, remove_from_ban_list, \
-    back_to_main_markup
+from keyboards.admin import (
+    add_to_ban_list,
+    admin_ban_markup,
+    admin_cancel_markup,
+    back_to_main_markup,
+    ban_list,
+    cancel,
+    remove_from_ban_list,
+)
 from keyboards.user import back_to_main
 from loader import bot, logger
-
 from states import AdminData
 
 
@@ -30,9 +34,7 @@ async def cancel_message(message: types.Message, state: FSMContext):
 async def ban_list_message(message: types.Message):
     """Вывод сообщения с выбором действия по бану."""
     await bot.send_message(
-        message.from_user.id,
-        "Что вы хотите сделать?",
-        reply_markup=admin_ban_markup()
+        message.from_user.id, "Что вы хотите сделать?", reply_markup=admin_ban_markup()
     )
 
 
@@ -44,7 +46,7 @@ async def ban_list_add(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         "Введите id пользователя, которого необходимо забанить:",
-        reply_markup=admin_cancel_markup()
+        reply_markup=admin_cancel_markup(),
     )
     await AdminData.user_ban.set()
 
@@ -52,8 +54,7 @@ async def ban_list_add(message: types.Message):
 # @dp.message_handler(state=AdminData.user_ban)
 async def ban_list_add_answer(message: types.Message, state: FSMContext):
     """Получение ответа от админа и проверка введенного id."""
-    logger.info(f"Для добавления в бан введен пользователь "
-                f"с if {message.text}.")
+    logger.info(f"Для добавления в бан введен пользователь " f"с if {message.text}.")
     user_id = message.text
     if not await ban_validator(message):
         return
@@ -81,28 +82,34 @@ async def comment_to_ban_answer(message: types.Message, state: FSMContext):
     if not await comment_validator(comment):
         await bot.send_message(
             message.from_user.id,
-            "Комментарий должен быть не менее 10 и не более 500 символов"
+            "Комментарий должен быть не менее 10 и не более 500 символов",
         )
         return
     data = await state.get_data()
-    banned_user_id = data.get('banned_user_id')
+    banned_user_id = data.get("banned_user_id")
     await save_to_ban(banned_user_id, comment)
-    await bot.send_message(message.from_user.id,
-                           "Пользователь добавлен в бан-лист")
+    await bot.send_message(message.from_user.id, "Пользователь добавлен в бан-лист")
     await back_to_main_message(message, state)
 
 
 async def save_to_ban(banned_user_id, comment):
     """Запись в БД пользователя с баном."""
-    db_session.add(BanList(banned_user_id=banned_user_id,
-                           ban_status=1,
-                           comment_to_ban=comment,
-                           date_of_ban=str(datetime.date.today())))
-    db_session.query(Holidays).filter(Holidays.id == banned_user_id). \
-        update({'status': 0, 'till_date': 'null'})
-    db_session.query(UserStatus).filter(UserStatus.id == banned_user_id). \
-        update({'status': 0})
-    db_session.commit()
+    with Session() as db_session:
+        db_session.add(
+            BanList(
+                banned_user_id=banned_user_id,
+                ban_status=1,
+                comment_to_ban=comment,
+                date_of_ban=str(datetime.date.today()),
+            )
+        )
+        db_session.query(Holidays).filter(Holidays.id == banned_user_id).update(
+            {"status": 0, "till_date": "null"}
+        )
+        db_session.query(UserStatus).filter(UserStatus.id == banned_user_id).update(
+            {"status": 0}
+        )
+        db_session.commit()
 
 
 # @dp.message_handler(text=remove_from_ban_list)
@@ -113,7 +120,7 @@ async def ban_list_remove(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         "Введите id пользователя, которого необходимо убрать из бан листа:",
-        reply_markup=admin_cancel_markup()
+        reply_markup=admin_cancel_markup(),
     )
     await AdminData.user_unban.set()
 
@@ -121,8 +128,7 @@ async def ban_list_remove(message: types.Message):
 # @dp.message_handler(state=AdminData.user_unban)
 async def ban_list_remove_answer(message: types.Message, state: FSMContext):
     """Получение ответа с id пользователем для вывода из бана. Валидация."""
-    logger.info(f"Для вывода из бана введен пользователь "
-                f"с if {message.text}.")
+    logger.info(f"Для вывода из бана введен пользователь " f"с if {message.text}.")
     user_id = message.text
     if not await unban_validator(message):
         return
@@ -149,27 +155,30 @@ async def comment_to_unban_answer(message: types.Message, state: FSMContext):
     if not await comment_validator(comment):
         await bot.send_message(
             message.from_user.id,
-            "Комментарий должен быть не менее 10 и не более 500 символов"
+            "Комментарий должен быть не менее 10 и не более 500 символов",
         )
         return
     data = await state.get_data()
-    unbanned_user_id = data.get('unbanned_user_id')
+    unbanned_user_id = data.get("unbanned_user_id")
     await save_to_unban(unbanned_user_id, comment)
-    await bot.send_message(message.from_user.id,
-                           "Пользователь исключен из бан-листа")
+    await bot.send_message(message.from_user.id, "Пользователь исключен из бан-листа")
     await back_to_main_message(message, state)
 
 
 async def save_to_unban(unbanned_user_id, comment):
     """Сохранение в БД, что пользователь выведен из бана."""
-    db_session.query(BanList).filter(
-        BanList.banned_user_id == unbanned_user_id
-    ).update({'ban_status': 0,
-              'date_of_unban': datetime.date.today(),
-              'comment_to_unban': comment})
-    db_session.query(UserStatus).filter(UserStatus.id == unbanned_user_id). \
-        update({'status': 1})
-    db_session.commit()
+    with Session() as db_session:
+        db_session.query(BanList).filter(BanList.banned_user_id == unbanned_user_id).update(
+            {
+                "ban_status": 0,
+                "date_of_unban": datetime.date.today(),
+                "comment_to_unban": comment,
+            }
+        )
+        db_session.query(UserStatus).filter(UserStatus.id == unbanned_user_id).update(
+            {"status": 1}
+        )
+        db_session.commit()
 
 
 # @dp.message_handler(text=back_to_main, state="*")
@@ -179,7 +188,7 @@ async def back_to_main_message(message: types.Message, state: FSMContext):
     await bot.send_message(
         message.from_user.id,
         "Вы в главном меню",
-        reply_markup=back_to_main_markup(message)
+        reply_markup=back_to_main_markup(message),
     )
 
 
@@ -188,12 +197,10 @@ def register_admin_ban_handlers(dp: Dispatcher):
     dp.register_message_handler(ban_list_message, text=ban_list)
     dp.register_message_handler(ban_list_add, text=add_to_ban_list)
     dp.register_message_handler(ban_list_add_answer, state=AdminData.user_ban)
-    dp.register_message_handler(comment_to_ban_answer,
-                                state=AdminData.comment_to_ban)
+    dp.register_message_handler(comment_to_ban_answer, state=AdminData.comment_to_ban)
     dp.register_message_handler(ban_list_remove, text=remove_from_ban_list)
-    dp.register_message_handler(ban_list_remove_answer,
-                                state=AdminData.user_unban)
-    dp.register_message_handler(comment_to_unban_answer,
-                                state=AdminData.comment_to_unban)
-    dp.register_message_handler(back_to_main_message,
-                                text=back_to_main, state="*")
+    dp.register_message_handler(ban_list_remove_answer, state=AdminData.user_unban)
+    dp.register_message_handler(
+        comment_to_unban_answer, state=AdminData.comment_to_unban
+    )
+    dp.register_message_handler(back_to_main_message, text=back_to_main, state="*")

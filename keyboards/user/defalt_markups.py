@@ -2,13 +2,13 @@ from aiogram.types import ReplyKeyboardMarkup
 
 from data import ADMIN_TG_ID
 
-back_message = '👈 Назад'
-skip_message = '👉 Пропустить'
-all_right_message = '✅ Все верно'
-cancel_message = '🚫 Отменить'
-menu_message = '🏠 Меню'
-confirm_message = '✅ Да'
-reject_message = '❌ Нет'
+back_message = "👈 Назад"
+skip_message = "👉 Пропустить"
+all_right_message = "✅ Все верно"
+cancel_message = "🚫 Отменить"
+menu_message = "🏠 Меню"
+confirm_message = "✅ Да"
+reject_message = "❌ Нет"
 edit_profile_message = "👩🏿‍🎨 Изменить Профиль"
 my_profile_message = "Мой профиль"
 my_status_message = "Мой статус"
@@ -26,7 +26,7 @@ three_week_holidays_message = "3 недели"
 turn_off_holidays = "Отключить"
 back_to_menu = "Вернуться в меню"
 my_pare_button = "Моя пара"
-back_to_main = 'Главное меню'
+back_to_main = "Главное меню"
 
 
 def main_markup():

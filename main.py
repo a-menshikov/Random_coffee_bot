@@ -8,8 +8,7 @@ from handlers.admin.ban_handlers import register_admin_ban_handlers
 from handlers.admin.handlers import register_admin_handlers
 from handlers.user.handlers import register_user_handlers
 from handlers.user.help_texts import register_help_texts_handlers
-from handlers.user.holidays import (register_holidays_handlers,
-                                    sheduled_check_holidays)
+from handlers.user.holidays import register_holidays_handlers, sheduled_check_holidays
 from handlers.user.new_member import register_new_member_handler
 from handlers.user.review_history import register_review_history_handler
 from handlers.user.reviews import register_review_handlers
@@ -43,20 +42,19 @@ async def on_startup(_):
     """Выполняется во время запуска бота."""
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
-    message = 'Бот запущен'
+    message = "Бот запущен"
     await send_message_to_admins(message)
     logger.info(message)
 
 
 async def on_shutdown(_):
     """Выполняется во время остановки бота."""
-    message = 'Бот остановлен'
+    message = "Бот остановлен"
     await send_message_to_admins(message)
     logger.info(message)
 
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True,
-                           on_startup=on_startup,
-                           on_shutdown=on_shutdown
-                           )
+if __name__ == "__main__":
+    executor.start_polling(
+        dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown
+    )

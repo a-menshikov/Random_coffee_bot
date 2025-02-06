@@ -13,6 +13,7 @@ def admin_handlers(func):
         message = list(args)[0]
         if message.from_user.id in list(map(int, ADMIN_TG_ID.split())):
             return await func(*args)
+
     return wrapped
 
 
@@ -25,9 +26,8 @@ def user_handlers(func):
             else:
                 await bot.send_message(
                     message.from_user.id,
-                    ("Ты заблокирован. Пожалуйста, "
-                     "обратись к администратору."),
-                    reply_markup=ReplyKeyboardRemove()
+                    ("Ты заблокирован. Пожалуйста, " "обратись к администратору."),
+                    reply_markup=ReplyKeyboardRemove(),
                 )
         else:
             await bot.send_message(
@@ -35,6 +35,7 @@ def user_handlers(func):
                 "Ты не зарегистрирован. Введи 'Регистрация' без кавычек "
                 "или нажми кнопку снизу.",
                 reply_markup=start_registr_markup(),
-                )
+            )
             await UserData.start.set()
+
     return wrapped
